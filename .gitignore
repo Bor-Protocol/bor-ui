@@ -23,3 +23,11 @@ dist-ssr
 *.sln
 *.sw?
 src/components/3d/stresstest.py
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Example environment file should be committed
+!.env.example
