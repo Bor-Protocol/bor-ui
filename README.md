@@ -81,5 +81,6 @@ In order to use the twitch chat, you need to create a twitch account and get the
 from https://twitchtokengenerator.com/ select bot chat token
 
 In order to use twitter chat you need to install the extension.
-
-to activate only twitch 
+to activate only twitch use VITE_TWITCH_ENABLED=true
+to activate only twitter use VITE_TWITCH_ENABLED=true
+to activate both use VITE_TWITCH_ENABLED=true and VITE_TWITCH_ENABLED=true
