@@ -26,8 +26,7 @@ src/components/3d/stresstest.py
 
 # Environment variables
 .env
-.env.local
-.env.*.local
 
-# Example environment file should be committed
+
+# Allow example env
 !.env.example
