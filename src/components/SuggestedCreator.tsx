@@ -1,5 +1,4 @@
-import { Heart, User } from "lucide-react";
-import { useViewerCount } from "../hooks/useViewerCount";
+import {  User } from "lucide-react";
 import Avatar from "./Avatar";
 import { useEffect, useState } from "react";
 
@@ -16,15 +15,13 @@ interface SuggestedCreatorProps {
 }
 
 export function SuggestedCreator({ creator, onCreatorClick }: SuggestedCreatorProps) {
-    const viewerCount = useViewerCount(creator.agentId);
-    const likeCount = 0;
     const [animateCount, setAnimateCount] = useState(false);
 
     useEffect(() => {
         setAnimateCount(true);
         const timer = setTimeout(() => setAnimateCount(false), 300); // Reset animation
         return () => clearTimeout(timer);
-    }, [viewerCount]); // Trigger animation when viewerCount changes
+    }, []); // Trigger animation when viewerCount changes
 
     return (
         <div
@@ -48,7 +45,7 @@ export function SuggestedCreator({ creator, onCreatorClick }: SuggestedCreatorPr
                             animateCount ? 'translate-y-2 opacity-0' : 'translate-y-0 opacity-100'
                         }`}
                     >
-                        {viewerCount}
+                        {0}
                     </span>
                 </span>
                 {/* <Heart className="w-4 h-4 text-red-500 ml-2"/>

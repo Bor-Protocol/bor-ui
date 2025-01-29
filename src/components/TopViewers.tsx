@@ -1,7 +1,6 @@
 import { useScene } from '../contexts/ScenesContext';
 import { useTopGifters } from '../hooks/useGiftsApi';
 import { ChevronRight } from 'lucide-react';
-import { cn } from '../lib/utils';
 
 export interface TopStreamer {
   id: string;

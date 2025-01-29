@@ -1,12 +1,9 @@
-import { Moon, Sun, Circle, Pencil, Coins, Terminal } from 'lucide-react';
+import { Moon, Sun, Pencil } from 'lucide-react';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useTheme } from '../contexts/ThemeContext';
 import { useUser } from '../contexts/UserContext';
-import { RechargeModal } from './RechargeModal';
 import { TerminalOverlay } from './TerminalOverlay';
-import { BORP_MINT, COIN_LOGO } from '../utils/constants';
-import { useTokenBalance } from '../hooks/useTokenBalance';
 
 interface HeaderProps {
   onMenuClick: () => void;

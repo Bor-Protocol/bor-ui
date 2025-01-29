@@ -1,6 +1,5 @@
 import { useScene } from '../contexts/ScenesContext';
 import { X, Loader2 } from 'lucide-react';
-import Avatar from './Avatar';
 
 interface GiftConfirmationModalProps {
   isOpen: boolean;

@@ -1,5 +1,5 @@
 import { ChatSection } from './ChatSection';
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useScene } from '../contexts/ScenesContext';
 import SceneWrapper from './SceneWrapper';
 import { useParams, useNavigate } from 'react-router-dom';

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Terminal, X, Heart } from 'lucide-react';
+import {  X, Heart } from 'lucide-react';
 import { useScene } from '../contexts/ScenesContext';
 
 interface TerminalOverlayProps {

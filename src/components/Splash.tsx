@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import  { useEffect } from 'react';
 import './Splash.css';  // Create this file for the styles
 
 const Splash = () => {

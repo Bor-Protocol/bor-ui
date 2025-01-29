@@ -1,13 +1,9 @@
-import React, { Suspense, useCallback, useRef, useState, useEffect } from 'react';
-import { Maximize2, Minimize2, Share2, MoreHorizontal, Heart, User, Layout, Lock, Unlock } from 'lucide-react';
-import DefaultScene from './3d/DefaultScene';
-import { ErrorBoundary } from 'react-error-boundary';
+import React, { Suspense, useRef, useState, useEffect } from 'react';
+import { Maximize2, Minimize2, Share2, Heart, User, Layout } from 'lucide-react';
 
 
-import { Canvas, useFrame } from '@react-three/fiber';
-import { PerspectiveCamera, Environment, OrbitControls } from '@react-three/drei';
-import * as THREE from 'three';
-import { SceneConfig } from '@/config/scenes';
+import { Canvas } from '@react-three/fiber';
+import { OrbitControls } from '@react-three/drei';
 import { Scene } from './old/Scene';
 import ThreeScene from './3d/ThreeScene';
 import { useScene } from '../contexts/ScenesContext';
@@ -20,7 +16,6 @@ import { GiftNotifications } from './old/GiftNotifications';
 
 import { CommentDrawer } from './old/CommentDrawer';
 import { ShareDrawer } from './old/ShareDrawer';
-import { useGifts } from '../hooks/useGifts';
 import { useSocket } from '../hooks/useSocket';
 import Avatar from './Avatar';
 import { useStreamCount } from '../hooks/useStreamCount';
