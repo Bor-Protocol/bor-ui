@@ -15,7 +15,7 @@ export function TerminalOverlay({ isOpen, onClose }: TerminalOverlayProps) {
   useEffect(() => {
     if (!isOpen) {
       setLines([]);
-      return;ma
+      return;
     }
 
     const thoughts = [

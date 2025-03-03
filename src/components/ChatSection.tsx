@@ -2,10 +2,8 @@ import './WebSocketProvider';  // Import this first!
 
 import { useState, useEffect, useRef } from 'react';
 import { X, Heart } from 'lucide-react';
-import { TopViewers, TopStreamer } from './TopViewers';
 import { useScene } from '../contexts/ScenesContext';
 import { useUser } from '../contexts/UserContext';
-import { useTopGifters } from '../hooks/useGiftsApi';
 import { HeartAnimation } from './old/HeartAnimation';
 import { validateMessage, sanitizeMessage } from '../utils/messageValidation';
 import { Client } from 'tmi.js';
@@ -69,29 +67,7 @@ const getBadgeStyle = (badge: Badge) => {
   return `${baseStyle} bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300`;
 };
 
-const INITIAL_TOP_STREAMERS: TopStreamer[] = [
-  {
-    id: '1',
-    username: "Helleyy",
-    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=48&h=48&fit=crop",
-    rank: 1,
-    coins: 2000
-  },
-  {
-    id: '2',
-    username: "DropOff",
-    avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=48&h=48&fit=crop",
-    rank: 2,
-    coins: 1500
-  },
-  {
-    id: '3',
-    username: "Never Broke...",
-    avatar: "https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=48&h=48&fit=crop",
-    rank: 3,
-    coins: 800
-  }
-];
+
 
 const INITIAL_MESSAGES: Message[] = [
   {
@@ -147,10 +123,8 @@ const SIMULATED_MESSAGES = [
 export function ChatSection({ onClose }: ChatSectionProps) {
   const { comments, addComment, currentAgentId, triggerLike, lastLikeTimestamp } = useScene();
   const [newMessage, setNewMessage] = useState('');
-  const [showTopStreamers, setShowTopStreamers] = useState(true);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const messageContainerRef = useRef<HTMLDivElement>(null);
-  const [topStreamers, setTopStreamers] = useState(INITIAL_TOP_STREAMERS);
   const { userProfile } = useUser();
   const [likeCount, setLikeCount] = useState(15);
   const [isLiked, setIsLiked] = useState(false);
@@ -172,7 +146,6 @@ export function ChatSection({ onClose }: ChatSectionProps) {
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
 
 
-  const { data: topViewers, isLoading } = useTopGifters(currentAgentId, 3);
 
   // // console.log({ topViewers });
   const [isConnected, setIsConnected] = useState(false);
@@ -544,19 +517,7 @@ const client = new Client({
     return () => clearInterval(timer);
   }, [timeLeft]);
 
-  const getTopViewerBadge = (userAddress: string): Badge | undefined => {
-    if (!topViewers?.topGifters) return undefined;
-
-    const viewerIndex = topViewers.topGifters.findIndex(viewer => viewer._id === userAddress);
-    if (viewerIndex === -1) return undefined;
-
-    return {
-      icon: '👑',
-      text: `${viewerIndex + 1}`,
-      type: 'special',
-      color: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300'
-    };
-  };
+  
 
   const renderMessage = (message: Message) => {
     if (message.messageType === 'gift') {
@@ -612,13 +573,7 @@ const client = new Client({
                   {badge.text && <span>{badge.text}</span>}
                 </div>
               ))}
-              {/* Add top streamer badge if applicable */}
-              {getTopViewerBadge(message.user) && (
-                <div className={getBadgeStyle(getTopViewerBadge(message.user)!)}>
-                  <span>{getTopViewerBadge(message.user)!.icon}</span>
-                  <span>{getTopViewerBadge(message.user)!.text}</span>
-                </div>
-              )}
+             
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-300">{message.message}</p>
           </div>
@@ -640,12 +595,7 @@ const client = new Client({
               {message.handle }
             </span>
             {/* Add top viewer badge if applicable */}
-            {getTopViewerBadge(message.user) && (
-              <div className={getBadgeStyle(getTopViewerBadge(message.user)!)}>
-                <span>{getTopViewerBadge(message.user)!.icon}</span>
-                <span>{getTopViewerBadge(message.user)!.text}</span>
-              </div>
-            )}
+           
             <p className="text-sm text-gray-600 dark:text-gray-300">{message.message}</p>
           </div>
         </div>
@@ -675,11 +625,7 @@ const client = new Client({
 
       <HeartAnimation isLiked={isHeartAnimating} />
 
-      <TopViewers
-        expanded={showTopStreamers}
-        onToggle={() => setShowTopStreamers(!showTopStreamers)}
-        streamers={topStreamers}
-      />
+     
 
       <div
         ref={messageContainerRef}

@@ -22,6 +22,7 @@ export interface SceneConfig {
     stats: SceneStats;
     creator?: CreatorProfile;
     walletAddress?: string;
+    clothes: string;
 }
 
 // Component mapping for dynamic imports

@@ -73,14 +73,7 @@ interface SceneContextType {
   isLoading: boolean;
   error: Error | null;
   refreshScenes: () => Promise<void>;
-  sendGift: (gift: {
-    count: number,
-    name: string,
-    icon: string,
-    coins: number,
-    txHash: string,
-    recipientAddress: string
-  }) => void;
+
   sceneConfigIndex: number;
   setSceneConfigIndex: (index: number) => void;
   swapSceneConfig: (index: number) => void;
@@ -186,8 +179,6 @@ export function SceneProvider({ children }: { children: ReactNode }) {
   const nextSceneIndex = (currentSceneIndex + 1) % newScenes.length;
   const prevSceneIndex = (currentSceneIndex - 1 + newScenes.length) % newScenes.length;
 
-  const { notifications, addNotification } = useGiftNotifications(currentSceneIndex);
-  const { refetch: refetchTopViewers } = useTopGifters(currentAgentId, 3);
 
 
   // Update currentAgentId when scenes change
@@ -358,75 +349,7 @@ export function SceneProvider({ children }: { children: ReactNode }) {
     }
   }, [scene, currentAgentId]);
 
-  // Add the sendGift function
-  const sendGift = useCallback((gift: {
-    count: number,
-    name: string,
-    icon: string,
-    coins: number,
-    txHash: string
-  }) => {
-    if (!socket || !userId) return;
 
-    // Get the recipient wallet address from the current scene or use the default
-    const recipientWallet = scene?.walletAddress || STREAMER_ADDRESS;
-
-    const giftEvent = {
-      senderPublicKey: userId,
-      recipientAgentId: currentAgentId,
-      recipientWallet, // Use the recipient wallet address
-      giftName: gift.name,
-      giftCount: gift.count,
-      coinsTotal: gift.coins * gift.count,
-      txHash: gift.txHash,
-      icon: gift.icon,
-      timestamp: Date.now(),
-      handle: userProfile?.handle || undefined, // Include user's handle
-      avatar: userProfile?.pfp || undefined // Include user's pfp
-    };
-
-    // console.log('Emitting gift event:', giftEvent);
-    emit('new_gift', giftEvent);
-
-    setTimeout(() => {
-      refetchTopViewers();
-    }, 1000);
-
-    // Optionally add a system message to the chat
-    // addComment(
-    //     `Sent ${gift.count}x ${gift.icon} ${gift.name} (${gift.coins * gift.count} USDC)`,
-    //     false,
-    //     false
-    // );
-  }, [socket, userId, currentAgentId, scene, emit, addComment, userProfile]);
-
-  // Listen for server's response to the gift event
-  const { addNotification: _addGiftNotification } = useGiftNotifications(currentSceneIndex);
-  useEffect(() => {
-    if (!socket) return;
-
-    const handleGiftReceived = (data: any) => {
-      // console.log('Gift received from server:', data);
-      // Update chat log or UI with the received gift data
-      addComment(
-        `sent ${data.giftCount}x ${data.icon} ${data.giftName})`,
-        false,
-        false,
-        'gift',
-        data
-      );
-
-      addNotification(data.giftName, data.icon, data.giftCount);
-
-    };
-
-    // Listen for the specific event emitted by the server
-    socket.on(`${currentAgentId}_gift_received`, handleGiftReceived);
-
-    return () => {
-      socket.off(`${currentAgentId}_gift_received`, handleGiftReceived);
-    };
-  }, [socket, currentAgentId, addComment]);
 
   if (isLoading) {
     return <Splash />; // Or any loading indicator you prefer
@@ -468,7 +391,6 @@ export function SceneProvider({ children }: { children: ReactNode }) {
         isLoading,
         error,
         refreshScenes,
-        sendGift,
 
 
         sceneConfigIndex,

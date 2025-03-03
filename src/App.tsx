@@ -1,7 +1,6 @@
 import { Header } from './components/Header';
 import { LiveStream } from './components/LiveStream';
-import { ProfileModal } from './components/ProfileModal';
-import { ToastContainer } from './components/Toast';
+
 import { useState } from 'react';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { UserProvider } from './contexts/UserContext';
@@ -35,9 +34,8 @@ export default function App() {
                             <Route path="/" element={<InnerApp />} />
                             <Route path="/configure" element={<SceneConfigurator />} />
                             <Route path="/docs" element={<DocsPage />} />
-                          </Routes>
-                          <ProfileModal />
-                          <ToastContainer />
+                          </Routes>       
+                        
                       </SceneEngineProvider>
                     </ModalProvider>
                   </SceneProvider>
@@ -57,16 +55,11 @@ const InnerApp = () => {
     <div className="flex flex-col h-screen overflow-hidden overscroll-none dark:bg-dark">
       <Header onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)} />
       <div className="flex flex-1 overflow-hidden">
-        <div>
-          {/* <Sidebar /> */}
-        </div>
+      
         <div className="flex-1 min-w-0">
           <LiveStream />
         </div>
       </div>
-      {/*       <ProfileModal /> */}
-       {/* <ToastContainer /> */}
-      
       
     </div>
   )

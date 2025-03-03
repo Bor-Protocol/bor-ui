@@ -2,26 +2,20 @@ import { ChatSection } from './ChatSection';
 import { useState, useRef, useEffect } from 'react';
 import { useScene } from '../contexts/ScenesContext';
 import SceneWrapper from './SceneWrapper';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 export function LiveStream() {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(true);//
   const {
-    triggerLike,
     setCurrentSceneIndex,
-    activeScene,
     setActiveScene,
-    scenes
+    newScenes: scenes
   } = useScene();
   const containerRef = useRef<HTMLDivElement>(null);
-  const [isTerminalOpen, setIsTerminalOpen] = useState(false);
 
   const { modelName } = useParams<{ modelName: string }>();
 
-  const navigate = useNavigate();
-
-  const [isLiked, setIsLiked] = useState(false);
 
   // Handle model name from URL
   useEffect(() => {
@@ -83,33 +77,7 @@ export function LiveStream() {
 
 
 
-  // Handle like ******
-  const handleLike = () => {
-    setIsLiked(true);
-    triggerLike();
-    setTimeout(() => setIsLiked(false), 300);
-  };
 
-
-  // Handle double tap to like
-  useEffect(() => {
-    let lastTap = 0;
-    const handleDoubleTap = (e: TouchEvent) => {
-      const currentTime = new Date().getTime();
-      const tapLength = currentTime - lastTap;
-      if (tapLength < 300 && tapLength > 0) {
-        handleLike();
-        e.preventDefault();
-      }
-      lastTap = currentTime;
-    };
-
-    const element = containerRef.current;
-    if (element) {
-      element.addEventListener('touchend', handleDoubleTap);
-      return () => element.removeEventListener('touchend', handleDoubleTap);
-    }
-  }, []);
 
   const toggleFullscreen = () => {
     setIsFullscreen(!isFullscreen);
@@ -132,40 +100,32 @@ export function LiveStream() {
         >
           {scenes.map((scene, index) => (
             <div
-              key={scene.id || `${scene.someUniqueValue}-${index}`}
+              key={scene.id || `scene-${index}`}
               data-index={index}
               data-scene-index={index}
               className="h-full w-full snap-start snap-always flex flex-col"
             >
               <SceneWrapper
-                scene={scene}
+                scene={{
+                  ...scene,
+                  id: scene.id.toString(),
+                  creator: {
+                    ...scene.creator,
+                    name: scene.creator.title,
+                    description: scene.creator.title,
+                    followers: 0
+                  }
+                }}
                 isFullscreen={isFullscreen}
                 toggleFullscreen={toggleFullscreen}
                 index={index}
                 toggleChat={() => setIsChatOpen(!isChatOpen)}
               />
-
-              {/* Gift Bar */}
-              <div className={`
-                flex-none bg-[#18181b]/95 backdrop-blur-sm
-                transition-opacity duration-300
-                
-                ${isFullscreen ? 'opacity-0 hover:opacity-100' : ''}
-              `}>
-              </div>
             </div>
           ))}
         </div>
 
-        {/* Mobile chat toggle button */}
-        {/* {!isFullscreen && (
-          <button
-            onClick={() => setIsChatOpen(!isChatOpen)}
-            className="md:hidden fixed bottom-24 right-4 z-50 bg-[#fe2c55] text-white px-4 py-2 rounded-full shadow-lg"
-          >
-            {isChatOpen ? 'Close' : 'Chat'}
-          </button>
-        )} */}
+      
       </div>
 
       {/* Chat section */}

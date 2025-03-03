@@ -48,16 +48,6 @@ export function SuggestedCreator({ creator, onCreatorClick }: SuggestedCreatorPr
                         {0}
                     </span>
                 </span>
-                {/* <Heart className="w-4 h-4 text-red-500 ml-2"/>
-                <span className="text-[10px] text-gray-600 dark:text-gray-300 overflow-hidden">
-                    <span 
-                        className={`inline-block transition-transform duration-300 ${
-                            animateCount ? 'translate-y-2 opacity-0' : 'translate-y-0 opacity-100'
-                        }`}
-                    >
-                        {likeCount}
-                    </span>
-                </span> */}
             </div>
         </div>
     );

@@ -12,7 +12,7 @@ import {
   LoopRepeat,
   Vector3
 } from 'three';
-import { loadMixamoAnimation } from '../old/loadMixamoAnimation.js';
+import { loadMixamoAnimation } from '../old/loadMixamoAnimation';
 import { useScene } from '../../contexts/ScenesContext.js';
 // import Note from '../Note';
 

@@ -1,26 +1,13 @@
 import React, { Suspense, useRef, useState, useEffect } from 'react';
-import { Maximize2, Minimize2, Share2, Heart, User, Layout } from 'lucide-react';
 
 
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
-import { Scene } from './old/Scene';
 import ThreeScene from './3d/ThreeScene';
 import { useScene } from '../contexts/ScenesContext';
-import { SideActions } from './old/SideActions';
-import { HeartAnimation } from './old/HeartAnimation';
-import { LiveChat } from './old/LiveChat';
-import AIResponseDisplay from './old/AIResponseDisplay';
-import { useGiftNotifications } from '../hooks/useGiftNotifications';
-import { GiftNotifications } from './old/GiftNotifications';
 
-import { CommentDrawer } from './old/CommentDrawer';
-import { ShareDrawer } from './old/ShareDrawer';
-import { useSocket } from '../hooks/useSocket';
-import Avatar from './Avatar';
-import { useStreamCount } from '../hooks/useStreamCount';
+
 import { useSceneEngine } from '../contexts/SceneEngineContext';
-import { toast } from 'sonner';
 
 interface Creator {
     name: string;
@@ -60,7 +47,7 @@ export function OrbitingBall({ color, delay }: OrbitingBallProps) {
     );
 }
 
-export function OrbitingBall2({ color, delay }: OrbitingBallProps) {
+export function OrbitingBall2({  delay }: OrbitingBallProps) {
     return (
         <div
             className={`absolute left-1/2 top-1/2 -ml-1.5 -mt-1.5 ${delay ? 'animate-orbit-delayed' : 'animate-orbit'
@@ -100,13 +87,13 @@ function SceneErrorFallback() {
 }
 
 
-function SceneContent({ scene, isActive, debugMode, orbitEnabled }: {
+function SceneContent({  isActive, debugMode, orbitEnabled }: {
     scene: any,
     isActive: boolean,
     debugMode: boolean,
     orbitEnabled: boolean
 }) {
-    const { scenes, activeScene, sceneConfigIndex } = useScene();
+    const { newScenes: scenes, activeScene, sceneConfigIndex } = useScene();
     const { playBackgroundMusic, stopBackgroundMusic } = useSceneEngine();
     const currentScene = scenes[activeScene];
     const prevSceneRef = useRef<string | null>(null);
@@ -122,13 +109,14 @@ function SceneContent({ scene, isActive, debugMode, orbitEnabled }: {
         
         // Handle BGM playlist
         if (Array.isArray(currentBgm)) {
-            const playNextTrack = () => {
+            //commented by abder to see what will use in future
+            /*const playNextTrack = () => {
                 setCurrentTrackIndex(prevIndex => {
                     const nextIndex = (prevIndex + 1) % currentBgm.length;
                     playBackgroundMusic(currentBgm[nextIndex]);
                     return nextIndex;
                 });
-            };
+            };*/
 
             // Play initial track
             playBackgroundMusic(currentBgm[currentTrackIndex]);
@@ -143,7 +131,7 @@ function SceneContent({ scene, isActive, debugMode, orbitEnabled }: {
     }, [activeScene, sceneConfigIndex]);
 
     useEffect(() => {
-        if (prevSceneRef.current !== currentScene.id) {
+        if (String(prevSceneRef.current) !== String(currentScene.id)) {
             setIsLoading(true);
 
             // Cleanup previous scene
@@ -156,7 +144,7 @@ function SceneContent({ scene, isActive, debugMode, orbitEnabled }: {
 
             // Load new scene after a short delay to ensure cleanup
             const loadTimer = setTimeout(() => {
-                prevSceneRef.current = currentScene.id;
+                prevSceneRef.current = currentScene.id.toString();
                 setIsLoading(false);
             }, 300);
 
@@ -191,7 +179,7 @@ function SceneContent({ scene, isActive, debugMode, orbitEnabled }: {
                 <SceneLoader />
             ) : (
                 <Canvas>
-                    <ThreeScene key={currentScene.id} debugMode={debugMode} orbitEnabled={orbitEnabled} />
+                    <ThreeScene key={currentScene.id} debugMode={debugMode}  />
                     {orbitEnabled && <OrbitControls />}
                 </Canvas>
             )}
@@ -204,45 +192,18 @@ const SceneWrapper: React.FC<SceneWrapperProps> = ({
     isFullscreen,
     toggleFullscreen,
     index,
-    toggleChat,
-    debugMode: initialDebugMode = false
 }) => {
-    const [debugMode, setDebugmode] = useState(initialDebugMode);
-    const [orbitEnabled, setOrbitEnabled] = useState(false);
+
 
     const {
-        likes,
-        triggerLike,
-        lastLikeTimestamp,
-        setLikes,
-        currentSceneIndex,
-        setCurrentSceneIndex,
+       
         activeScene,
-        setActiveScene,
-        scenes,
-        currentAgentId
+       
     } = useScene();
-    const { peerCount } = useSocket();
-    const { notifications, addNotification } = useGiftNotifications();
-    const { audioRef } = useSceneEngine();
+   
     // console.log({ audioRef })
-    // useGifts(addNotification);
-    const [isLiked, setIsLiked] = useState(false);
-    const [isHeartAnimating, setIsHeartAnimating] = useState(false);
-
-    const [isCommentDrawerOpen, setIsCommentDrawerOpen] = useState(false);
-    const [isShareDrawerOpen, setIsShareDrawerOpen] = useState(false);
-    const [isGiftsDrawerOpen, setIsGiftsDrawerOpen] = useState(false);
-
-    const viewerCount = useStreamCount(currentAgentId);
-
-    const twitter = scenes[currentSceneIndex].twitter
-
-    const handleLike = () => {
-        setIsLiked(true);
-        triggerLike();
-        setTimeout(() => setIsLiked(false), 300);
-    };
+    
+   
 
 
     // Update the viewport height effect to run immediately
@@ -266,6 +227,8 @@ const SceneWrapper: React.FC<SceneWrapperProps> = ({
             clearTimeout(initialTimeout);
         };
     }, []);
+
+
     useEffect(() => {
         // Force fullscreen on mount
         if (!isFullscreen) {
@@ -273,41 +236,10 @@ const SceneWrapper: React.FC<SceneWrapperProps> = ({
         }
     }, []);
 
-    // Heart animation
-    useEffect(() => {
-        if (lastLikeTimestamp) {
-            setIsHeartAnimating(true);
-            const timer = setTimeout(() => setIsHeartAnimating(false), 100);
-            return () => clearTimeout(timer);
-        }
-    }, [lastLikeTimestamp]);
+    
 
 
-    const handleShare = async () => {
-        const url = `https://www.borptv.com/${scene.identifier}`;
-        
-        try {
-            // Try the modern navigator.clipboard API first
-            await navigator.clipboard.writeText(url);
-            toast.success('Link copied to clipboard');
-        } catch (err) {
-            // Fallback for browsers that don't support clipboard API
-            const textarea = document.createElement('textarea');
-            textarea.value = url;
-            textarea.style.position = 'fixed';  // Avoid scrolling to bottom
-            document.body.appendChild(textarea);
-            textarea.select();
-            
-            try {
-                document.execCommand('copy');
-                toast.success('Link copied to clipboard');
-            } catch (err) {
-                toast.error('Failed to copy link');
-            } finally {
-                document.body.removeChild(textarea);
-            }
-        }
-    };
+   
 
    // Empty dependency array means this runs once on mount
 
@@ -316,150 +248,8 @@ const SceneWrapper: React.FC<SceneWrapperProps> = ({
             <div className="flex-1 relative">
                 {/* 3D Scene - Always render */}
                 <div className="absolute inset-0">
-                    <SceneContent scene={scene} isActive={activeScene === index} debugMode={debugMode} orbitEnabled={orbitEnabled} />
+                    <SceneContent scene={scene} isActive={activeScene === index} debugMode={false} orbitEnabled={false} />
                 </div>
-
-                {/* Background Image */}
-                {/* {debugMode && (
-                    <>
-                        <img 
-                            src="/images/camera.png "
-                            alt="Debug Overlay"
-                            className="absolute pointer-events-none bottom-0 left-1/2 -translate-x-1/2 w-[50%] h-[50%] object-cover"
-                            style={{ opacity: 0.8 }}
-                        />
-                    </>
-                )} */}
-
-                {/* Conditionally render everything else */}
-                {!debugMode && (
-                    <>
-                        {/* Creator Info */}
-                        <div
-                            className={`
-            absolute top-4 left-4 right-4 
-            flex items-center justify-between z-10
-            transition-opacity duration-300
-            ${isFullscreen ? 'opacity-0 hover:opacity-100' : ''}
-          `}
-                        >
-                            <div className="flex items-center gap-3 opacity-0">
-                                <Avatar avatar={scene.creator.avatar} username={scene.creator.username} />
-                                <div>
-                                    <div className="flex items-center gap-2">
-                                        <h3 className="text-white font-semibold text-sm md:text-base">
-                                            {scene.creator.username}
-                                        </h3>
-                                        <span className="text-white/80 text-xs md:text-sm hidden md:inline">
-                                            {scene.description}
-                                        </span>
-                                    </div>
-                                    <div className="flex items-center gap-2 text-xs md:text-sm text-white/80">
-                                        {/* <span className="hidden md:inline">Virtual Creator</span> */}
-                                        <div className="flex items-center gap-1  bg-black/50 px-2 py-0.5 rounded-lg">
-                                            <User size={12} className="text-pink-500" />
-                                            <span>{viewerCount}</span>
-                                        </div>
-                                        <div className="flex items-center gap-1  bg-black/50 px-2 py-0.5 rounded-lg">
-                                            <Heart size={12} className="text-red-500" />
-                                            <span>{likes}</span>
-                                        </div>
-                                        {/* <div className="flex items-center gap-1  bg-black/50 px-2 py-0.5 rounded-lg">
-                                            <span>{scene.agentId}</span>
-                                        </div> */}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="flex items-center gap-2 md:gap-3">
-                                <button
-                                    onClick={toggleFullscreen}
-                                    className="flex items-center gap-2 bg-white/10 hover:bg-white/20 p-2 md:px-4 md:py-1.5 rounded-full"
-                                >
-                                    {isFullscreen ? (
-                                        <Minimize2 size={16} className="text-white" />
-                                    ) : (
-                                        <Maximize2 size={16} className="text-white" />
-                                    )}
-                                </button>
-                                <button
-                                    onClick={() => setDebugmode(!debugMode)}
-                                    className="flex items-center gap-2 bg-white/10 hover:bg-white/20 p-2 md:px-4 md:py-1.5 rounded-full"
-                                >
-                                    <Layout size={16} className="text-white" />
-                                </button>
-                                <button
-                                    className="flex items-center gap-2 bg-white/10 hover:bg-white/20 p-2 md:px-4 md:py-1.5 rounded-full"
-                                    onClick={() => handleShare()}
-                                >
-                                    <Share2 size={16} className="text-white" />
-                                </button>
-                                {/* <button className="flex items-center gap-2 bg-white/10 hover:bg-white/20 p-2 md:px-4 md:py-1.5 rounded-full">
-                                    <MoreHorizontal size={16} className="text-white" />
-                                </button> */}
-                                <a
-                                    href={`https://twitter.com/${twitter.replace('@', '')}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="hidden md:flex items-center gap-2 bg-black text-white px-3 py-2 px-2 rounded-md font-medium text-sm hover:bg-black/80 no transition-all duration-200 ease-in-out"
-                                >
-                                    <img src={'./icons/x.svg'} alt="X" className="w-3 h-3" />
-                                    <span className="text-sm font-medium">{twitter.replace('@', '@')}</span>
-                                </a>
-                                {/* <button
-                                    onClick={() => setOrbitEnabled(!orbitEnabled)}
-                                    className="flex items-center gap-2 bg-white/10 hover:bg-white/20 p-2 md:px-4 md:py-1.5 rounded-full"
-                                >
-                                    {orbitEnabled ? (
-                                        <Unlock size={16} className="text-white" />
-                                    ) : (
-                                        <Lock size={16} className="text-white" />
-                                    )}
-                                </button> */}
-                            </div>
-                        </div>
-
-                        {/* Side Actions */}
-
-                        <SideActions
-                            likes={likes}
-                            isLiked={isLiked}
-                            onLike={handleLike}
-                            onCommentClick={() => setIsCommentDrawerOpen(true)}
-                            onShareClick={() => setIsShareDrawerOpen(true)}
-                            onGiftClick={() => setIsGiftsDrawerOpen(true)}
-                            toggleChat={toggleChat}
-                        />
-
-                        <HeartAnimation isLiked={isHeartAnimating} />
-
-                        <LiveChat />
-
-                        <AIResponseDisplay />
-
-                        <GiftNotifications notifications={notifications} />
-
-
-                        <CommentDrawer
-                            isOpen={isCommentDrawerOpen}
-                            onClose={() => setIsCommentDrawerOpen(false)}
-                            className="md:hidden"
-                        />
-
-
-
-                    
-
-
-                    </>
-                )}
-                <ShareDrawer
-                    isOpen={isShareDrawerOpen}
-                    onClose={() => setIsShareDrawerOpen(false)}
-                    className=""
-                />
-
-
             </div>
         </div>
     );

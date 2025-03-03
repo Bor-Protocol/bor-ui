@@ -34,6 +34,7 @@ interface Model {
 }
 
 export interface SceneConfig {
+  id: string;
  name: string; // scene name -- unused
  description: string; // scene description -- unused
  environmentURL: string; // environment file name -- must be a glb file located in the public/environments folder
@@ -50,6 +51,8 @@ export interface SceneConfig {
 
  // Array of models instead of single model config
  models: Model[];
+ clothes: string;
+
 }
 
 // Extend your existing NewStreamConfig interface
@@ -71,6 +74,8 @@ export interface NewStreamConfig {
    username: string;
  };
  sceneConfigs: (SceneConfig)[];  
+ stats: SceneStats;
+ clothes: string;
 }
 
 // Add BGM URL constants
@@ -175,11 +180,11 @@ export const NEW_STREAM_CONFIGS: NewStreamConfig[] = [
 
    ],
    stats: {
-     likes: 0,
      comments: 0,
      bookmarks: 0,
      shares: 0
    },
+   clothes: "casual"
  },
 ]
 
@@ -308,5 +313,11 @@ export const AGENT_MAP: { [agentId: string]: { name: string } } = {
       name: "Borp",
   },
    
+}
+
+export interface SceneStats {
+  comments: number;
+  bookmarks: number;
+  shares: number;
 }
 
