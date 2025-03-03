@@ -5,10 +5,7 @@ import { useUser } from './UserContext';
 import axios from 'axios';
 import { API_URL, NEW_STREAM_CONFIGS, StreamConfig, STREAMER_ADDRESS, NewStreamConfig } from '../utils/constants';
 import { useSceneManager } from '../hooks/useSceneManager';
-import { useTopGifters } from '../hooks/useGiftsApi';
-import { useGiftNotifications } from '../hooks/useGiftNotifications';
 import Splash from '../components/Splash';
-import { useScenesQuery } from '../hooks/useScenesApi';
 
 interface Comment {
   id: string;

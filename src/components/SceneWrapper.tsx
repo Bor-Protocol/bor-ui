@@ -5,8 +5,11 @@ import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import ThreeScene from './3d/ThreeScene';
 import { useScene } from '../contexts/ScenesContext';
+import { HeartAnimation } from './old/HeartAnimation';
+import { LiveChat } from './old/LiveChat';
+import AIResponseDisplay from './old/AIResponseDisplay';
 
-
+import { useSocket } from '../hooks/useSocket';
 import { useSceneEngine } from '../contexts/SceneEngineContext';
 
 interface Creator {
@@ -47,7 +50,7 @@ export function OrbitingBall({ color, delay }: OrbitingBallProps) {
     );
 }
 
-export function OrbitingBall2({  delay }: OrbitingBallProps) {
+export function OrbitingBall2({ color, delay }: OrbitingBallProps) {
     return (
         <div
             className={`absolute left-1/2 top-1/2 -ml-1.5 -mt-1.5 ${delay ? 'animate-orbit-delayed' : 'animate-orbit'
@@ -87,13 +90,13 @@ function SceneErrorFallback() {
 }
 
 
-function SceneContent({  isActive, debugMode, orbitEnabled }: {
+function SceneContent({ scene, isActive, debugMode, orbitEnabled }: {
     scene: any,
     isActive: boolean,
     debugMode: boolean,
     orbitEnabled: boolean
 }) {
-    const { newScenes: scenes, activeScene, sceneConfigIndex } = useScene();
+    const { scenes, activeScene, sceneConfigIndex } = useScene();
     const { playBackgroundMusic, stopBackgroundMusic } = useSceneEngine();
     const currentScene = scenes[activeScene];
     const prevSceneRef = useRef<string | null>(null);
@@ -109,14 +112,13 @@ function SceneContent({  isActive, debugMode, orbitEnabled }: {
         
         // Handle BGM playlist
         if (Array.isArray(currentBgm)) {
-            //commented by abder to see what will use in future
-            /*const playNextTrack = () => {
+            const playNextTrack = () => {
                 setCurrentTrackIndex(prevIndex => {
                     const nextIndex = (prevIndex + 1) % currentBgm.length;
                     playBackgroundMusic(currentBgm[nextIndex]);
                     return nextIndex;
                 });
-            };*/
+            };
 
             // Play initial track
             playBackgroundMusic(currentBgm[currentTrackIndex]);
@@ -131,7 +133,7 @@ function SceneContent({  isActive, debugMode, orbitEnabled }: {
     }, [activeScene, sceneConfigIndex]);
 
     useEffect(() => {
-        if (String(prevSceneRef.current) !== String(currentScene.id)) {
+        if (prevSceneRef.current !== currentScene.id) {
             setIsLoading(true);
 
             // Cleanup previous scene
@@ -144,7 +146,7 @@ function SceneContent({  isActive, debugMode, orbitEnabled }: {
 
             // Load new scene after a short delay to ensure cleanup
             const loadTimer = setTimeout(() => {
-                prevSceneRef.current = currentScene.id.toString();
+                prevSceneRef.current = currentScene.id;
                 setIsLoading(false);
             }, 300);
 
@@ -179,7 +181,7 @@ function SceneContent({  isActive, debugMode, orbitEnabled }: {
                 <SceneLoader />
             ) : (
                 <Canvas>
-                    <ThreeScene key={currentScene.id} debugMode={debugMode}  />
+                    <ThreeScene key={currentScene.id} debugMode={false} orbitEnabled={orbitEnabled} />
                     {orbitEnabled && <OrbitControls />}
                 </Canvas>
             )}
@@ -192,18 +194,26 @@ const SceneWrapper: React.FC<SceneWrapperProps> = ({
     isFullscreen,
     toggleFullscreen,
     index,
+    toggleChat,
+    debugMode: initialDebugMode = false
 }) => {
-
+    const [debugMode, setDebugmode] = useState(initialDebugMode);
+    const [orbitEnabled, setOrbitEnabled] = useState(false);
 
     const {
+       
+        lastLikeTimestamp,
        
         activeScene,
        
     } = useScene();
+    const { peerCount } = useSocket();
    
-    // console.log({ audioRef })
+    const [isHeartAnimating, setIsHeartAnimating] = useState(false);
+
+   
+
     
-   
 
 
     // Update the viewport height effect to run immediately
@@ -227,8 +237,6 @@ const SceneWrapper: React.FC<SceneWrapperProps> = ({
             clearTimeout(initialTimeout);
         };
     }, []);
-
-
     useEffect(() => {
         // Force fullscreen on mount
         if (!isFullscreen) {
@@ -236,10 +244,17 @@ const SceneWrapper: React.FC<SceneWrapperProps> = ({
         }
     }, []);
 
+    // Heart animation
+    useEffect(() => {
+        if (lastLikeTimestamp) {
+            setIsHeartAnimating(true);
+            const timer = setTimeout(() => setIsHeartAnimating(false), 100);
+            return () => clearTimeout(timer);
+        }
+    }, [lastLikeTimestamp]);
+
+
     
-
-
-   
 
    // Empty dependency array means this runs once on mount
 
@@ -248,8 +263,16 @@ const SceneWrapper: React.FC<SceneWrapperProps> = ({
             <div className="flex-1 relative">
                 {/* 3D Scene - Always render */}
                 <div className="absolute inset-0">
-                    <SceneContent scene={scene} isActive={activeScene === index} debugMode={false} orbitEnabled={false} />
+                    <SceneContent scene={scene} isActive={activeScene === index} debugMode={debugMode} orbitEnabled={orbitEnabled} />
                 </div>
+
+                        <HeartAnimation isLiked={isHeartAnimating} />
+
+                        <LiveChat />
+
+                        <AIResponseDisplay />
+
+
             </div>
         </div>
     );
