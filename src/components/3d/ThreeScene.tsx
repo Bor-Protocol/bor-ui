@@ -1,6 +1,6 @@
 import { useEffect, useRef, useCallback, useState, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { PerspectiveCamera, Environment, useGLTF, OrbitControls, Loader } from '@react-three/drei';
+import { PerspectiveCamera, Environment, useGLTF } from '@react-three/drei';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { VRMLoaderPlugin, VRMUtils } from '@pixiv/three-vrm';
 import {
@@ -9,8 +9,7 @@ import {
   Group,
   AnimationAction,
   LoopOnce,
-  LoopRepeat,
-  Vector3
+  LoopRepeat
 } from 'three';
 import { loadMixamoAnimation } from '../old/loadMixamoAnimation';
 import { useScene } from '../../contexts/ScenesContext.js';
@@ -113,7 +112,7 @@ const getModelNameFromUrl = (url: string): string => {
 };
 
 // Make CafeEnvironment a proper React component
-const CafeEnvironment: React.FC<{ environmentUrl: string, config: ModelConfig }> = ({ environmentUrl: _environmentUrl, config }) => {
+const CafeEnvironment: React.FC<{ environmentUrl: string, config: SceneConfig }> = ({ environmentUrl: _environmentUrl, config }) => {
   // console.log("CAFE_ENVIRONMENT", _environmentUrl)
   const environmentUrl = getEnvironmentUrl(_environmentUrl)
   const { scene } = useGLTF(environmentUrl);

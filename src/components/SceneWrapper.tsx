@@ -90,7 +90,7 @@ function SceneErrorFallback() {
 }
 
 
-function SceneContent({ scene, isActive, debugMode, orbitEnabled }: {
+function SceneContent({  isActive, }: {
     scene: any,
     isActive: boolean,
     debugMode: boolean,
@@ -181,8 +181,8 @@ function SceneContent({ scene, isActive, debugMode, orbitEnabled }: {
                 <SceneLoader />
             ) : (
                 <Canvas>
-                    <ThreeScene key={currentScene.id} debugMode={false} orbitEnabled={orbitEnabled} />
-                    {orbitEnabled && <OrbitControls />}
+                    <ThreeScene key={currentScene.id} debugMode={false} />
+                    {false && <OrbitControls />}
                 </Canvas>
             )}
         </Suspense>
@@ -193,12 +193,9 @@ const SceneWrapper: React.FC<SceneWrapperProps> = ({
     scene,
     isFullscreen,
     toggleFullscreen,
-    index,
-    toggleChat,
-    debugMode: initialDebugMode = false
+    index
 }) => {
-    const [debugMode, setDebugmode] = useState(initialDebugMode);
-    const [orbitEnabled, setOrbitEnabled] = useState(false);
+    
 
     const {
        
@@ -207,7 +204,6 @@ const SceneWrapper: React.FC<SceneWrapperProps> = ({
         activeScene,
        
     } = useScene();
-    const { peerCount } = useSocket();
    
     const [isHeartAnimating, setIsHeartAnimating] = useState(false);
 
@@ -263,7 +259,7 @@ const SceneWrapper: React.FC<SceneWrapperProps> = ({
             <div className="flex-1 relative">
                 {/* 3D Scene - Always render */}
                 <div className="absolute inset-0">
-                    <SceneContent scene={scene} isActive={activeScene === index} debugMode={debugMode} orbitEnabled={orbitEnabled} />
+                    <SceneContent scene={scene} isActive={activeScene === index} debugMode={false} orbitEnabled={false} />
                 </div>
 
                         <HeartAnimation isLiked={isHeartAnimating} />

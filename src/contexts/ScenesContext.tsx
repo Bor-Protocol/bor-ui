@@ -336,12 +336,7 @@ export function SceneProvider({ children }: { children: ReactNode }) {
         }
       };
 
-      // Fetch recent gifts
-      const fetchGifts = async () => {
-        
-      };
-
-      fetchGifts();
+     
       fetchComments();
     }
   }, [scene, currentAgentId]);

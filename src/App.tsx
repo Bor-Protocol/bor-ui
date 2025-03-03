@@ -26,7 +26,6 @@ export default function App() {
               <Router>
                 <UserProvider>
                   <SceneProvider>
-                    <ModalProvider>
                       <SceneEngineProvider>
                           <Routes>
                             <Route path="/:modelName" element={<InnerApp />} />
@@ -36,7 +35,6 @@ export default function App() {
                           </Routes>       
                         
                       </SceneEngineProvider>
-                    </ModalProvider>
                   </SceneProvider>
                 </UserProvider>
               </Router>
@@ -49,7 +47,6 @@ export default function App() {
 
 
 const InnerApp = () => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   return (
     <div className="flex flex-col h-screen overflow-hidden overscroll-none dark:bg-dark">
       <div className="flex flex-1 overflow-hidden">
