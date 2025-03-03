@@ -1,4 +1,3 @@
-import { Header } from './components/Header';
 import { LiveStream } from './components/LiveStream';
 
 import { useState } from 'react';
@@ -53,7 +52,6 @@ const InnerApp = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   return (
     <div className="flex flex-col h-screen overflow-hidden overscroll-none dark:bg-dark">
-      <Header onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)} />
       <div className="flex flex-1 overflow-hidden">
       
         <div className="flex-1 min-w-0">
