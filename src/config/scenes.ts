@@ -23,23 +23,7 @@ export interface SceneConfig {
     clothes: string;
 }
 
-// Component mapping for dynamic imports
-const componentMapping = {
-    'ThreeScene': () => import('../components/3d/ThreeScene'),
-    'DefaultScene': () => import('../components/3d/scenes/DefaultScene'),
-    'WaveScene': () => import('../components/3d/scenes/WaveScene'),
-    'CosmicScene': () => import('../components/3d/scenes/CosmicScene'),
-    'ComingSoonScene': () => import('../components/3d/scenes/ComingSoonScene'),
-};
 
-// Function to convert API response to SceneConfig
-const convertApiResponseToSceneConfig = (apiScene: any): SceneConfig => {
-    return {
-        ...apiScene,
-        component: lazy(componentMapping[apiScene.component as keyof typeof componentMapping] || componentMapping['ThreeScene']),
-        type: (apiScene.type || 'default') as SceneConfig['type']
-    };
-};
 
 // Cache for scene configurations
 let cachedScenes: SceneConfig[] | null = null;
@@ -49,6 +33,7 @@ export async function getSceneConfigs(forceRefresh = false): Promise<SceneConfig
     if (cachedScenes && !forceRefresh) {
         return cachedScenes;
     }
+    return scenesConfig;
 
     
 }
@@ -68,8 +53,6 @@ export const scenesConfig: SceneConfig[] = [
         component: lazy(() => import('../components/3d/ThreeScene')),
         stats: {
             comments: 0,
-            bookmarks: 0,
-            shares: 0
         },
         creator: {
             username: "Default",
@@ -92,3 +75,27 @@ getSceneConfigs().catch(console.error);
 export function refreshScenes(): Promise<SceneConfig[]> {
     return getSceneConfigs(true);
 }
+
+
+
+
+// future use : 
+/*
+// Component mapping for dynamic imports
+const componentMapping = {
+    'ThreeScene': () => import('../components/3d/ThreeScene'),
+    'DefaultScene': () => import('../components/3d/scenes/DefaultScene'),
+    'WaveScene': () => import('../components/3d/scenes/WaveScene'),
+    'CosmicScene': () => import('../components/3d/scenes/CosmicScene'),
+    'ComingSoonScene': () => import('../components/3d/scenes/ComingSoonScene'),
+};
+
+// Function to convert API response to SceneConfig
+const convertApiResponseToSceneConfig = (apiScene: any): SceneConfig => {
+    return {
+        ...apiScene,
+        component: lazy(componentMapping[apiScene.component as keyof typeof componentMapping] || componentMapping['ThreeScene']),
+        type: (apiScene.type || 'default') as SceneConfig['type']
+    };
+};
+*/

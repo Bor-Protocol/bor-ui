@@ -25,10 +25,7 @@ interface Scene {
 
 interface SceneWrapperProps {
     scene: Scene;
-    isFullscreen: boolean;
-    toggleFullscreen: () => void;
     index: number;
-    toggleChat: () => void;
     debugMode?: boolean;
 }
 
@@ -189,8 +186,6 @@ function SceneContent({  isActive, }: {
 
 const SceneWrapper: React.FC<SceneWrapperProps> = ({
     scene,
-    isFullscreen,
-    toggleFullscreen,
     index
 }) => {
     
@@ -229,12 +224,7 @@ const SceneWrapper: React.FC<SceneWrapperProps> = ({
             clearTimeout(initialTimeout);
         };
     }, []);
-    useEffect(() => {
-        // Force fullscreen on mount
-        if (!isFullscreen) {
-            toggleFullscreen();
-        }
-    }, []);
+ 
 
     
 

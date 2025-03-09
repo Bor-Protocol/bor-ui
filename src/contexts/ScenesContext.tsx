@@ -4,8 +4,8 @@ import { SceneConfig } from '../utils/constants.js';
 import { useSocket } from '../hooks/useSocket';
 import axios from 'axios';
 import { API_URL, NEW_STREAM_CONFIGS, NewStreamConfig } from '../utils/constants';
-import { useSceneManager } from '../hooks/useSceneManager';
-import Splash from '../components/Splash';
+//import { useSceneManager } from '../hooks/useSceneManager';
+// import Splash from '../components/Splash';
 
 interface Comment {
   id: string;
@@ -24,20 +24,11 @@ interface Comment {
   };
 }
 
-const COLORS = ['text-pink-400', 'text-orange-400', 'text-green-400', 'text-yellow-400'];
 
-const getColorForUser = (userId: string): string => {
-  const hash = userId.split('').reduce((acc, char) => {
-    return char.charCodeAt(0) + ((acc << 5) - acc);
-  }, 0);
-  const index = Math.abs(hash % COLORS.length);
-  return COLORS[index];
-};
 
 export interface SceneStats {
   comments: number;
-  bookmarks: number;
-  shares: number;
+ 
 }
 
 interface SceneContextType {
@@ -59,8 +50,8 @@ interface SceneContextType {
   activeScene: number;
   setCurrentSceneIndex: (index: number) => void;
   setActiveScene: (scene: number) => void;
-  isLoading: boolean;
-  error: Error | null;
+  //isLoading: boolean;
+  //error: Error | null;
   //refreshScenes: () => Promise<void>;
 
   sceneConfigIndex: number;
@@ -80,30 +71,19 @@ const FAKE_AVATARS = [
   'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=32&h=32&fit=crop'
 ];
 
-const FAKE_BADGES = [
-  { icon: '💎', text: '25', type: 'level' },
-  { icon: '❤️', text: 'I', type: 'rank' },
-  { icon: '🎯', text: 'No. 2', type: 'special', color: 'bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-300' }
-];
 
 
 
 export function SceneProvider({ children }: { children: ReactNode }) {
   //get scenes config
   //refreshScenes is removed for now but can be added back in to ensure the refresh after we change config
-  const { isLoading, error } = useSceneManager();
+  //const { isLoading, error } = useSceneManager();
 
-  // const scenes = useMemo(() => STREAM_CONFIGS, [])
   const newScenes: NewStreamConfig[] = useMemo(() => NEW_STREAM_CONFIGS, [])
- // const scenes: NewStreamConfig[] = useMemo(() => NEW_STREAM_CONFIGS, [])
-
-
-  //const { data: newScenesnew } = useScenesQuery();
-  //console.log({newScenesnew})
 
 
   const { emit, socket } = useSocket();
-  const [userId, setUserId] = useState<string>("Anonymous");
+  const [userId] = useState<string>("Anonymous");
 
 
   const [currentAgentId, setCurrentAgentId] = useState(newScenes[0]?.agentId || '');
@@ -219,6 +199,9 @@ export function SceneProvider({ children }: { children: ReactNode }) {
         createdAt: data.newComment.createdAt,
         avatar: data.newComment.avatar,
         handle: data.newComment.handle,
+        __v: 0,  // Add this
+        _id: data.newComment.id.toString()  // Add this
+
       };
 
       setComments(prev => [...prev, comment].slice(-100));
@@ -262,19 +245,19 @@ export function SceneProvider({ children }: { children: ReactNode }) {
     }
   ) => {
     const randomAvatar = FAKE_AVATARS[Math.floor(Math.random() * FAKE_AVATARS.length)];
-    const randomBadges = [FAKE_BADGES[Math.floor(Math.random() * FAKE_BADGES.length)]];
 
-    const newComment = {
+    const newComment: Comment = {
       id: Date.now().toString(),
+      agentId: currentAgentId,
       user: userId ? userId : isSystem ? 'System' : '',
       message,
-      avatar: avatar?avatar:randomAvatar,
-      handle: handle?handle:'Anonymous',
-      badges: randomBadges,
-      color: isSystem ? 'text-gray-500' : getColorForUser(userId),
-      createdAt: Date.now(),
+      avatar: avatar ?? randomAvatar,
+      handle: handle ?? 'Anonymous',
+      createdAt: new Date().toISOString(),
+      __v: 0,
+      _id: Date.now().toString(),
       messageType,
-      metadata // Add the metadata
+      metadata
     };
 
     setComments(prev => [...prev, newComment]);
@@ -320,9 +303,7 @@ export function SceneProvider({ children }: { children: ReactNode }) {
 
 
 
-  if (isLoading) {
-    return <Splash />; // Or any loading indicator you prefer
-  }
+
 
   return (
     <SceneContext.Provider
@@ -354,8 +335,8 @@ export function SceneProvider({ children }: { children: ReactNode }) {
         setActiveScene,
 
         // New properties
-        isLoading,
-        error,
+       // isLoading,
+       // error,
         //refreshScenes,
 
 

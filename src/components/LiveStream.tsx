@@ -1,20 +1,85 @@
 import { ChatSection } from './ChatSection';
-import { useState, useRef, useEffect } from 'react';
+import { useRef } from 'react';
 import { useScene } from '../contexts/ScenesContext';
 import SceneWrapper from './SceneWrapper';
-import { useParams } from 'react-router-dom';
+//import { useParams } from 'react-router-dom';
 
 export function LiveStream() {
-  const [isChatOpen, setIsChatOpen] = useState(false);
-  const [isFullscreen, setIsFullscreen] = useState(true);//
+
   const {
-    setCurrentSceneIndex,
-    setActiveScene,
+   // setCurrentSceneIndex,
+   // setActiveScene,
     newScenes: scenes
   } = useScene();
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const { modelName } = useParams<{ modelName: string }>();
+  return (
+    <div className="flex flex-1 h-full w-full">
+      {/* Main content area */}
+      <div className="flex-1 flex-col min-w-0">
+
+        <div
+          ref={containerRef}
+          className={`
+            h-full w-full overflow-auto snap-y snap-mandatory
+           fixed inset-0 z-[60] bg-black
+          `}
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        >
+          {scenes.map((scene, index) => (
+            <div
+              key={scene.id || `scene-${index}`}
+              data-index={index}
+              data-scene-index={index}
+              className="h-full w-full snap-start snap-always flex flex-col"
+            >
+              <SceneWrapper
+                scene={{
+                  ...scene,
+                  id: scene.id.toString(),
+                  creator: {
+                    ...scene.creator,
+                    name: scene.creator.title,
+                    description: scene.creator.title,
+                    followers: 0
+                  }
+                }}
+                index={index}
+              />
+            </div>
+          ))}
+        </div>
+
+      
+      </div>
+
+      {/* Chat section is related to twitch and twitter received messages*/}
+     
+        <div
+          className={`
+           translate-x-0
+            fixed md:relative md:translate-x-0 
+            right-0 top-16 bottom-0 
+            w-full md:w-[320px] md:min-w-[320px]
+            z-40 
+            transition-transform duration-300 ease-in-out 
+            md:top-0
+            md:h-full
+            md:border-l md:border-gray-100 md:dark:border-gray-700
+          `}
+        >
+          <ChatSection />
+        </div>
+    </div>
+  );
+}
+
+
+
+
+//just kept to be used for future reference
+
+  //const { modelName } = useParams<{ modelName: string }>();
 
   /* to be removed related to model name from URL
 
@@ -80,75 +145,3 @@ export function LiveStream() {
 
 */
 
-
-  const toggleFullscreen = () => {
-    setIsFullscreen(!isFullscreen);
-    setIsChatOpen(false);
-  };
-
-
-  return (
-    <div className="flex flex-1 h-full w-full">
-      {/* Main content area */}
-      <div className="flex-1 flex-col min-w-0">
-
-        <div
-          ref={containerRef}
-          className={`
-            h-full w-full overflow-auto snap-y snap-mandatory
-            ${isFullscreen ? 'fixed inset-0 z-[60] bg-black' : ''}
-          `}
-          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-        >
-          {scenes.map((scene, index) => (
-            <div
-              key={scene.id || `scene-${index}`}
-              data-index={index}
-              data-scene-index={index}
-              className="h-full w-full snap-start snap-always flex flex-col"
-            >
-              <SceneWrapper
-                scene={{
-                  ...scene,
-                  id: scene.id.toString(),
-                  creator: {
-                    ...scene.creator,
-                    name: scene.creator.title,
-                    description: scene.creator.title,
-                    followers: 0
-                  }
-                }}
-                isFullscreen={isFullscreen}
-                toggleFullscreen={toggleFullscreen}
-                index={index}
-                toggleChat={() => setIsChatOpen(!isChatOpen)}
-              />
-            </div>
-          ))}
-        </div>
-
-      
-      </div>
-
-      {/* Chat section is related to twitch and twitter received messages*/}
-      {isFullscreen && (
-        <div
-          className={`
-            ${isChatOpen ? 'translate-x-0' : 'translate-x-full'} 
-            fixed md:relative md:translate-x-0 
-            right-0 top-16 bottom-0 
-            w-full md:w-[320px] md:min-w-[320px]
-            z-40 
-            transition-transform duration-300 ease-in-out 
-            md:top-0
-            md:h-full
-            md:border-l md:border-gray-100 md:dark:border-gray-700
-          `}
-        >
-          <ChatSection onClose={() => setIsChatOpen(false)} />
-        </div>
-      )}
-
-    </div>
-  );
-}

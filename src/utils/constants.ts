@@ -175,8 +175,7 @@ export const NEW_STREAM_CONFIGS: NewStreamConfig[] = [
    ],
    stats: {
      comments: 0,
-     bookmarks: 0,
-     shares: 0
+
    },
    clothes: "casual"
  },
@@ -311,7 +310,6 @@ export const AGENT_MAP: { [agentId: string]: { name: string } } = {
 
 export interface SceneStats {
   comments: number;
-  bookmarks: number;
-  shares: number;
+
 }
 

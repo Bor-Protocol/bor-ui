@@ -1,5 +1,5 @@
 // Common bad words list - extend this as needed
-const BAD_WORDS = [];
+const BAD_WORDS: string[] = [];
 
 // URL regex pattern
 const URL_PATTERN = /(https?:\/\/[^\s]+)|(www\.[^\s]+)/;

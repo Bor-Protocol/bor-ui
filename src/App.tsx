@@ -1,6 +1,5 @@
 import { LiveStream } from './components/LiveStream';
 
-import { ThemeProvider } from './contexts/ThemeContext';
 import { SceneProvider } from './contexts/ScenesContext';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -18,8 +17,6 @@ export default function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-      
               <Router>
                   <SceneProvider>
                       <SceneEngineProvider>
@@ -28,14 +25,10 @@ export default function App() {
                             <Route path="/" element={<InnerApp />} />
                             <Route path="/configure" element={<SceneConfigurator />} />
                             <Route path="/docs" element={<DocsPage />} />
-                          </Routes>       
-                        
+                          </Routes>      
                       </SceneEngineProvider>
                   </SceneProvider>
               </Router>
-
-           
-      </ThemeProvider>
     </QueryClientProvider>
   );
 }
@@ -45,12 +38,10 @@ const InnerApp = () => {
   return (
     <div className="flex flex-col h-screen overflow-hidden overscroll-none dark:bg-dark">
       <div className="flex flex-1 overflow-hidden">
-      
         <div className="flex-1 min-w-0">
           <LiveStream />
         </div>
-      </div>
-      
+      </div> 
     </div>
   )
 }
