@@ -199,13 +199,11 @@ const SceneWrapper: React.FC<SceneWrapperProps> = ({
 
     const {
        
-        lastLikeTimestamp,
        
         activeScene,
        
     } = useScene();
    
-    const [isHeartAnimating, setIsHeartAnimating] = useState(false);
 
    
 
@@ -240,14 +238,7 @@ const SceneWrapper: React.FC<SceneWrapperProps> = ({
         }
     }, []);
 
-    // Heart animation
-    useEffect(() => {
-        if (lastLikeTimestamp) {
-            setIsHeartAnimating(true);
-            const timer = setTimeout(() => setIsHeartAnimating(false), 100);
-            return () => clearTimeout(timer);
-        }
-    }, [lastLikeTimestamp]);
+    
 
 
     
@@ -262,7 +253,6 @@ const SceneWrapper: React.FC<SceneWrapperProps> = ({
                     <SceneContent scene={scene} isActive={activeScene === index} debugMode={false} orbitEnabled={false} />
                 </div>
 
-                        <HeartAnimation isLiked={isHeartAnimating} />
 
                         <LiveChat />
 

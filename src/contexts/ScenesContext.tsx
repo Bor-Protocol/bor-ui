@@ -1,9 +1,10 @@
 import { createContext, useContext, useState, ReactNode, useEffect, useMemo, useCallback } from 'react';
-import { type SceneConfig } from '../config/scenes';
+import { SceneConfig } from '../utils/constants.js';
+
 import { useSocket } from '../hooks/useSocket';
 import { useUser } from './UserContext';
 import axios from 'axios';
-import { API_URL, NEW_STREAM_CONFIGS, StreamConfig, STREAMER_ADDRESS, NewStreamConfig } from '../utils/constants';
+import { API_URL, NEW_STREAM_CONFIGS, NewStreamConfig } from '../utils/constants';
 import { useSceneManager } from '../hooks/useSceneManager';
 import Splash from '../components/Splash';
 
@@ -48,7 +49,7 @@ interface SceneContextType {
   currentAgentId: string;
   nextAgentId: string;
   prevAgentId: string;
-  scenes: StreamConfig[]; // TODO: moving off this
+  scenes: NewStreamConfig[]; // TODO: moving off this
   newScenes: NewStreamConfig[];
   setCurrentAgentId: (agentId: string) => void;
   updateSceneStats: (agentId: string, key: keyof SceneStats) => void;
@@ -56,20 +57,16 @@ interface SceneContextType {
   setComments: (comments: Comment[]) => void;
   setCommentCount: (commentCount: number) => void;
   commentCount: number;
-  likes: number;
   addComment: (message: string,avatar?: string,handle?: string, isSystem?: boolean, emitToServer?: boolean) => void;
-  triggerLike: () => void;
-  lastLikeTimestamp: number | null;
   currentSceneIndex: number;
   nextSceneIndex: number;
   prevSceneIndex: number;
   activeScene: number;
   setCurrentSceneIndex: (index: number) => void;
   setActiveScene: (scene: number) => void;
-  scene: SceneConfig | null;
   isLoading: boolean;
   error: Error | null;
-  refreshScenes: () => Promise<void>;
+  //refreshScenes: () => Promise<void>;
 
   sceneConfigIndex: number;
   setSceneConfigIndex: (index: number) => void;
@@ -97,11 +94,13 @@ const FAKE_BADGES = [
 
 
 export function SceneProvider({ children }: { children: ReactNode }) {
-  const { scenes: fetchedScenes, isLoading, error, refreshScenes } = useSceneManager();
+  //get scenes config
+  //refreshScenes is removed for now but can be added back in to ensure the refresh after we change config
+  const { isLoading, error } = useSceneManager();
 
   // const scenes = useMemo(() => STREAM_CONFIGS, [])
   const newScenes: NewStreamConfig[] = useMemo(() => NEW_STREAM_CONFIGS, [])
-  const scenes: NewStreamConfig[] = useMemo(() => NEW_STREAM_CONFIGS, [])
+ // const scenes: NewStreamConfig[] = useMemo(() => NEW_STREAM_CONFIGS, [])
 
 
   //const { data: newScenesnew } = useScenesQuery();
@@ -115,13 +114,11 @@ export function SceneProvider({ children }: { children: ReactNode }) {
 
   const [currentAgentId, setCurrentAgentId] = useState(newScenes[0]?.agentId || '');
 
-  // Commenta 
+  // Comments
   const [comments, setComments] = useState<Comment[]>([]);
   const [commentCount, setCommentCount] = useState(0)
 
-  // Likes
-  const [likes, setLikes] = useState(0);
-  const [lastLikeTimestamp, setLastLikeTimestamp] = useState<number | null>(null);
+  
 
   // Helper function to get scene indices
   const getCurrentSceneIndex = useCallback(() =>
@@ -196,7 +193,6 @@ export function SceneProvider({ children }: { children: ReactNode }) {
       try {
         const res = await axios.get(`${API_URL}/api/streams/${currentAgentId}/stats`);
         // console.log(`Scene stats for ${currentAgentId}:`, res.data);
-        setLikes(res.data.likes);
         setCommentCount(res.data.comments || []);
       } catch (error) {
         console.error(`Failed to fetch scene stats for ${currentAgentId}:`, error);
@@ -240,10 +236,7 @@ export function SceneProvider({ children }: { children: ReactNode }) {
 
     // Add new listeners
     socket.on(`${currentAgentId}_comment_received`, handleCommentReceived);
-    socket.on(`${currentAgentId}_like_received`, () => {
-      setLikes(prev => prev + 1);
-      setLastLikeTimestamp(Date.now());
-    });
+
 
     return () => {
       socket.off(`${currentAgentId}_comment_received`);
@@ -302,12 +295,7 @@ export function SceneProvider({ children }: { children: ReactNode }) {
     }
   }, [currentAgentId, userId, emit, userProfile]);
 
-  // Likes
-  const triggerLike = () => {
-    emit(`new_like`, { user: userId, agentId: currentAgentId });
-    setLikes(prev => prev + 1);
-    setLastLikeTimestamp(Date.now());
-  };
+
 
   // Update scene memo with safety check
   const scene = useMemo(() =>
@@ -357,7 +345,6 @@ export function SceneProvider({ children }: { children: ReactNode }) {
         scenes: newScenes,
         setCurrentAgentId,
         updateSceneStats,
-        scene,
         newScenes,
 
         // Comments
@@ -365,11 +352,9 @@ export function SceneProvider({ children }: { children: ReactNode }) {
         commentCount,
         setCommentCount,
         addComment,
+        setComments,
 
-        // Likes
-        likes,
-        triggerLike,
-        lastLikeTimestamp,
+        
 
         // Scene Context
         currentSceneIndex,
@@ -382,7 +367,7 @@ export function SceneProvider({ children }: { children: ReactNode }) {
         // New properties
         isLoading,
         error,
-        refreshScenes,
+        //refreshScenes,
 
 
         sceneConfigIndex,

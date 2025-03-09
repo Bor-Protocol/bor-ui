@@ -62,8 +62,7 @@ export function SceneEngineProvider({ children }: SceneEngineProviderProps) {
 
   // AI Response
   const [currentResponse, setCurrentResponse] = useState<AIResponse | null>(null);
-  const [previousResponses] = useState(() => new Set<string>());
-  const [responseQueue, setResponseQueue] = useState<AIResponse[]>([]);
+
 
   // Audio Manager
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -151,7 +150,7 @@ export function SceneEngineProvider({ children }: SceneEngineProviderProps) {
   const analyzerRef = useRef<AnalyserNode | null>(null);
   const gainNodeRef = useRef<GainNode | null>(null);
   const dataArrayRef = useRef<Float32Array | null>(null);
-  const mediaSourceRef = useRef<MediaElementSourceNode | null>(null);
+  const mediaSourceRef = useRef<MediaElementAudioSourceNode | null>(null);
 
   // Initialize audio context and analyzer
   useEffect(() => {
@@ -277,19 +276,6 @@ export function SceneEngineProvider({ children }: SceneEngineProviderProps) {
       mediaSourceRef.current = null;  // Reset the media source reference
     };
   }, []);
-
-
-  // HandleAudio Response
-  const _handleAudioResponse = useCallback(async (data: AudioResponse) => {
-    // console.log('Received audio response:', data);
-
-    if (!data.audioUrl || !isValidUrl(data.audioUrl)) {
-      console.error('Invalid audio URL received:', data.audioUrl);
-      return;
-    }
-
-    handleAudioResponse(data.audioUrl);
-  }, [audioRef]);
 
 
   // Animation Handler //

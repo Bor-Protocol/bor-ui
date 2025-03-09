@@ -1,12 +1,10 @@
 import { LiveStream } from './components/LiveStream';
 
-import { useState } from 'react';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { UserProvider } from './contexts/UserContext';
 import { SceneProvider } from './contexts/ScenesContext';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ModalProvider } from './contexts/ModalContext';
 import { DocsPage } from './components/DocsPage';
 
 

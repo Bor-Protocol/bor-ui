@@ -16,6 +16,7 @@ export function LiveStream() {
 
   const { modelName } = useParams<{ modelName: string }>();
 
+  /* to be removed related to model name from URL
 
   // Handle model name from URL
   useEffect(() => {
@@ -29,7 +30,8 @@ export function LiveStream() {
       }
     }
   }, [modelName, scenes, setCurrentSceneIndex, setActiveScene]);
-    
+    */
+  /* to be removed related to scroll down multiple scenes
   // Scroll down multiple scenes
   useEffect(() => {
     const container = containerRef.current;
@@ -76,7 +78,7 @@ export function LiveStream() {
   }, [setCurrentSceneIndex, setActiveScene, scenes]);
 
 
-
+*/
 
 
   const toggleFullscreen = () => {

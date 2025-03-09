@@ -1,0 +1,233 @@
+---
+description: 
+globs: 
+---
+# Project Structure
+
+```
+./
+├── public/
+│   ├── animations/
+│   │   ├── dance/
+│   │   │   ├── belly_dance.fbx
+│   │   │   └── maraschino.fbx
+│   │   ├── idle/
+│   │   │   ├── floating.fbx
+│   │   │   ├── idle-2.fbx
+│   │   │   ├── idle_dwarf.fbx
+│   │   │   ├── idlet.fbx
+│   │   │   └── offensive_idle.fbx
+│   │   ├── Hiphop_Dancing.fbx
+│   │   ├── Insulting.fbx
+│   │   ├── Listening_To_Music.fbx
+│   │   ├── Pointing.fbx
+│   │   ├── Untitled.html
+│   │   ├── acknowledging.fbx
+│   │   ├── angry.fbx
+│   │   ├── angry_gesture.fbx
+│   │   ├── annoyed_head_shake.fbx
+│   │   ├── appearing.vrma
+│   │   ├── are_You_Crazy.fbx
+│   │   ├── arguing.fbx
+│   │   ├── arm_stretching.fbx
+│   │   ├── bboy_hiphopmove.fbx
+│   │   ├── being_cocky.fbx
+│   │   ├── blow_a_kiss.fbx
+│   │   ├── brutal_assassination.fbx
+│   │   ├── capoeira.fbx
+│   │   ├── cheering.fbx
+│   │   ├── chicken_dance.fbx
+│   │   ├── dancing_twerk.fbx
+│   │   ├── defeated.fbx
+│   │   ├── dismissing_gesture.fbx
+│   │   ├── excited.fbx
+│   │   ├── fist_up.fbx
+│   │   ├── floating.fbx
+│   │   ├── focusing.fbx
+│   │   ├── fortnite.fbx
+│   │   ├── greeting.fbx
+│   │   ├── hands_up.fbx
+│   │   ├── happy.fbx
+│   │   ├── happy_Idle.fbx
+│   │   ├── happy_hand_gesture.fbx
+│   │   ├── hard_head_nod.fbx
+│   │   ├── head_nod_yes.fbx
+│   │   ├── hip_hop_dancing.fbx
+│   │   ├── idle-2.fbx
+│   │   ├── idle.fbx
+│   │   ├── idle_dwarf.fbx
+│   │   ├── idlet.fbx
+│   │   ├── joyful_jump.fbx
+│   │   ├── laughing.fbx
+│   │   ├── lengthy_head_nod.fbx
+│   │   ├── light_dance.fbx
+│   │   ├── look_around.fbx
+│   │   ├── look_away_gesture.fbx
+│   │   ├── nervously_look_around.fbx
+│   │   ├── offensive_idle.fbx
+│   │   ├── play_golf.fbx
+│   │   ├── praying.fbx
+│   │   ├── relieved_sigh.fbx
+│   │   ├── robot_dance.fbx
+│   │   ├── rumba_dancing.fbx
+│   │   ├── salute.fbx
+│   │   ├── sarcastic_head_nod.fbx
+│   │   ├── saying_no.fbx
+│   │   ├── shaking_hands.fbx
+│   │   ├── shaking_head_no.fbx
+│   │   ├── silly_dancing.fbx
+│   │   ├── sitting.fbx
+│   │   ├── sitting_disbelief.fbx
+│   │   ├── sitting_legs_swinging.fbx
+│   │   ├── sitting_yell.fbx
+│   │   ├── speedbag_boxing.fbx
+│   │   ├── standing_clap.fbx
+│   │   ├── swing_dancing.fbx
+│   │   ├── thoughtful_head_shake.fbx
+│   │   ├── threatening.fbx
+│   │   ├── trump_dance.fbx
+│   │   ├── walk_with_rifle.fbx
+│   │   ├── weight_shift.fbx
+│   │   └── youre_loser.fbx
+│   ├── audio/
+│   │   └── musicbg.mp3
+│   ├── environments/
+│   │   ├── tromp1.glb
+│   │   ├── tromp_roomglb.glb
+│   │   ├── trump_room.glb
+│   │   ├── tt.glb
+│   │   └── wall6.glb
+│   ├── fonts/
+│   │   └── Visby.ttf
+│   ├── icons/
+│   │   └── x.svg
+│   └── models/
+│       ├── bor_model.vrm
+│       ├── testtrump.vrm
+│       ├── tromp.vrm
+│       └── trump.vrm
+├── src/
+│   ├── components/
+│   │   ├── 3d/
+│   │   │   ├── scenes/
+│   │   │   │   ├── ComingSoonScene.tsx
+│   │   │   │   ├── CosmicScene.tsx
+│   │   │   │   ├── DefaultScene.tsx
+│   │   │   │   └── WaveScene.tsx
+│   │   │   ├── DefaultScene.tsx
+│   │   │   └── ThreeScene.tsx
+│   │   ├── old/
+│   │   │   ├── AIResponseDisplay.tsx
+│   │   │   ├── HeartAnimation.tsx
+│   │   │   ├── LiveChat.tsx
+│   │   │   ├── loadMixamoAnimation.d.ts
+│   │   │   ├── loadMixamoAnimation.js
+│   │   │   └── mixamoVRMRigMap.js
+│   │   ├── ui/
+│   │   │   ├── SearchBar.tsx
+│   │   │   ├── accordion.tsx
+│   │   │   ├── alert-dialog.tsx
+│   │   │   ├── alert.tsx
+│   │   │   ├── aspect-ratio.tsx
+│   │   │   ├── avatar.tsx
+│   │   │   ├── badge.tsx
+│   │   │   ├── breadcrumb.tsx
+│   │   │   ├── button.tsx
+│   │   │   ├── calendar.tsx
+│   │   │   ├── card.tsx
+│   │   │   ├── carousel.tsx
+│   │   │   ├── chart.tsx
+│   │   │   ├── checkbox.tsx
+│   │   │   ├── collapsible.tsx
+│   │   │   ├── command.tsx
+│   │   │   ├── context-menu.tsx
+│   │   │   ├── dialog.tsx
+│   │   │   ├── drawer.tsx
+│   │   │   ├── dropdown-menu.tsx
+│   │   │   ├── form.tsx
+│   │   │   ├── hover-card.tsx
+│   │   │   ├── input-otp.tsx
+│   │   │   ├── input.tsx
+│   │   │   ├── label.tsx
+│   │   │   ├── menubar.tsx
+│   │   │   ├── navigation-menu.tsx
+│   │   │   ├── pagination.tsx
+│   │   │   ├── popover.tsx
+│   │   │   ├── progress.tsx
+│   │   │   ├── radio-group.tsx
+│   │   │   ├── resizable.tsx
+│   │   │   ├── scroll-area.tsx
+│   │   │   ├── select.tsx
+│   │   │   ├── separator.tsx
+│   │   │   ├── sheet.tsx
+│   │   │   ├── skeleton.tsx
+│   │   │   ├── slider.tsx
+│   │   │   ├── sonner.tsx
+│   │   │   ├── switch.tsx
+│   │   │   ├── table.tsx
+│   │   │   ├── tabs.tsx
+│   │   │   ├── textarea.tsx
+│   │   │   ├── toast.tsx
+│   │   │   ├── toaster.tsx
+│   │   │   ├── toggle-group.tsx
+│   │   │   ├── toggle.tsx
+│   │   │   └── tooltip.tsx
+│   │   ├── Avatar.tsx
+│   │   ├── ChatSection.tsx
+│   │   ├── DocsPage.tsx
+│   │   ├── Link.tsx
+│   │   ├── LiveStream.tsx
+│   │   ├── Note.tsx
+│   │   ├── SceneConfigurator.tsx
+│   │   ├── SceneWrapper.tsx
+│   │   ├── Splash.css
+│   │   ├── Splash.tsx
+│   │   └── WebSocketProvider.ts
+│   ├── config/
+│   │   └── scenes.ts
+│   ├── contexts/
+│   │   ├── ModalContext.tsx
+│   │   ├── SceneEngineContext.tsx
+│   │   ├── ScenesContext.tsx
+│   │   ├── ThemeContext.tsx
+│   │   └── UserContext.tsx
+│   ├── hooks/
+│   │   ├── useResponsive.ts
+│   │   ├── useSceneManager.ts
+│   │   ├── useScenesApi.ts
+│   │   ├── useSocket.ts
+│   │   ├── useStreamCount.ts
+│   │   ├── useUser.ts
+│   │   └── useVRM.ts
+│   ├── lib/
+│   │   └── utils.ts
+│   ├── styles/
+│   │   └── globals.css
+│   ├── utils/
+│   │   ├── cn.ts
+│   │   ├── constants.ts
+│   │   ├── messageValidation.ts
+│   │   └── socketEvents.ts
+│   ├── App.tsx
+│   ├── env.d.ts
+│   ├── index.css
+│   ├── main.tsx
+│   └── vite-env.d.ts
+├── README.md
+├── components.json
+├── eslint.config.js
+├── exmpl.env
+├── index.html
+├── newfile.txt
+├── package-lock.json
+├── package.json
+├── pnpm-lock.yaml
+├── postcss.config.js
+├── script.sh*
+├── structure.mdc
+├── tailwind.config.js
+├── tsconfig.app.json
+├── tsconfig.json
+├── tsconfig.node.json
+└── vite.config.ts
+```

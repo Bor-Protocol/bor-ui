@@ -54,7 +54,7 @@ export async function getSceneConfigs(forceRefresh = false): Promise<SceneConfig
 
     
 }
-
+//this is the scene config for the default scene
 // Initial scene configurations (fallback data)
 export const scenesConfig: SceneConfig[] = [
     {

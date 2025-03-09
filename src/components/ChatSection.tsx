@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from 'react';
 import { X, Heart } from 'lucide-react';
 import { useScene } from '../contexts/ScenesContext';
 import { useUser } from '../contexts/UserContext';
-import { HeartAnimation } from './old/HeartAnimation';
 import { validateMessage, sanitizeMessage } from '../utils/messageValidation';
 import { Client } from 'tmi.js';
 
@@ -121,13 +120,11 @@ const SIMULATED_MESSAGES = [
 ];
 
 export function ChatSection({ onClose }: ChatSectionProps) {
-  const { comments, addComment, currentAgentId, triggerLike, lastLikeTimestamp } = useScene();
+  const { comments, addComment } = useScene();
   const [newMessage, setNewMessage] = useState('');
   const chatEndRef = useRef<HTMLDivElement>(null);
   const messageContainerRef = useRef<HTMLDivElement>(null);
   const { userProfile } = useUser();
-  const [likeCount, setLikeCount] = useState(15);
-  const [isLiked, setIsLiked] = useState(false);
   const [clickCount, setClickCount] = useState(0);
   const [lastClickTime, setLastClickTime] = useState(Date.now());
   const [showMultiplier, setShowMultiplier] = useState(false);
@@ -174,24 +171,6 @@ export function ChatSection({ onClose }: ChatSectionProps) {
     };
   }, [addComment]);
 
-  const simulateNewMessage = () => {
-    const randomMessage = SIMULATED_MESSAGES[Math.floor(Math.random() * SIMULATED_MESSAGES.length)];
-    const newMsg: Message = {
-      id: Date.now().toString(),
-      ...randomMessage,
-      timestamp: Date.now(),
-    };
-
-    addComment(newMsg.message, false, false);
-  };
-
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     simulateNewMessage();
-  //   }, Math.random() * 2000 + 2000);
-
-  //   return () => clearInterval(interval);
-  // }, []);
 
   useEffect(() => {
     if (chatEndRef.current) {
@@ -199,170 +178,10 @@ export function ChatSection({ onClose }: ChatSectionProps) {
     }
   }, [comments]);
 
-  const handleLike = () => {
-    const currentTime = Date.now();
-    const timeDiff = currentTime - lastClickTime;
-
-    // Reset counter if more than 5 seconds have passed
-    if (timeDiff > 5000) {
-      setClickCount(1);
-    } else {
-      setClickCount(prev => {
-        if (prev >= 4) {
-          // Trigger animation on number change
-          setIsMultiplierAnimating(true);
-          setTimeout(() => setIsMultiplierAnimating(false), 100);
-        }
-        return prev + 1;
-      });
-    }
-
-    // Clear any existing timeout
-    if (multiplierTimeoutRef.current) {
-      clearTimeout(multiplierTimeoutRef.current);
-    }
-
-    // Show multiplier if clicked more than 5 times
-    if (clickCount >= 4) { // Changed to 4 so it shows on the 5th click
-      setShowMultiplier(true);
-      // Set new timeout
-      multiplierTimeoutRef.current = setTimeout(() => {
-        setShowMultiplier(false);
-      }, 2000); // Increased to 2 seconds for better visibility
-    }
-
-    setLastClickTime(currentTime);
-    setIsLiked(true);
-    triggerLike();
-    setTimeout(() => setIsLiked(false), 300);
-  };
-
-  const [isHeartAnimating, setIsHeartAnimating] = useState(false);
-
-  // Heart animation
-  useEffect(() => {
-    if (lastLikeTimestamp) {
-      setIsHeartAnimating(true);
-      const timer = setTimeout(() => setIsHeartAnimating(false), 100);
-      return () => clearTimeout(timer);
-    }
-  }, [lastLikeTimestamp]);
-/*
-  useEffect(() => {
  
-      // Create a new client
-     const client = new Client({
-    options: { debug: true },
-    connection: {
-        secure: true,
-        reconnect: true
-    },
-    identity: {
-        username: import.meta.env.VITE_TWITCH_BOT_USERNAME,
-        password: import.meta.env.VITE_TWITCH_ACCESS_TOKEN
-    },
-    channels: [import.meta.env.VITE_TWITCH_CHANNEL]
-});
-        //console.log('Received message:', event.data); // Debug log
-        client.on('message', async (channel, tags, message, self) => {
-          if (self) return;
-      
-          const avatar = await fetchUserAvatar(tags['user-id'] || '');
 
 
-           // Verify the payload has the expected structure
-            const newMessage: ChatMessage = {
-                username:  tags['display-name'],
-                chatContent: message,
-                timestamp: new Date(),
-                avatar: avatar || 'https://static-cdn.jtvnw.net/user-default-pictures-uv/13e5fa74-defa-11e9-809c-784f43822e80-profile_image-70x70.png' // Default Twitch avatar
-              };
-
-                  // Check if message already exists with same content and username
-
-             // Check for duplicate message
-             let x = true
-
-    setChatMessages(prevMessages => {
-      const isDuplicate = prevMessages.some(msg => 
-        msg.username === newMessage.username && 
-        msg.chatContent === newMessage.chatContent
-      );
-
-      console.error('information:', isDuplicate);
-      console.error('prev messages:', prevMessages);
-      console.error('msg:', newMessage);
-
-
-      if (isDuplicate) {
-        x=false
-        return prevMessages; // Don't add duplicate message
-      }
-      const trimmedMessage = newMessage.chatContent.trim();
-      addComment(trimmedMessage, newMessage.avatar, newMessage.username);
-      console.error('true:', prevMessages);
-      return [...prevMessages, newMessage];
-    });
-
-
-
-
-          
-            // Validate message
-           // const validation = validateMessage(trimmedMessage);
-          
-
-
-            // Sanitize message before sending
-           // const sanitizedMessage = sanitizeMessage(trimmedMessage);
-    // Only add comment if it's not a duplicate
-    if (x
-    ) {
-
-      setIsMultiplierAnimating(true);
-      setTimeout(() => setIsMultiplierAnimating(false), 100);
-      triggerLike();
-    }
-            setNewMessage('');
-            setCanSend(false);
-            setTimeLeft(1);
-          })
-
-      
-    
-      
-    
-
-      // Handle incoming messages
-     
-
-      client.on('connected', () => {
-        setIsConnected(true);
-        console.log('Connected to Twitch chat!');
-      });
-      
-      client.on('disconnected', () => {
-        setIsConnected(false);
-        console.log('Disconnected from Twitch chat!');
-      });
-      
-      // Connect to Twitch
-      client.connect().catch(console.error);
-      
-   
-
-      // Cleanup on unmount
-  
-
-   
-
-    return () => {
-      client.disconnect();
-        // window.removeEventListener('message', messageHandler);
-    };
-}, []);
-
-*/
+ 
 useEffect(() => {
 
   const messageHandler = (event: MessageEvent) => {
@@ -392,9 +211,9 @@ useEffect(() => {
              // const sanitizedMessage = sanitizeMessage(trimmedMessage);
               addComment(trimmedMessage,newMessage.avatar,newMessage.username);
                  // Trigger animation on number change
-        setIsMultiplierAnimating(true);
-        setTimeout(() => setIsMultiplierAnimating(false), 100);
-        triggerLike();
+              setIsMultiplierAnimating(true);
+              setTimeout(() => setIsMultiplierAnimating(false), 100);
+       
               setNewMessage('');
               setCanSend(false);
               setTimeLeft(1);
@@ -445,9 +264,8 @@ useEffect(() => {
  // const sanitizedMessage = sanitizeMessage(trimmedMessage);
   addComment(trimmedMessage,newMessage.avatar,newMessage.username);
      // Trigger animation on number change
-setIsMultiplierAnimating(true);
-setTimeout(() => setIsMultiplierAnimating(false), 100);
-triggerLike();
+  setIsMultiplierAnimating(true);
+  setTimeout(() => setIsMultiplierAnimating(false), 100);
   setNewMessage('');
   setCanSend(false);
   setTimeLeft(1);
@@ -519,229 +337,14 @@ const client = new Client({
 
   
 
-  const renderMessage = (message: Message) => {
-    if (message.messageType === 'gift') {
-      return (
-        <div key={message.id} className="flex items-center gap-2 animate-fade-in bg-pink-50 dark:bg-pink-950/40 p-2 border-l-2 border-pink-500">
-          <img
-            src={message.metadata?.avatar || message.avatar}
-            className="w-8 h-8 rounded-full object-cover"
-            alt={message.user}
-          />
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2">
-              <span className="font-medium text-gray-900 dark:text-white">
-                {message.metadata?.handle || message.user}
-              </span>
-              <span className="text-sm text-gray-600 dark:text-gray-300">
-                sent {message.metadata?.giftCount}x {message.metadata?.icon} {message.metadata?.giftName}
-              </span>
-            </div>
-            <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
-              {/* {message.metadata?.txHash && (
-                <a
-                  href={`https://solscan.io/tx/${message.metadata.txHash}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs text-pink-500 hover:text-pink-600"
-                >
-                  View Transaction ↗
-                </a>
-              )} */}
-            </div>
-          </div>
-        </div>
-      );
-    }
-
-    if (message.isSystem) {
-      return (
-        <div key={message.id} className="flex items-start gap-2 animate-fade-in bg-[#fe2c55]/10 p-2 rounded-lg">
-          <img
-            src={message.avatar}
-            className="w-8 h-8 rounded-full object-cover"
-            alt={message.user}
-          />
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-[#fe2c55] font-medium">
-                {message?.handle}
-              </span>
-              {message.badges?.map((badge, index) => (
-                <div key={index} className={getBadgeStyle(badge)}>
-                  <span>{badge.icon}</span>
-                  {badge.text && <span>{badge.text}</span>}
-                </div>
-              ))}
-             
-            </div>
-            <p className="text-sm text-gray-600 dark:text-gray-300">{message.message}</p>
-          </div>
-        </div>
-      );
-    }
-
-    // Default message render
-    return (
-      <div key={message.id} className="flex items-start gap-2 animate-fade-in">
-        <img
-          src={message.avatar}
-          className="w-8 h-8 rounded-full object-cover"
-          alt={message.user}
-        />
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-gray-900 dark:text-white">
-              {message.handle }
-            </span>
-            {/* Add top viewer badge if applicable */}
-           
-            <p className="text-sm text-gray-600 dark:text-gray-300">{message.message}</p>
-          </div>
-        </div>
-      </div>
-    );
-  };
 
 
 
   return (
-    <div className="h-full flex flex-col bg-white dark:bg-[#000000] relative">
-      <div className="absolute right-4 top-20 z-10">
-
-      </div>
-
-      <div className="p-4 border-b border-gray-100 dark:border-[#1f1f1f] flex items-center justify-between shrink-0">
-        <h3 className="font-semibold text-gray-900 dark:text-white">LIVE chat</h3>
-        {onClose && (
-          <button
-            onClick={onClose}
-            className="md:hidden p-2 hover:bg-gray-100 dark:hover:bg-[#1f1f1f] rounded-full"
-          >
-            <X size={20} className="text-gray-600 dark:text-white" />
-          </button>
-        )}
-      </div>
-
-      <HeartAnimation isLiked={isHeartAnimating} />
-
-     
-
-      <div
-        ref={messageContainerRef}
-        className="flex-1 overflow-y-auto p-4 space-y-4 relative"
-      >
-        {comments.map(renderMessage)}
-        
-        {/* Add local system messages */}
-        {localMessages.map((msg) => (
-          <div
-            key={msg.id}
-            className="flex items-start gap-2 animate-fade-in bg-[#fe2c55]/10 p-2 rounded-lg"
-          >
-            <span className="text-[#fe2c55] text-sm">{msg.message}</span>
-          </div>
-        ))}
-        <div ref={chatEndRef} />
-      </div>
-
-      <div className="absolute right-4 bottom-24 z-50">
-        <button
-          onClick={handleLike}
-          className="w-12 h-12 rounded-full flex items-center justify-center bg-gray-300 dark:bg-gray-700 backdrop-blur-sm hover:bg-gray-400 dark:hover:bg-gray-600 transition-colors relative"
-        >
-          <Heart
-            size={28}
-            className={`transition-colors ${isLiked ? 'text-red-500 fill-red-500' : 'text-gray-700 dark:text-gray-300'}`}
-          />
-          {showMultiplier && clickCount >= 5 && (
-            <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-red-500 text-white px-2 py-1 rounded-full text-sm font-bold">
-              <span className={`inline-block ${isMultiplierAnimating ? 'animate-multiplier-pop' : ''}`}>
-                x{clickCount}
-              </span>
-            </div>
-          )}
-        </button>
-      </div>
-
-      <div className="border-t border-gray-100 dark:border-[#1f1f1f]">
-        <div className="p-4">
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-
-             
-
-              const trimmedMessage = newMessage.trim();
-              
-              // Validate message
-              const validation = validateMessage(trimmedMessage);
-              if (!validation.isValid) {
-                setShowError(true);
-                setTimeout(() => setShowError(false), 1000);
-                
-                setLocalMessages(prev => [...prev, {
-                  id: crypto.randomUUID(),
-                  message: validation.reason || "Invalid message",
-                  isSystem: true,
-                  timestamp: Date.now()
-                }]);
-
-                setTimeout(() => {
-                  setLocalMessages(prev => prev.filter(msg =>
-                    Date.now() - msg.timestamp < 2000
-                  ));
-                }, 2000);
-                
-                return;
-              }
-
-              if (!canSend) {
-                setShowError(true);
-                setTimeout(() => setShowError(false), 1000);
-                
-                setLocalMessages(prev => [...prev, {
-                  id: crypto.randomUUID(),
-                  message: `Please wait ${timeLeft} seconds before sending..`,
-                  isSystem: true,
-                  timestamp: Date.now()
-                }]);
-
-                setTimeout(() => {
-                  setLocalMessages(prev => prev.filter(msg =>
-                    Date.now() - msg.timestamp < 2000
-                  ));
-                }, 2000);
-                
-                return;
-              }
-
-              // Sanitize message before sending
-              const sanitizedMessage = sanitizeMessage(trimmedMessage);
-              addComment(sanitizedMessage);
-              setNewMessage('');
-              setCanSend(false);
-              setTimeLeft(1);
-            }}
-            className="relative"
-          >
-            <input
-              type="text"
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              placeholder={!canSend ? `Wait ${timeLeft} seconds...` : "Say something nice"}
-              className="w-full bg-gray-100 dark:bg-[#1f1f1f] text-gray-900 dark:text-white rounded-full py-2.5 pl-4 pr-12 outline-none placeholder-gray-500"
-            />
-            <button
-              type="button"
-              onClick={() => setNewMessage(prev => prev + '😊')}
-              className="absolute right-2 top-1/2 -translate-y-1/2 hover:opacity-75"
-            >
-              😊
-            </button>
-          </form>
-        </div>
-      </div>
-    </div>
+ <div>
+  <div>
+    <h1>Chat</h1>
+  </div>
+ </div>
   );
 }
