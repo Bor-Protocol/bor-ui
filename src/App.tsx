@@ -1,7 +1,6 @@
 import { LiveStream } from './components/LiveStream';
 
 import { ThemeProvider } from './contexts/ThemeContext';
-import { UserProvider } from './contexts/UserContext';
 import { SceneProvider } from './contexts/ScenesContext';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -22,7 +21,6 @@ export default function App() {
       <ThemeProvider>
       
               <Router>
-                <UserProvider>
                   <SceneProvider>
                       <SceneEngineProvider>
                           <Routes>
@@ -34,7 +32,6 @@ export default function App() {
                         
                       </SceneEngineProvider>
                   </SceneProvider>
-                </UserProvider>
               </Router>
 
            

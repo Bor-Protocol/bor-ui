@@ -2,7 +2,6 @@ import { createContext, useContext, useState, ReactNode, useEffect, useMemo, use
 import { SceneConfig } from '../utils/constants.js';
 
 import { useSocket } from '../hooks/useSocket';
-import { useUser } from './UserContext';
 import axios from 'axios';
 import { API_URL, NEW_STREAM_CONFIGS, NewStreamConfig } from '../utils/constants';
 import { useSceneManager } from '../hooks/useSceneManager';
@@ -104,7 +103,6 @@ export function SceneProvider({ children }: { children: ReactNode }) {
 
 
   const { emit, socket } = useSocket();
-  const {  userProfile } = useUser()
   const [userId, setUserId] = useState<string>("Anonymous");
 
 
@@ -284,7 +282,7 @@ export function SceneProvider({ children }: { children: ReactNode }) {
     if (emitToServer) {
       emit(`new_comment`, { comment: newComment, agentId: currentAgentId });
     }
-  }, [currentAgentId, userId, emit, userProfile]);
+  }, [currentAgentId, userId, emit]);
 
 
 

@@ -1,7 +1,6 @@
 // Unused
-import { SceneStats } from '../context/SceneContext';
+import { SceneStats } from '../contexts/ScenesContext';
 import { lazy } from 'react';
-import {API_URL, STREAMER_ADDRESS} from '../utils/constants';
 export interface CreatorProfile {
     username: string;
     title: string;
@@ -21,7 +20,6 @@ export interface SceneConfig {
     component: React.LazyExoticComponent<(props: { color?: string }) => JSX.Element>;
     stats: SceneStats;
     creator?: CreatorProfile;
-    walletAddress?: string;
     clothes: string;
 }
 
@@ -78,7 +76,6 @@ export const scenesConfig: SceneConfig[] = [
             title: "Virtual Streamer",
             avatar: "https://3d.nicovideo.jp/upload/contents/td83829/f1e0d59ec8e7ee5016a748b6ae3a7_thumb.png"
         },
-        walletAddress: STREAMER_ADDRESS
     }
 ];
 

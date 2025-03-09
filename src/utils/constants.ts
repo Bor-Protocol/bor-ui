@@ -10,7 +10,6 @@ export const SOCKET_EVENTS = {
    CONNECTED: 'connected'
 } as const;
 
-export const STREAMER_ADDRESS = 'mdx5dxD754H8uGrz6Wc96tZfFjPqSgBvqUDbKycpump'; // Default address
 
 
 
