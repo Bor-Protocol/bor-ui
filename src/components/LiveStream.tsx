@@ -130,7 +130,7 @@ export function LiveStream() {
       
       </div>
 
-      {/* Chat section */}
+      {/* Chat section is related to twitch and twitter received messages*/}
       {isFullscreen && (
         <div
           className={`

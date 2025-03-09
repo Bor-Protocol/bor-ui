@@ -1,17 +1,7 @@
-import { Diamond, Gift } from 'lucide-react';
-import { useState, FormEvent, useEffect } from 'react';
+import { Diamond } from 'lucide-react';
 import { useScene } from '../../contexts/ScenesContext';
-import { useSocket } from '../../hooks/useSocket';
-import { useUser } from '../../contexts/UserContext';
 
-function getColorFromString(str: string): string {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    hash = str.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  const hue = hash % 360;
-  return `hsl(${hue}, 70%, 65%)`; // Using HSL for better control over brightness
-}
+
 
 const truncateText = (text: string, maxLength: number): string => {
   if (text.length > maxLength) {
@@ -21,49 +11,8 @@ const truncateText = (text: string, maxLength: number): string => {
 };
 
 export function LiveChat() {
-  const { comments, addComment } = useScene();
-  const [inputValue, setInputValue] = useState("");
-  const [canSend, setCanSend] = useState(true);
-  const [timeLeft, setTimeLeft] = useState(0);
-  const [localMessages, setLocalMessages] = useState<Array<{
-    id: string,
-    message: string,
-    isSystem: boolean,
-    timestamp: number
-  }>>([]);
-  const [showError, setShowError] = useState(false);
-  const { userProfile } = useUser();
+  const { comments } = useScene();
 
-
- 
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      if (timeLeft > 0) {
-        setTimeLeft(time => time - 1);
-      } else {
-        setCanSend(true);
-      }
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [timeLeft]);
-
-
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    if (!inputValue.trim()) return;
-
-   
-
-
-    addComment(inputValue.trim());
-    setInputValue("");
-    setCanSend(false);
-    setTimeLeft(3);
-  };
-
-  // // console.log({comments});
  
   return (
     <div className="absolute bottom-0 left-0 right-0 z-[0] p-4 bg-gradient-to-t from-black/70 to-transparent">
@@ -111,17 +60,6 @@ export function LiveChat() {
               </div>
             </div>
           ))}
-
-        {localMessages.map((msg) => (
-          <div
-            key={msg.id}
-            className="flex items-center space-x-2 p-2 rounded-lg 
-              bg-red-500/10 animate-slide-up"
-          >
-            <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
-            <span className="text-white-400 text-sm italic">{msg.message}</span>
-          </div>
-        ))}
       </div>
     </div>
   );
