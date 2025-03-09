@@ -36,8 +36,6 @@ interface AIResponse {
   replyToMessage?: string;
   replyToHandle?: string;
   replyToPfp?: string;
-  isGiftResponse?: boolean;
-  giftId?: string;
   thought?: boolean;
 }
 

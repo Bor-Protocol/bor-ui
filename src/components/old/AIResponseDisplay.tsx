@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import  { useEffect, useState } from 'react';
 import { useSceneEngine } from '../../contexts/SceneEngineContext';
 import { AGENT_MAP } from '../../utils/constants';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageCircle, Gift } from 'lucide-react';
 
 export default function AIResponseDisplay() {
   const [isVisible, setIsVisible] = useState(false);
@@ -24,7 +23,6 @@ export default function AIResponseDisplay() {
     replyToMessage, 
     replyToHandle, 
     replyToPfp, 
-    isGiftResponse, 
     agentId 
   } = currentResponse;
 
@@ -50,9 +48,7 @@ export default function AIResponseDisplay() {
                   <h3 className="font-medium text-white">
                     {AGENT_MAP[agentId]?.name || 'Bor'}
                   </h3>
-                  <p className="text-xs text-white/90">
-                    {isGiftResponse ? 'Sending a gift' : 'Responding'}
-                  </p>
+                
                 </div>
               </div>
             </div>
@@ -65,10 +61,7 @@ export default function AIResponseDisplay() {
                   <span className="text-sm text-white">
                     Replying to {replyToHandle}
                   </span>
-                  {isGiftResponse ? 
-                    <Gift size={14} className="text-white/90" /> : 
-                    <MessageCircle size={14} className="text-white/90" />
-                  }
+                
                 </div>
                 {replyToMessage && (
                   <p className="mt-1 text-sm text-white/90 italic">

@@ -5,11 +5,9 @@ import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import ThreeScene from './3d/ThreeScene';
 import { useScene } from '../contexts/ScenesContext';
-import { HeartAnimation } from './old/HeartAnimation';
 import { LiveChat } from './old/LiveChat';
 import AIResponseDisplay from './old/AIResponseDisplay';
 
-import { useSocket } from '../hooks/useSocket';
 import { useSceneEngine } from '../contexts/SceneEngineContext';
 
 interface Creator {

@@ -18,12 +18,9 @@ interface Comment {
   handle: string;
   __v: number;
   _id: string;
-  messageType?: 'gift' | 'regular' | 'system';
+  messageType?: 'regular' | 'system';
   metadata?: {
     txHash?: string;
-    giftName?: string;
-    giftCount?: number;
-    coinsTotal?: number;
     icon?: string;
   };
 }
@@ -39,7 +36,6 @@ const getColorForUser = (userId: string): string => {
 };
 
 export interface SceneStats {
-  likes: number;
   comments: number;
   bookmarks: number;
   shares: number;
@@ -232,7 +228,6 @@ export function SceneProvider({ children }: { children: ReactNode }) {
 
     // Remove any existing listeners before adding new ones
     socket.off(`${currentAgentId}_comment_received`);
-    socket.off(`${currentAgentId}_like_received`);
 
     // Add new listeners
     socket.on(`${currentAgentId}_comment_received`, handleCommentReceived);
@@ -240,7 +235,6 @@ export function SceneProvider({ children }: { children: ReactNode }) {
 
     return () => {
       socket.off(`${currentAgentId}_comment_received`);
-      socket.off(`${currentAgentId}_like_received`);
     };
   }, [socket, currentAgentId, userId]);
 
@@ -262,13 +256,10 @@ export function SceneProvider({ children }: { children: ReactNode }) {
     handle?: string,
     isSystem: boolean = false,
     emitToServer: boolean = true,
-    messageType: 'gift' | 'regular' | 'system' = 'regular',
+    messageType: 'regular' | 'system' = 'regular',
    
     metadata?: {
-      txHash?: string;
-      giftName?: string;
-      giftCount?: number;
-      coinsTotal?: number;
+      txHash?: string; 
       icon?: string;
     }
   ) => {

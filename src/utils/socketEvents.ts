@@ -6,11 +6,9 @@ export const SOCKET_EVENTS = {
     AI_RESPONSE: 'ai_response',
     UPDATE_ANIMATION: 'update_animation',
     // Dynamic events based on currentAgentId
-    LIKE_RECEIVED: (agentId: string) => `${agentId}_like_received`,
     COMMENT_RECEIVED: (agentId: string) => `${agentId}_comment_received`,
     AGENT_AI_RESPONSE: (agentId: string) => `${agentId}_ai_response`,
     // Emitters
-    SEND_LIKE: 'send_like',
     SEND_COMMENT: 'send_comment',
     // New event
     NEW_MESSAGE: 'new_message',

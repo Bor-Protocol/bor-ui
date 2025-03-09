@@ -13,12 +13,7 @@ export const SOCKET_EVENTS = {
 export const STREAMER_ADDRESS = 'mdx5dxD754H8uGrz6Wc96tZfFjPqSgBvqUDbKycpump'; // Default address
 
 
-export interface Gift {
- id: string;
- name: string;
- coins: number;
- icon: string;
-}
+
 
 
 interface Model {

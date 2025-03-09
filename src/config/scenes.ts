@@ -69,7 +69,6 @@ export const scenesConfig: SceneConfig[] = [
         type: 'stream',
         component: lazy(() => import('../components/3d/ThreeScene')),
         stats: {
-            likes: 0,
             comments: 0,
             bookmarks: 0,
             shares: 0
