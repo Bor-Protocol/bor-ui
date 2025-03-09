@@ -41,7 +41,6 @@ export function LiveStream() {
                     ...scene.creator,
                     name: scene.creator.title,
                     description: scene.creator.title,
-                    followers: 0
                   }
                 }}
                 index={index}

@@ -39,18 +39,7 @@ interface AIResponse {
   thought?: boolean;
 }
 
-interface AudioResponse {
-  audioUrl: string;
-}
 
-const isValidUrl = (url: string): boolean => {
-  try {
-    new URL(url);
-    return true;
-  } catch {
-    return false;
-  }
-};
 
 
 export function SceneEngineProvider({ children }: SceneEngineProviderProps) {
@@ -85,22 +74,6 @@ export function SceneEngineProvider({ children }: SceneEngineProviderProps) {
 
 
 
-  // console.log('messageQueue: ', {messageQueue})
-
-
-  // const handleSetAnimation = (animation: string, callback?: () => void) => {
-  //   setAnimation(animations[animation]);
-
-  //   // Set a timeout to revert to idle after 2 seconds
-  //   setTimeout(() => {
-  //     setAnimation(animations['idle']);
-  //     if (callback) callback();
-  //   }, 2000);
-  // }
-
-  
-
-
   // Process Next Message //
   const processNextMessage = () => {
     console.log('processNextMessage called', {
@@ -130,9 +103,6 @@ export function SceneEngineProvider({ children }: SceneEngineProviderProps) {
 
     handleProcessMessage(nextMessage);
   }
-
-
-
 
 
 
@@ -216,7 +186,7 @@ export function SceneEngineProvider({ children }: SceneEngineProviderProps) {
 
             setAudioData({
               isPlaying: true,
-              currentTime: audioRef.current.currentTime,
+              currentTime: audioRef.current?.currentTime ?? 0,
               amplitude: amplitude
             });
 

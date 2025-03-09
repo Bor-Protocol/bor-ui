@@ -1,81 +1,10 @@
-export const SOCKET_URL = 'ws://localhost:6969'
-export const API_URL = 'http://localhost:6969'
-
-export const BORP_AGENT_ID = ""
-
-export const SOCKET_EVENTS = {
-   CONNECTION: 'connection',
-   DISCONNECT: 'disconnect',
-   NEW_COMMENT: 'new comment',
-   CONNECTED: 'connected'
-} as const;
+//Configuration Constants
 
 
-
-
-
-
-interface Model {
- model: string; // model file name -- must be a vrm file located in the public/models folder
- name: string; // model name -- unused
- description: string; // model description -- unused
- agentId: string; // needed to set up animation/aiReply/audio handlers per model, coming in from the server
- clothes: string; // unused
- defaultAnimation: string; // animation to play when the model is loaded
- modelPosition: [number, number, number]; // position of the model in the scene
- modelRotation: [number, number, number]; // rotation of the model in the scene
- modelScale: [number, number, number]; // scale of the model in the scene 
-}
-
-export interface SceneConfig {
-  id: string;
- name: string; // scene name -- unused
- description: string; // scene description -- unused
- environmentURL: string; // environment file name -- must be a glb file located in the public/environments folder
-
- // Camera settings
- cameraPosition: [number, number, number]; // camera position in the scene
- cameraRotation: number; // camera rotation in the scene
- cameraPitch: number; // camera pitch in the scene
-
- // Environment settings
- environmentScale: [number, number, number]; // scale of the environment in the scene
- environmentPosition: [number, number, number]; // position of the environment in the scene
- environmentRotation: [number, number, number]; // rotation of the environment in the scene
-
- // Array of models instead of single model config
- models: Model[];
- clothes: string;
-
-}
-
-// Extend your existing NewStreamConfig interface
-export interface NewStreamConfig {
- id: number;
- title: string;
- agentId: string;
- twitter: string;
- modelName: string;
- description: string;
- identifier: string;
- color: string;
- type: string;
- component: string;
- bgm?: string | string[]; 
- creator: {
-   avatar: string;
-   title: string;
-   username: string;
- };
- sceneConfigs: (SceneConfig)[];  
- stats: SceneStats;
- clothes: string;
-}
 
 // Add BGM URL constants
 export const BGM_URLS = {
    BORP: {
-       CAFE: '/audio/musicbg.mp3',
        DEFAULT: '/audio/musicbg.mp3'
    },
 } as const;
@@ -101,29 +30,6 @@ export const NEW_STREAM_CONFIGS: NewStreamConfig[] = [
        "name": "Cafe",
        "environmentURL": "tt.glb",
        "models": [
-        //  {
-        //   "model": "Clown doll A.vrm",
-        //   "agentId": "a9f3105f-7b14-09bd-919f-a1482637a374",       // model's need to store the agentId for now. this is because of the way animations are triggered via SceneEngine into ThreeScene by the model's agentId
-        //    "name": "Borp",
-        //    "description": "Borp",
-        //    "clothes": "casual",
-        //    "defaultAnimation": "offensive_idle",
-        //    "modelPosition": [
-        //      1.0999999999999999,
-        //      -0.4999999999999999,
-        //      -7.3000000000000185
-        //    ],
-        //    "modelRotation": [
-        //      0,
-        //      2.1000000000000005,
-        //      0
-        //    ],
-        //    "modelScale": [
-        //      0.9605960100000004,
-        //      0.9605960100000004,
-        //      0.9605960100000004
-        //    ]
-        //  },
          {
            "model": "tromp.vrm",
            "name": "Bor",
@@ -175,35 +81,10 @@ export const NEW_STREAM_CONFIGS: NewStreamConfig[] = [
    ],
    stats: {
      comments: 0,
-
    },
    clothes: "casual"
  },
 ]
-
-
-// SCENES
-export const ANIMATIONS_BASE_URL = '/animations';
-export const ENVIRONMENTS_BASE_URL = '/environments';
-export const MODELS_BASE_URL = '/models';
-
-// should just be key of ANIMATION_MAP
-export const getAnimationUrl = (animation: keyof typeof ANIMATION_MAP) => {
-   const animationFile = ANIMATION_MAP[animation];
-   const animationUrl = `${ANIMATIONS_BASE_URL}/${animationFile}`;
-   console.log('🎬 Getting Animation URL:', {
-       animation,
-       animationFile,
-       fullUrl: animationUrl
-   });
-   return animationUrl;
-};
-export const getEnvironmentUrl = (environment: string) => {
-   return `${ENVIRONMENTS_BASE_URL}/${environment}`;
-}
-export const getModelUrl = (model: string) => `${MODELS_BASE_URL}/${model}`;
-
-
 
 export const ANIMATION_MAP: { [key: string]: string } = {
   "pointing": "Pointing.fbx",
@@ -285,6 +166,31 @@ export const ANIMATION_MAP: { [key: string]: string } = {
 };
 
 
+// SCENES
+
+// URLS to import animations, environments, and models
+export const ANIMATIONS_BASE_URL = '/animations';
+export const ENVIRONMENTS_BASE_URL = '/environments';
+export const MODELS_BASE_URL = '/models';
+
+// should just be key of ANIMATION_MAP
+export const getAnimationUrl = (animation: keyof typeof ANIMATION_MAP) => {
+   const animationFile = ANIMATION_MAP[animation];
+   const animationUrl = `${ANIMATIONS_BASE_URL}/${animationFile}`;
+   console.log('🎬 Getting Animation URL:', {
+       animation,
+       animationFile,
+       fullUrl: animationUrl
+   });
+   return animationUrl;
+};
+export const getEnvironmentUrl = (environment: string) => {
+   return `${ENVIRONMENTS_BASE_URL}/${environment}`;
+}
+export const getModelUrl = (model: string) => `${MODELS_BASE_URL}/${model}`;
+
+
+
 const MESSAGE_TIMEOUTS = {
    "small": 3000,    // For messages < 50 chars
    "medium": 8000,  // For messages 50-150 chars
@@ -308,8 +214,79 @@ export const AGENT_MAP: { [agentId: string]: { name: string } } = {
    
 }
 
-export interface SceneStats {
+
+//api && socket
+
+export const SOCKET_URL = 'ws://localhost:6969'
+export const API_URL = 'http://localhost:6969'
+
+
+export const SOCKET_EVENTS = {
+   CONNECTION: 'connection',
+   DISCONNECT: 'disconnect',
+   NEW_COMMENT: 'new comment',
+   CONNECTED: 'connected'
+} as const;
+
+
+//*******Abstraction Interfaces*******
+
+interface Model {
+  model: string; // model file name -- must be a vrm file located in the public/models folder
+  name: string; // model name -- unused
+  description: string; // model description -- unused
+  agentId: string; // needed to set up animation/aiReply/audio handlers per model, coming in from the server
+  clothes: string; // unused
+  defaultAnimation: string; // animation to play when the model is loaded
+  modelPosition: [number, number, number]; // position of the model in the scene
+  modelRotation: [number, number, number]; // rotation of the model in the scene
+  modelScale: [number, number, number]; // scale of the model in the scene 
+ }
+ 
+ export interface SceneConfig {
+  id: number;
+  name: string; // scene name -- unused
+  environmentURL: string; // environment file name -- must be a glb file located in the public/environments folder
+ 
+  // Camera settings
+  cameraPosition: [number, number, number]; // camera position in the scene
+  cameraRotation: number; // camera rotation in the scene
+  cameraPitch: number; // camera pitch in the scene
+ 
+  // Environment settings
+  environmentScale: [number, number, number]; // scale of the environment in the scene
+  environmentPosition: [number, number, number]; // position of the environment in the scene
+  environmentRotation: [number, number, number]; // rotation of the environment in the scene
+ 
+  // Array of models instead of single model config
+  models: Model[];
+ 
+ }
+ 
+ // Extend your existing NewStreamConfig interface
+ export interface NewStreamConfig {
+  id: number;
+  title: string;
+  agentId: string;
+  twitter: string;
+  modelName: string;
+  description: string;
+  identifier: string;
+  color: string;
+  type: string;
+  component: string;
+  bgm?: string | string[]; 
+  creator: {
+    avatar: string;
+    title: string;
+    username: string;
+  };
+  sceneConfigs: (SceneConfig)[];  
+  stats: SceneStats;
+  clothes: string;
+ }
+
+ export interface SceneStats {
   comments: number;
 
 }
-

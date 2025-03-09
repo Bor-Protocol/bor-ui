@@ -14,7 +14,6 @@ interface Creator {
     name: string;
     avatar: string;
     description: string;
-    followers: number;
 }
 
 interface Scene {
@@ -73,16 +72,7 @@ export function SceneLoader() {
     );
 }
 
-function SceneErrorFallback() {
-    return (
-        <div className="absolute inset-0 flex items-center justify-center bg-red-300">
-            <div className="text-center p-4">
-                <h3 className="text-lg font-semibold mb-2">Something went wrong</h3>
-                <p className="text-muted-foreground">Please try refreshing the page</p>
-            </div>
-        </div>
-    );
-}
+
 
 
 function SceneContent({  isActive, }: {
@@ -99,22 +89,13 @@ function SceneContent({  isActive, }: {
     const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
 
     useEffect(() => {
-        const sceneConfig = currentScene.sceneConfigs[sceneConfigIndex];
-        let currentBgm = sceneConfig?.bgm || currentScene.bgm;
+        let currentBgm = currentScene.bgm;
         
         // Stop any playing BGM
         stopBackgroundMusic();
         
         // Handle BGM playlist
         if (Array.isArray(currentBgm)) {
-            const playNextTrack = () => {
-                setCurrentTrackIndex(prevIndex => {
-                    const nextIndex = (prevIndex + 1) % currentBgm.length;
-                    playBackgroundMusic(currentBgm[nextIndex]);
-                    return nextIndex;
-                });
-            };
-
             // Play initial track
             playBackgroundMusic(currentBgm[currentTrackIndex]);
         } else if (currentBgm) {
@@ -149,25 +130,6 @@ function SceneContent({  isActive, }: {
         }
     }, [currentScene.id]);
 
-    // Add keyboard controls for debug mode
-    // useEffect(() => {
-    // //     if (!debugMode) return;
-
-    // //     // const handleKeyDown = (e: KeyboardEvent) => {
-    // //     //     // Dispatch custom event for ThreeScene to handle
-    // //     //     window.dispatchEvent(new CustomEvent('debug-control', {
-    // //     //         detail: { 
-    // //     //             key: e.key,
-    // //     //             shift: e.shiftKey,
-    // //     //             ctrl: e.ctrlKey
-    // //     //         }
-    // //     //     }));
-    // //     // };
-
-    // //     // window.addEventListener('keydown', handleKeyDown);
-    // //     return () => window.removeEventListener('keydown', handleKeyDown);
-    // // }, [debugMode]);
-
     if (!isActive) return null;
 
     return (
@@ -188,51 +150,7 @@ const SceneWrapper: React.FC<SceneWrapperProps> = ({
     scene,
     index
 }) => {
-    
-
-    const {
-       
-       
-        activeScene,
-       
-    } = useScene();
-   
-
-   
-
-    
-
-
-    // Update the viewport height effect to run immediately
-    useEffect(() => {
-        const updateHeight = () => {
-            const vh = window.innerHeight * 0.01;
-            document.documentElement.style.setProperty('--vh', `${vh}px`);
-        };
-
-        // Run immediately
-        updateHeight();
-
-        // Force a second update after a brief delay to handle any initial rendering issues
-        const initialTimeout = setTimeout(updateHeight, 100);
-
-        // Add resize listener
-        window.addEventListener('resize', updateHeight);
-
-        return () => {
-            window.removeEventListener('resize', updateHeight);
-            clearTimeout(initialTimeout);
-        };
-    }, []);
- 
-
-    
-
-
-    
-
-   // Empty dependency array means this runs once on mount
-
+    const {activeScene} = useScene();
     return (
         <div className="h-full w-full snap-start snap-always flex flex-col">
             <div className="flex-1 relative">
@@ -240,13 +158,8 @@ const SceneWrapper: React.FC<SceneWrapperProps> = ({
                 <div className="absolute inset-0">
                     <SceneContent scene={scene} isActive={activeScene === index} debugMode={false} orbitEnabled={false} />
                 </div>
-
-
                         <LiveChat />
-
                         <AIResponseDisplay />
-
-
             </div>
         </div>
     );

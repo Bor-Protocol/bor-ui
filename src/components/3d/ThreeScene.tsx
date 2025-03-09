@@ -105,11 +105,7 @@ const ANIMATIONS = [
 ];
 
 
-// Helper function to get model name from URL
-const getModelNameFromUrl = (url: string): string => {
-  const parts = url.split('/');
-  return parts[parts.length - 1];
-};
+
 
 // Make CafeEnvironment a proper React component
 const CafeEnvironment: React.FC<{ environmentUrl: string, config: SceneConfig }> = ({ environmentUrl: _environmentUrl, config }) => {
@@ -132,34 +128,7 @@ const CafeEnvironment: React.FC<{ environmentUrl: string, config: SceneConfig }>
   );
 };
 
-type ConfigKey = keyof ModelConfig;
 
-
-// Example usage:
-// updateSceneConfig('cameraPosition', [0, 1.5, 1], setSceneConfig);
-
-// Then in your component:
-
-interface AudioData {
-  buffer: Float32Array;
-  duration: number;
-  timestamp: number;
-}
-
-interface LipSyncConfig {
-  threshold: number;
-  smoothing: number;
-  mouthOpenValue: number;
-}
-
-interface ModelConfig {
-  // ... existing properties ...
-  lipSyncConfig?: {
-    threshold: number;
-    smoothing: number;
-    mouthOpenValue: number;
-  };
-}
 
 export function ThreeScene({ debugMode }: { debugMode: boolean }) {
   const modelRefs = useRef<(Group | undefined)[]>([]);
@@ -186,8 +155,6 @@ export function ThreeScene({ debugMode }: { debugMode: boolean }) {
   console.log({sceneConfig})
 
   // This is the index of the model we are currently using (editor)
-  const [selectedModelIndex, setSelectedModelIndex] = useState<number>(0);
-  const currentModel = getModelUrl(models[selectedModelIndex].model);
 
   // Add camera position state
   const [cameraPosition, setCameraPosition] = useState<[number, number, number]>(sceneConfig.cameraPosition);
@@ -196,15 +163,6 @@ export function ThreeScene({ debugMode }: { debugMode: boolean }) {
 
   console.log("THIS IS THE SCENE CONFIG", { ...sceneConfig, cameraPosition, cameraRotation, cameraPitch })
 
-  const updateSceneConfig = useCallback((
-    key: ConfigKey,
-    value: [number, number, number]
-  ) => {
-    setSceneConfig(prev => ({
-      ...prev,
-      [key]: value
-    }));
-  }, [setSceneConfig]);
 
 
   // Function to play a specific animation
@@ -547,218 +505,7 @@ export function ThreeScene({ debugMode }: { debugMode: boolean }) {
     console.log("THIS IS THE CURRENT CONFIG", JSON.stringify(currentConfig, null, 2));
   };
 
-  // Update the keyboard handler
-  useEffect(() => {
-    if (!debugMode) return;
-    
-    const handleKeyPress = (event: KeyboardEvent) => {
-      const moveSpeed = 0.1;
-      const rotateSpeed = 0.1;
-      const cameraRotateSpeed = Math.PI / 32;
 
-      // Model selection controls
-      if (event.key >= '1' && event.key <= '9') {
-        const index = parseInt(event.key) - 1;
-        if (index < models.length) {
-          setSelectedModelIndex(index);
-          console.log(`Selected model ${index}`);
-        }
-        return;
-      }
-
-      switch (event.key.toLowerCase()) {
-        // Camera rotation
-        case 'q':
-          setCameraRotation(prev => prev - cameraRotateSpeed);
-          break;
-        case 'e':
-          setCameraRotation(prev => prev + cameraRotateSpeed);
-          break;
-        case 'r':
-          setCameraPitch(prev => Math.max(prev - cameraRotateSpeed, -Math.PI / 3)); // Limit looking up to 60 degrees
-          break;
-        case 'f':
-          setCameraPitch(prev => Math.min(prev + cameraRotateSpeed, Math.PI / 3)); // Limit looking down to 60 degrees
-          break;
-
-
-
-        // Existing camera movement controls
-        case 'w':
-          setCameraPosition([
-            cameraPosition[0] + Math.sin(cameraRotation) * moveSpeed,
-            cameraPosition[1],
-            cameraPosition[2] - Math.cos(cameraRotation) * moveSpeed
-          ]);
-          break;
-        case 's':
-          setCameraPosition([
-            cameraPosition[0] - Math.sin(cameraRotation) * moveSpeed,
-            cameraPosition[1],
-            cameraPosition[2] + Math.cos(cameraRotation) * moveSpeed
-          ]);
-          break;
-        case 'a':
-          setCameraPosition([
-            cameraPosition[0] - Math.cos(cameraRotation) * moveSpeed,
-            cameraPosition[1],
-            cameraPosition[2] - Math.sin(cameraRotation) * moveSpeed
-          ]);
-          break;
-        case 'd':
-          setCameraPosition([
-            cameraPosition[0] + Math.cos(cameraRotation) * moveSpeed,
-            cameraPosition[1],
-            cameraPosition[2] + Math.sin(cameraRotation) * moveSpeed
-          ]);
-          break;
-        // New camera Y-axis controls
-        case 'z':
-          setCameraPosition([
-            cameraPosition[0],
-            cameraPosition[1] - moveSpeed, // Move down
-            cameraPosition[2]
-          ]);
-          break;
-        case 'x':
-          setCameraPosition([
-            cameraPosition[0],
-            cameraPosition[1] + moveSpeed, // Move up
-            cameraPosition[2]
-          ]);
-          break;
-
-        // Model controls - now using selectedModelIndex
-        case 'i':
-        case 'k':
-        case 'j':
-        case 'l':
-        case 'n':
-        case 'm':
-          {
-            const currentPosition = modelPositionsRef.current[selectedModelIndex] || [0, 0, 0];
-            const newPosition = [...currentPosition] as [number, number, number];
-
-            switch (event.key.toLowerCase()) {
-              case 'i': newPosition[2] -= moveSpeed; break;
-              case 'k': newPosition[2] += moveSpeed; break;
-              case 'j': newPosition[0] -= moveSpeed; break;
-              case 'l': newPosition[0] += moveSpeed; break;
-              case 'n': newPosition[1] -= moveSpeed; break;
-              case 'm': newPosition[1] += moveSpeed; break;
-            }
-
-            // Update the ref immediately
-            modelPositionsRef.current[selectedModelIndex] = newPosition;
-
-            // Update Three.js object
-            if (modelRefs.current[selectedModelIndex]) {
-              modelRefs.current[selectedModelIndex].position.set(...newPosition);
-            }
-
-            // Update scene config
-            setSceneConfig(prev => {
-              const newModels = [...prev.models];
-              newModels[selectedModelIndex] = {
-                ...newModels[selectedModelIndex],
-                modelPosition: newPosition
-              };
-              return { ...prev, models: newModels };
-            });
-          }
-          break;
-        case 'u':
-          {
-            const currentRotation = modelRotationsRef.current[selectedModelIndex] || [0, 0, 0];
-            const newRotation = [...currentRotation] as [number, number, number];
-
-            newRotation[1] -= rotateSpeed;
-
-            // Update the ref immediately
-            modelRotationsRef.current[selectedModelIndex] = newRotation;
-
-            // Update Three.js object
-            if (modelRefs.current[selectedModelIndex]) {
-              modelRefs.current[selectedModelIndex].rotation.set(...newRotation);
-            }
-
-            // Update scene config
-            setSceneConfig(prev => {
-              const newModels = [...prev.models];
-              newModels[selectedModelIndex] = {
-                ...newModels[selectedModelIndex],
-                modelRotation: newRotation
-              };
-              return { ...prev, models: newModels };
-            });
-          }
-          break;
-        case 'o':
-          {
-            const currentRotation = modelRotationsRef.current[selectedModelIndex] || [0, 0, 0];
-            const newRotation = [...currentRotation] as [number, number, number];
-
-            newRotation[1] += rotateSpeed;
-
-            // Update the ref immediately
-            modelRotationsRef.current[selectedModelIndex] = newRotation;
-
-            // Update Three.js object
-            if (modelRefs.current[selectedModelIndex]) {
-              modelRefs.current[selectedModelIndex].rotation.set(...newRotation);
-            }
-
-            // Update scene config
-            setSceneConfig(prev => {
-              const newModels = [...prev.models];
-              newModels[selectedModelIndex] = {
-                ...newModels[selectedModelIndex],
-                modelRotation: newRotation
-              };
-              return { ...prev, models: newModels };
-            });
-          }
-          break;
-        case ',':
-          {
-            const newModels = [...models];
-            const newScale = newModels[selectedModelIndex].modelScale.map(s => s * 0.9) as [number, number, number];
-            newModels[selectedModelIndex] = {
-              ...newModels[selectedModelIndex],
-              modelScale: newScale
-            };
-            // Immediately update the model scale
-            if (modelRefs.current[selectedModelIndex]) {
-              modelRefs.current[selectedModelIndex].scale.set(...newScale);
-            }
-            setSceneConfig(prev => ({ ...prev, models: newModels }));
-          }
-          break;
-        case '.':
-          {
-            const newModels = [...models];
-            const newScale = newModels[selectedModelIndex].modelScale.map(s => s * 1.1) as [number, number, number];
-            newModels[selectedModelIndex] = {
-              ...newModels[selectedModelIndex],
-              modelScale: newScale
-            };
-            // Immediately update the model scale
-            if (modelRefs.current[selectedModelIndex]) {
-              modelRefs.current[selectedModelIndex].scale.set(...newScale);
-            }
-            setSceneConfig(prev => ({ ...prev, models: newModels }));
-          }
-          break;
-        // Add this case to log config when 'P' is pressed
-        case 'p':
-          logSceneConfig();
-          break;
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyPress);
-    return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [debugMode, models, selectedModelIndex, cameraPosition, cameraPitch, cameraRotation]);
 
   useEffect(() => {
     if (activeSceneConfig) {
@@ -800,36 +547,7 @@ export function ThreeScene({ debugMode }: { debugMode: boolean }) {
   const analyserRef = useRef<AnalyserNode | null>(null);
   const dataArrayRef = useRef<Float32Array | null>(null);
 
-  const updateLipSync = useCallback((audioData: AudioData, modelIndex: number) => {
-    const vrm = vrmRefs.current[modelIndex];
-    if (!vrm || !vrm.expressionManager) return;
 
-    // Get current audio amplitude
-    const amplitude = Math.max(...audioData.buffer);
-    
-    // Configure lip sync parameters
-    const lipSyncConfig: LipSyncConfig = {
-      threshold: 0.1,
-      smoothing: 0.5,
-      mouthOpenValue: 1.0
-    };
-
-    // Calculate mouth opening based on amplitude
-    const mouthOpen = Math.min(
-      amplitude * lipSyncConfig.mouthOpenValue, 
-      lipSyncConfig.mouthOpenValue
-    );
-
-    // Apply smoothing
-    const currentMouthOpen = vrm.expressionManager.getValue('aa') || 0;
-    const smoothedMouthOpen = currentMouthOpen * lipSyncConfig.smoothing + 
-      mouthOpen * (1 - lipSyncConfig.smoothing);
-
-    // Update VRM expressions for mouth movement
-    vrm.expressionManager.setValue('aa', smoothedMouthOpen);
-    vrm.expressionManager.setValue('ih', smoothedMouthOpen * 0.5);
-    vrm.expressionManager.setValue('ou', smoothedMouthOpen * 0.3);
-  }, []);
 
   useEffect(() => {
     // Initialize audio context
@@ -847,60 +565,7 @@ export function ThreeScene({ debugMode }: { debugMode: boolean }) {
     };
   }, []);
 
-  const playAudioWithLipSync = useCallback(async (
-    audioUrl: string, 
-    modelIndex: number
-  ) => {
-    if (!audioContextRef.current || !analyserRef.current || !dataArrayRef.current) return;
 
-    try {
-      const response = await fetch(audioUrl);
-      const arrayBuffer = await response.arrayBuffer();
-      const audioBuffer = await audioContextRef.current.decodeAudioData(arrayBuffer);
-
-      const source = audioContextRef.current.createBufferSource();
-      source.buffer = audioBuffer;
-      source.connect(analyserRef.current);
-      analyserRef.current.connect(audioContextRef.current.destination);
-
-      // Start audio playback
-      source.start();
-
-      // Update lip sync on each animation frame
-      const updateLips = () => {
-        if (!analyserRef.current || !dataArrayRef.current) return;
-
-        analyserRef.current.getFloatTimeDomainData(dataArrayRef.current);
-        
-        updateLipSync({
-          buffer: dataArrayRef.current,
-          duration: audioBuffer.duration,
-          timestamp: audioContextRef.current?.currentTime || 0
-        }, modelIndex);
-
-        if (audioContextRef.current?.state === 'running') {
-          requestAnimationFrame(updateLips);
-        }
-      };
-
-      requestAnimationFrame(updateLips);
-
-      // Clean up when audio ends
-      source.onended = () => {
-        source.disconnect();
-        // Reset mouth to closed position
-        const vrm = vrmRefs.current[modelIndex];
-        if (vrm && vrm.expressionManager) {
-          vrm.expressionManager.setValue('aa', 0);
-          vrm.expressionManager.setValue('ih', 0);
-          vrm.expressionManager.setValue('ou', 0);
-        }
-      };
-
-    } catch (error) {
-      console.error('Error playing audio with lip sync:', error);
-    }
-  }, [updateLipSync]);
 
   if (!sceneConfig) return null;
 
