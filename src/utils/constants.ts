@@ -290,3 +290,19 @@ interface Model {
   comments: number;
 
 }
+
+// Replace the hardcoded NEW_STREAM_CONFIGS with a function to load configs
+export const loadStreamConfig = async (configId: string): Promise<NewStreamConfig> => {
+  // This would fetch from your backend/database
+  const config = await fetch(`${API_URL}/stream-configs/${configId}`);
+  return config.json();
+};
+
+// Default values for new configurations
+export const DEFAULT_STREAM_CONFIG = {
+  environmentScale: [1, 1, 1],
+  modelScale: [1, 1, 1],
+  defaultCameraPosition: [2.86, 0.76, -7.73],
+  defaultModelPosition: [1.51, -0.5, -7.65],
+  defaultEnvironmentPosition: [3, -1, -3.5],
+} as const;

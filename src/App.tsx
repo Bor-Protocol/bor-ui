@@ -8,6 +8,7 @@ import { DocsPage } from './components/DocsPage';
 
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import SceneConfigurator from './components/SceneConfigurator';
+import { StreamConfigEditor } from './components/StreamConfigEditor';
 
 const queryClient = new QueryClient();
 
@@ -23,7 +24,7 @@ export default function App() {
                           <Routes>
                             <Route path="/:modelName" element={<InnerApp />} />
                             <Route path="/" element={<InnerApp />} />
-                            <Route path="/configure" element={<SceneConfigurator />} />
+                            <Route path="/configure" element={<StreamConfigEditor />} />
                             <Route path="/docs" element={<DocsPage />} />
                           </Routes>      
                       </SceneEngineProvider>

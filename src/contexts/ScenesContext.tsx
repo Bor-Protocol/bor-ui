@@ -61,6 +61,7 @@ interface SceneContextType {
   swapSceneConfigByClothes: (clothesName: string) => void;
   availableSceneConfigs: SceneConfig[];
   availableClothes: string[];
+  updateScene: (updatedScene: NewStreamConfig) => void;
 }
 
 const SceneContext = createContext<SceneContextType | undefined>(undefined);
@@ -79,8 +80,7 @@ export function SceneProvider({ children }: { children: ReactNode }) {
   //refreshScenes is removed for now but can be added back in to ensure the refresh after we change config
   //const { isLoading, error } = useSceneManager();
 
-  const newScenes: NewStreamConfig[] = useMemo(() => NEW_STREAM_CONFIGS, [])
-
+  const [newScenes, setNewScenes] = useState<NewStreamConfig[]>(NEW_STREAM_CONFIGS);
 
   const { emit, socket } = useSocket();
   const [userId] = useState<string>("Anonymous");
@@ -301,9 +301,11 @@ export function SceneProvider({ children }: { children: ReactNode }) {
     }
   }, [scene, currentAgentId]);
 
-
-
-
+  const updateScene = (updatedScene: NewStreamConfig) => {
+    setNewScenes(prev => prev.map(scene => 
+      scene.id === updatedScene.id ? updatedScene : scene
+    ));
+  };
 
   return (
     <SceneContext.Provider
@@ -347,6 +349,7 @@ export function SceneProvider({ children }: { children: ReactNode }) {
         swapSceneConfigByClothes,
         availableSceneConfigs,
         availableClothes,
+        updateScene,
       }}
     >
       {children}
