@@ -138,14 +138,75 @@ export const StreamConfigEditor: React.FC = () => {
     localStorage.setItem('stream-config', JSON.stringify(newConfig));
   };
 
+  const exportConfig = () => {
+    // Convert current config to NEW_STREAM_CONFIGS format
+    const exportedConfig = {
+      id: scenes[0].id,
+      title: config.streamInfo.title,
+      agentId: config.sceneConfig.character.agentId,
+      twitter: config.streamInfo.twitter,
+      modelName: config.streamInfo.modelName,
+      identifier: config.streamInfo.identifier,
+      description: config.streamInfo.description,
+      color: config.streamInfo.color,
+      type: config.streamInfo.type,
+      component: config.streamInfo.component,
+      creator: {
+        avatar: config.creatorInfo.avatar,
+        title: config.creatorInfo.title,
+        username: config.creatorInfo.username
+      },
+      bgm: config.audio.bgm,
+      sceneConfigs: [{
+        id: scenes[0].sceneConfigs[0].id,
+        name: config.sceneConfig.name,
+        environmentURL: "tt.glb",
+        models: [{
+          model: "tromp.vrm",
+          name: "Bor",
+          agentId: "795df77f-1620-07db-bd9a-0e2dfefef248",
+          description: "Bor",
+          clothes: "casual",
+          defaultAnimation: "idlet",
+          modelPosition: config.sceneConfig.character.position,
+          modelRotation: config.sceneConfig.character.rotation,
+          modelScale: config.sceneConfig.character.scale
+        }],
+        environmentScale: config.sceneConfig.environment.scale,
+        environmentPosition: config.sceneConfig.environment.position,
+        environmentRotation: config.sceneConfig.environment.rotation,
+        cameraPitch: config.sceneConfig.camera.pitch || 0,
+        cameraPosition: config.sceneConfig.camera.position,
+        cameraRotation: config.sceneConfig.camera.rotation
+      }],
+      stats: config.stats,
+      clothes: "casual"
+    };
+
+    // Create the file content with proper formatting
+    const fileContent = `export const NEW_STREAM_CONFIGS = ${JSON.stringify(exportedConfig, null, 2)};`;
+    
+    // Create and download the file
+    const blob = new Blob([fileContent], { type: 'text/javascript' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'sceneConfig.ts';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       localStorage.setItem('stream-config', JSON.stringify(config));
-      alert('Configuration saved successfully!');
+      exportConfig();
+      alert('Configuration exported! Replace your sceneConfig.ts file with the downloaded file.');
     } catch (error) {
-      console.error('Error saving configuration:', error);
-      alert('Error saving configuration');
+      console.error('Error exporting configuration:', error);
+      alert('Error exporting configuration');
     }
   };
 
@@ -319,7 +380,7 @@ export const StreamConfigEditor: React.FC = () => {
                 onClick={handleSubmit}
                 className="bg-blue-500 text-white px-3 py-1 rounded-md text-sm"
               >
-                Save
+                Export Config
               </button>
             </div>
           </div>
