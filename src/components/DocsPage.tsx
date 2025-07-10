@@ -1,4 +1,3 @@
-import React from 'react';
 import { ArrowRight, Sparkles, Clock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 

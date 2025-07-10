@@ -44,7 +44,7 @@ export function OrbitingBall({ color, delay }: OrbitingBallProps) {
     );
 }
 
-export function OrbitingBall2({ color, delay }: OrbitingBallProps) {
+export function OrbitingBall2({ color: _color, delay }: OrbitingBallProps) {
     return (
         <div
             className={`absolute left-1/2 top-1/2 -ml-1.5 -mt-1.5 ${delay ? 'animate-orbit-delayed' : 'animate-orbit'
@@ -86,7 +86,7 @@ function SceneContent({  isActive, }: {
     const currentScene = scenes[activeScene];
     const prevSceneRef = useRef<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
-    const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
+    const [currentTrackIndex, ] = useState(0);
 
     useEffect(() => {
         let currentBgm = currentScene.bgm;
@@ -109,7 +109,7 @@ function SceneContent({  isActive, }: {
     }, [activeScene, sceneConfigIndex]);
 
     useEffect(() => {
-        if (prevSceneRef.current !== currentScene.id) {
+        if (prevSceneRef.current !== String(currentScene.id)) {
             setIsLoading(true);
 
             // Cleanup previous scene
@@ -122,7 +122,7 @@ function SceneContent({  isActive, }: {
 
             // Load new scene after a short delay to ensure cleanup
             const loadTimer = setTimeout(() => {
-                prevSceneRef.current = currentScene.id;
+                prevSceneRef.current = String(currentScene.id);
                 setIsLoading(false);
             }, 300);
 

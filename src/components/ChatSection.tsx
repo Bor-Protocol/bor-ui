@@ -2,14 +2,11 @@ import './WebSocketProvider';  // Import this first!
 
 import { useState, useEffect, useRef } from 'react';
 import { useScene } from '../contexts/ScenesContext';
-import { Client } from 'tmi.js';
-
-
+import { Client, ChatUserstate } from 'tmi.js';
 
 interface ChatSectionProps {
   onClose?: () => void;
 }
-
 
 interface ChatMessage {
   username: string;
@@ -17,6 +14,7 @@ interface ChatMessage {
   timestamp: string;
   avatar: string;
 }
+
 interface MessageEvent {
   data: {
       type: string;
@@ -33,11 +31,8 @@ interface MessageEvent {
 
 
 export function ChatSection({  }: ChatSectionProps) {
-  const {  addComment } = useScene();
- 
-
-
-  const [isConnected, setIsConnected] = useState(false);
+  const { addComment } = useScene();
+  const [, setIsConnected] = useState(false);
 
   const clientIdRef = useRef(import.meta.env.VITE_TWITCH_CLIENT_ID);
 
@@ -124,17 +119,17 @@ useEffect(() => {
 
 
  // Function to handle messages
- const handleMessage = async (channel, tags, message, self) => {
+ const handleMessage = async (_channel: string, userstate: ChatUserstate, message: string, self: boolean) => {
   if (self) return; // Ignore messages from the bot
 
   // Fetch avatar for the user
-  const avatar = await fetchUserAvatar(tags['user-id']);
+  const avatar = await fetchUserAvatar(userstate['user-id'] || '');
 
   // Verify the payload has the expected structure
   const newMessage: ChatMessage = {
-    username:  tags['display-name'],
+    username:  userstate['display-name'] || 'Unknown',
     chatContent: message,
-    timestamp: new Date(),
+    timestamp: new Date().toISOString(),
     avatar: avatar || 'https://static-cdn.jtvnw.net/user-default-pictures-uv/13e5fa74-defa-11e9-809c-784f43822e80-profile_image-70x70.png' // Default Twitch avatar
   };
 
@@ -153,6 +148,21 @@ useEffect(() => {
 
 
 };
+
+// Expose test function to browser console
+if (typeof window !== 'undefined') {
+  (window as any).testTwitchMessage = async () => {
+    console.log('🧪 Testing Twitch message from console...');
+    
+    const mockUserstate = {
+      'user-id': '123456789',
+      'display-name': 'TestUser'
+    } as ChatUserstate;
+    
+    await handleMessage('#testchannel', mockUserstate, 'testing', false);
+    console.log('✅ Test message sent from console!');
+  };
+}
 
 // Handle connection
 const handleConnect = () => {
@@ -211,7 +221,7 @@ const client = new Client({
 
   return (
  <div>
-
+   {/* Test available via browser console: testTwitchMessage() */}
  </div>
   );
 }

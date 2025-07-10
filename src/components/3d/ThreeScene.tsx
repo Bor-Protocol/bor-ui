@@ -44,7 +44,8 @@ export const IPFS_BASE_URL = 'https://bafybeibgfj5zr3wtmbl6hgx5kuc4suiledti3ozkh
 //avoir ca doit etre changer par le bon url cdn
 
 
-const ANIMATIONS = [
+// Remove unused ANIMATIONS array
+ const ANIMATIONS = [
   '/animations/acknowledging.fbx',
   '/animations/angry_gesture.fbx',
   '/animations/annoyed_head_shake.fbx',
@@ -244,7 +245,7 @@ export function ThreeScene({ debugMode }: { debugMode: boolean }) {
       const vrm = vrmRefs.current[modelIndex];
       if (!vrm) return;
 
-      if (actionsRefs.current[modelIndex]?.[currentAnimation]) {
+      if (currentAnimation && actionsRefs.current[modelIndex]?.[currentAnimation]) {
         console.log('▶️ Playing Existing Animation:', {
           agentId,
           animation: currentAnimation,
@@ -257,7 +258,7 @@ export function ThreeScene({ debugMode }: { debugMode: boolean }) {
           animation: currentAnimation,
           modelIndex
         });
-        loadMixamoAnimation(getAnimationUrl(currentAnimation), vrm)
+        currentAnimation && loadMixamoAnimation(getAnimationUrl(currentAnimation), vrm)
           .then(clip => {
             if (mixerRefs.current[modelIndex]) {
               console.log('✅ Animation Loaded Successfully:', {
@@ -265,9 +266,11 @@ export function ThreeScene({ debugMode }: { debugMode: boolean }) {
                 animation: currentAnimation,
                 modelIndex
               });
-              const action = mixerRefs.current[modelIndex].clipAction(clip);
-              actionsRefs.current[modelIndex][currentAnimation] = action;
-              playAnimation(currentAnimation, true, modelIndex);
+              const action = mixerRefs.current[modelIndex]!.clipAction(clip);
+              if (currentAnimation) {
+                actionsRefs.current[modelIndex][currentAnimation] = action;
+                playAnimation(currentAnimation, true, modelIndex);
+              }
             }
           })
           .catch(error => {
@@ -298,8 +301,8 @@ export function ThreeScene({ debugMode }: { debugMode: boolean }) {
   }, []);
 
   // Add loading state
-  const [modelsLoaded, setModelsLoaded] = useState<boolean[]>([]);
-  const [allModelsLoaded, setAllModelsLoaded] = useState(false);
+  const [, setModelsLoaded] = useState<boolean[]>([]);
+  const [, setAllModelsLoaded] = useState(false);
 
   // Modify the model loading effect
   useEffect(() => {
@@ -345,7 +348,7 @@ export function ThreeScene({ debugMode }: { debugMode: boolean }) {
             const vrm = gltf.userData.vrm;
             vrmRefs.current[index] = vrm;
 
-            vrm.scene.traverse((obj) => {
+            vrm.scene.traverse((obj: any) => {
               obj.frustumCulled = false;
             });
 
@@ -417,7 +420,7 @@ export function ThreeScene({ debugMode }: { debugMode: boolean }) {
       const elapsedTime = clock.elapsedTime;
 
       // Lip sync logic
-      vrmRefs.current.forEach((vrm, index) => {
+      vrmRefs.current.forEach((vrm, _index) => {
         if (!vrm || !vrm.expressionManager) return;
 
         if (audioData.isPlaying) {

@@ -3,7 +3,21 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { PerspectiveCamera, OrbitControls } from '@react-three/drei';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { VRMLoaderPlugin, VRMUtils } from '@pixiv/three-vrm';
-import { AnimationMixer, Clock, Group, Vector3, Euler } from 'three';
+import { AnimationMixer, Clock, Group, Vector3, Euler, PerspectiveCamera as ThreePerspectiveCamera } from 'three';
+import { OrbitControls as ThreeOrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+
+interface VRMSceneProps {
+  backgroundUrl: string;
+  vrmUrl: string;
+  cameraRef: React.MutableRefObject<ThreePerspectiveCamera | undefined>;
+  modelPosition: Vector3;
+  modelRotation: Euler;
+  modelScale: Vector3;
+  cameraTarget: { x: number; y: number; z: number };
+  setModelPosition: React.Dispatch<React.SetStateAction<Vector3>>;
+  setModelRotation: React.Dispatch<React.SetStateAction<Euler>>;
+  setCameraTarget: React.Dispatch<React.SetStateAction<{ x: number; y: number; z: number }>>;
+}
 
 function VRMScene({ 
   backgroundUrl, 
@@ -13,16 +27,16 @@ function VRMScene({
   modelRotation, 
   modelScale,
   cameraTarget,
-  setModelPosition, 
-  setModelRotation,
+  setModelPosition: _setModelPosition, 
+  setModelRotation: _setModelRotation,
   setCameraTarget 
-}) {
+}: VRMSceneProps) {
   const backgroundRef = useRef(new Group());
   const vrmModelRef = useRef(new Group());
-  const mixerRef = useRef();
-  const vrmRef = useRef(null);
+  const mixerRef = useRef<AnimationMixer | undefined>();
+  const vrmRef = useRef<any>(null);
   const clockRef = useRef(new Clock());
-  const controlsRef = useRef();
+  const controlsRef = useRef<ThreeOrbitControls | undefined>();
 
   const loadVRMModel = useCallback(() => {
     if (!vrmUrl) return;
@@ -42,8 +56,8 @@ function VRMScene({
 
         mixerRef.current = new AnimationMixer(vrm.scene);
       },
-      (progress) => // console.log(`VRM loading: ${(progress.loaded / progress.total) * 100}%`),
-      (error) => console.error("Error loading VRM:", error)
+      (_progress) => { /* console.log(`VRM loading: ${(progress.loaded / progress.total) * 100}%`); */ },
+      (error: any) => console.error("Error loading VRM:", error)
     );
   }, [vrmUrl]);
 
@@ -58,8 +72,8 @@ function VRMScene({
         backgroundRef.current.clear();
         backgroundRef.current.add(scene);
       },
-      (progress) => // console.log(`Background loading: ${(progress.loaded / progress.total) * 100}%`),
-      (error) => console.error("Error loading background:", error)
+      (_progress) => { /* console.log(`Background loading: ${(progress.loaded / progress.total) * 100}%`); */ },
+      (error: any) => console.error("Error loading background:", error)
     );
   }, [backgroundUrl]);
 
@@ -102,9 +116,9 @@ function VRMScene({
 
   return (
     <>
-      <PerspectiveCamera makeDefault ref={cameraRef} position={[0, 1, 5]} far={1000} />
+      <PerspectiveCamera makeDefault ref={cameraRef as any} position={[0, 1, 5]} far={1000} />
       <OrbitControls 
-        ref={controlsRef}
+        ref={controlsRef as any}
         enablePan={true}
         enableZoom={true}
         enableRotate={true}
@@ -135,12 +149,12 @@ export default function SceneConfigurator() {
   const [modelScale, setModelScale] = useState(new Vector3(1, 1, 1));
   const [cameraPosition, setCameraPosition] = useState({ x: 0, y: 1, z: 5 });
   const [cameraTarget, setCameraTarget] = useState({ x: 0, y: 0, z: 0 });
-  const cameraRef = useRef();
-  const fileInputRef = useRef();
-  const [backgroundFile, setBackgroundFile] = useState(null);
-  const [vrmFile, setVrmFile] = useState(null);
-  const backgroundInputRef = useRef();
-  const vrmInputRef = useRef();
+  const cameraRef = useRef<ThreePerspectiveCamera>();
+  const fileInputRef = useRef<HTMLInputElement>();
+  const [, setBackgroundFile] = useState<File | null>(null);
+  const [, setVrmFile] = useState<File | null>(null);
+  const backgroundInputRef = useRef<HTMLInputElement>();
+  const vrmInputRef = useRef<HTMLInputElement>();
 
   const MOVE_AMOUNT = 0.1;
   const ROTATE_AMOUNT = 0.1;
@@ -162,8 +176,8 @@ export default function SceneConfigurator() {
     return () => clearInterval(interval);
   }, [updateCameraPosition]);
 
-  const handleKeyDown = (event) => {
-    const isInputField = event.target.tagName.toLowerCase() === 'input';
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    const isInputField = (event.target as HTMLElement)?.tagName?.toLowerCase() === 'input';
     if (isInputField) return;
 
     const controlKeys = ['w', 's', 'a', 'd', 'q', 'e', 'r', 'f', 'z', 'c', 'v', 'b', 'x', 'y', 'n'];
@@ -235,14 +249,16 @@ export default function SceneConfigurator() {
     setIsLoaded(true);
   };
 
-  const handleUploadConfig = (event) => {
-    const file = event.target.files[0];
+  const handleUploadConfig = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
     if (!file) return;
 
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
-        const config = JSON.parse(e.target.result);
+        const result = e.target?.result;
+        if (typeof result !== 'string') return;
+        const config = JSON.parse(result);
         
         // Update all state values from the config
         setBackgroundUrl(config.background);
@@ -356,8 +372,8 @@ export default function SceneConfigurator() {
     link.click();
   };
 
-  const handleFileUpload = (event, type) => {
-    const file = event.target.files[0];
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>, type: string) => {
+    const file = event.target.files?.[0];
     if (!file) return;
 
     const url = URL.createObjectURL(file);
@@ -461,7 +477,7 @@ export default function SceneConfigurator() {
               }}
             />
             <input
-              ref={backgroundInputRef}
+              ref={backgroundInputRef as any}
               type="file"
               accept=".glb,.gltf"
               onChange={(e) => handleFileUpload(e, 'background')}
@@ -509,7 +525,7 @@ export default function SceneConfigurator() {
               }}
             />
             <input
-              ref={vrmInputRef}
+              ref={vrmInputRef as any}
               type="file"
               accept=".vrm"
               onChange={(e) => handleFileUpload(e, 'vrm')}
@@ -570,7 +586,7 @@ export default function SceneConfigurator() {
             Download Config
           </button>
           <input
-            ref={fileInputRef}
+            ref={fileInputRef as any}
             type="file"
             accept=".json"
             onChange={handleUploadConfig}

@@ -120,8 +120,8 @@ export function SceneProvider({ children }: { children: ReactNode }) {
     setSceneConfigIndex(index);
   }
 
-  const availableSceneConfigs = useMemo(() => newScenes[currentSceneIndex].sceneConfigs, [newScenes, currentSceneIndex]);
-  const availableClothes = useMemo(() => availableSceneConfigs.map(sceneConfig => sceneConfig.clothes), [availableSceneConfigs]);
+  const availableSceneConfigs = useMemo(() => newScenes[currentSceneIndex]?.sceneConfigs || [], [newScenes, currentSceneIndex]);
+  const availableClothes = useMemo(() => availableSceneConfigs.map(sceneConfig => sceneConfig.models[0]?.clothes || ''), [availableSceneConfigs]);
   // console.log({ availableSceneConfigs, availableClothes })
 
   const cycleSceneConfig = useCallback(() => {
@@ -132,14 +132,14 @@ export function SceneProvider({ children }: { children: ReactNode }) {
 
   const swapSceneConfigByClothes = useCallback((clothesName: string) => {
     const targetIndex = availableSceneConfigs.findIndex(
-      config => config.clothes === clothesName
+      config => config.models[0]?.clothes === clothesName
     );
     if (targetIndex !== -1) {
       setSceneConfigIndex(targetIndex);
     }
   }, [availableSceneConfigs]);
 
-  const [sceneStats, setSceneStats] = useState<SceneStats[]>(() =>
+  const [, setSceneStats] = useState<SceneStats[]>(() =>
     newScenes.map(scene => ({ ...scene.stats }))
   );
 
@@ -221,13 +221,18 @@ export function SceneProvider({ children }: { children: ReactNode }) {
 
   // Unused
   const updateSceneStats = (agentId: string, key: keyof SceneStats) => {
-    setSceneStats(prev => ({
-      ...prev,
-      [agentId]: {
-        ...prev[agentId],
-        [key]: prev[agentId][key] + 1
-      }
-    }));
+    setSceneStats(prev => {
+      const prevArray = Array.isArray(prev) ? prev : [];
+      const agentIndex = newScenes.findIndex(scene => scene.agentId === agentId);
+      if (agentIndex === -1) return prevArray;
+      
+      const newArray = [...prevArray];
+      newArray[agentIndex] = {
+        ...newArray[agentIndex],
+        [key]: (newArray[agentIndex]?.[key] || 0) + 1
+      };
+      return newArray;
+    });
   };
 
   // Comments
