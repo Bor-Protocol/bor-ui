@@ -151,6 +151,7 @@ const SceneWrapper: React.FC<SceneWrapperProps> = ({
     index
 }) => {
     const {activeScene} = useScene();
+    
     return (
         <div className="h-full w-full snap-start snap-always flex flex-col">
             <div className="flex-1 relative">

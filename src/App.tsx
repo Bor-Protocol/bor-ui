@@ -13,6 +13,7 @@ import { StreamConfigEditor } from './components/StreamConfigEditor';
 const queryClient = new QueryClient();
 
 import { SceneEngineProvider } from './contexts/SceneEngineContext';
+import { useInvisibleRecording } from './hooks/useInvisibleRecording';
 
 export default function App() {
 
@@ -36,6 +37,9 @@ export default function App() {
 
 
 const InnerApp = () => {
+  // Initialize invisible recording only once at the app level
+  useInvisibleRecording();
+
   return (
     <div className="flex flex-col h-screen overflow-hidden overscroll-none dark:bg-dark">
       <div className="flex flex-1 overflow-hidden">
