@@ -18,6 +18,8 @@ export const useInvisibleRecording = () => {
   const initializationCompleteRef = useRef<boolean>(false);
   const lastAudioPlayingStateRef = useRef<boolean>(false);
   const recordingCooldownRef = useRef<boolean>(false);
+  const messageDisappearTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const lastResponseVisibleRef = useRef<boolean>(false);
 
   const log = useCallback((message: string) => {
     console.log(`🎬 Auto Recording: ${message}`);
@@ -201,11 +203,11 @@ export const useInvisibleRecording = () => {
       };
       setTimeout(logProgress, 10000);
 
-      // Auto-stop after 25 seconds
+      // Auto-stop after 25 seconds (failsafe)
       timeoutRef.current = setTimeout(() => {
         if (mediaRecorder.state === 'recording') {
           mediaRecorder.stop();
-          log('⏹️ Recording stopped automatically after 25 seconds');
+          log('⏹️ Recording stopped automatically after 25 seconds (failsafe)');
         }
       }, 25000);
 
@@ -292,6 +294,10 @@ export const useInvisibleRecording = () => {
       if (preRecordingTimeoutRef.current) {
         clearTimeout(preRecordingTimeoutRef.current);
       }
+      
+      if (messageDisappearTimeoutRef.current) {
+        clearTimeout(messageDisappearTimeoutRef.current);
+      }
     };
   }, [log]);
 
@@ -304,6 +310,11 @@ export const useInvisibleRecording = () => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
       timeoutRef.current = null;
+    }
+    
+    if (messageDisappearTimeoutRef.current) {
+      clearTimeout(messageDisappearTimeoutRef.current);
+      messageDisappearTimeoutRef.current = null;
     }
     
     isRecordingRef.current = false;
@@ -359,6 +370,38 @@ export const useInvisibleRecording = () => {
         startRecording();
       }
     }
+  }, [currentResponse, log]);
+
+  // Monitor when message popup disappears and stop recording 2 seconds later
+  useEffect(() => {
+    const responseVisible = currentResponse !== null;
+    const responseJustDisappeared = lastResponseVisibleRef.current && !responseVisible;
+    
+    if (responseJustDisappeared && isRecordingRef.current) {
+      log(`📱 Message popup disappeared - Stopping recording in 2 seconds`);
+      
+      // Clear any existing timeout
+      if (messageDisappearTimeoutRef.current) {
+        clearTimeout(messageDisappearTimeoutRef.current);
+      }
+      
+      // Stop recording 2 seconds after message disappears
+      messageDisappearTimeoutRef.current = setTimeout(() => {
+        if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+          mediaRecorderRef.current.stop();
+          log('⏹️ Recording stopped 2 seconds after message popup disappeared');
+          
+          // Clear the main timeout since we stopped early
+          if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+            timeoutRef.current = null;
+          }
+        }
+      }, 2000);
+    }
+    
+    // Update the last visible state
+    lastResponseVisibleRef.current = responseVisible;
   }, [currentResponse, log]);
 
   return {
