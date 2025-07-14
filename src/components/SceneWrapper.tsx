@@ -137,7 +137,17 @@ function SceneContent({  isActive, }: {
             {isLoading ? (
                 <SceneLoader />
             ) : (
-                <Canvas>
+                <Canvas
+                    frameloop="always"
+                    dpr={[1, 2]}
+                    performance={{ min: 0.5 }}
+                    gl={{ 
+                        antialias: true,
+                        alpha: false,
+                        powerPreference: "high-performance",
+                        preserveDrawingBuffer: true
+                    }}
+                >
                     <ThreeScene key={currentScene.id} debugMode={false} />
                     {false && <OrbitControls />}
                 </Canvas>

@@ -354,6 +354,18 @@ export function ThreeScene({ debugMode }: { debugMode: boolean }) {
 
             VRMUtils.rotateVRM0(vrm);
 
+            // Initialize eyes to be OPEN (very important!)
+            if (vrm.expressionManager) {
+              vrm.expressionManager.setValue('blinkLeft', 0);
+              vrm.expressionManager.setValue('blinkRight', 0);
+              vrm.expressionManager.setValue('blink', 0);
+              // Also reset mouth expressions
+              vrm.expressionManager.setValue('aa', 0);
+              vrm.expressionManager.setValue('ih', 0);
+              vrm.expressionManager.setValue('ou', 0);
+              console.log('👁️ Eyes initialized to OPEN state');
+            }
+
             // Create a new Group if it doesn't exist
             if (!modelRefs.current[index]) {
               modelRefs.current[index] = new Group();
@@ -402,22 +414,22 @@ export function ThreeScene({ debugMode }: { debugMode: boolean }) {
     };
   }, [models, cleanupModels]); // Add models to dependency array to reload when they change
 
-  // Update animation frame
-  useFrame(() => {
-    const clock = clockRef.current;
-    const delta = clock.getDelta();
-
-    // Update mixers
+  // Update animation frame with optimized delta time
+  useFrame((state, delta) => {
+    // Clamp delta to prevent lag spikes from causing animation jumps
+    const clampedDelta = Math.min(delta, 1/30); // Cap at 30fps minimum for smooth animations
+    
+    // Update mixers with clamped delta
     if (mixerRefs.current) {
       mixerRefs.current.forEach(mixer => {
         if (mixer) {
-          mixer.update(delta);
+          mixer.update(clampedDelta);
         }
       });
     }
 
     if (vrmRefs.current) {
-      const elapsedTime = clock.elapsedTime;
+      const elapsedTime = clockRef.current.elapsedTime;
 
       // Lip sync logic
       vrmRefs.current.forEach((vrm, _index) => {
@@ -442,26 +454,26 @@ export function ThreeScene({ debugMode }: { debugMode: boolean }) {
           vrm.expressionManager.setValue('ou', 0);
         }
 
-        // Blinking logic (existing code)
-        const blinkInterval = 5;
-        const blinkDuration = 0.2;
-        const doubleBlink = Math.floor(elapsedTime / blinkInterval) % 2 === 1;
+        // Fixed blinking logic - eyes should be OPEN most of the time
+        const blinkInterval = 4; // Blink every 4 seconds
+        const blinkDuration = 0.15; // Quick blink duration
         const timeSinceLastInterval = elapsedTime % blinkInterval;
 
-        let blinkValue = 0;
+        let blinkValue = 0; // 0 = eyes open, 1 = eyes closed
 
+        // Only blink for a short duration at the start of each interval
         if (timeSinceLastInterval < blinkDuration) {
-          blinkValue = Math.cos(Math.PI * timeSinceLastInterval / blinkDuration) * 0.5 + 0.5;
+          // Create a smooth blink curve (0 -> 1 -> 0)
+          const progress = timeSinceLastInterval / blinkDuration;
+          blinkValue = Math.sin(progress * Math.PI); // Smooth curve from 0 to 1 and back to 0
         }
 
-        if (doubleBlink && timeSinceLastInterval > blinkDuration + 0.15 && timeSinceLastInterval < (2 * blinkDuration + 0.15)) {
-          blinkValue = Math.cos(Math.PI * (timeSinceLastInterval - blinkDuration - 0.15) / blinkDuration) * 0.5 + 0.5;
-        }
-
+        // Apply blinking
         vrm.expressionManager.setValue('blinkLeft', blinkValue);
         vrm.expressionManager.setValue('blinkRight', blinkValue);
+        vrm.expressionManager.setValue('blink', blinkValue); // Some models use 'blink' instead
 
-        vrm.update(delta);
+        vrm.update(clampedDelta);
       });
     }
   });
