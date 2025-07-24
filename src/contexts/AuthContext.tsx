@@ -16,18 +16,59 @@ export interface User {
   preferences?: Record<string, any>;
 }
 
+export interface PointsInfo {
+  points: number;
+  maxPoints: number;
+  dailyRegenAmount: number;
+  nextRegeneration: string | null;
+  timeUntilRegenMs: number;
+  canRegenerate: boolean;
+}
+
+export interface AgentAvailability {
+  isAvailable: boolean;
+  queueLength: number;
+  estimatedWaitTime: number;
+  remainingTimeSeconds?: number;
+  currentSession?: {
+    name: string;
+    email: string;
+    startTime: string;
+    endTime: string;
+    remainingSeconds: number;
+  } | null;
+  queueDetails?: Array<{
+    position: number;
+    userId: string;
+    userName: string;
+    userEmail: string;
+    addedAt: string;
+    estimatedStartTime: string;
+  }>;
+}
+
 export interface AuthContextType {
   user: User | null;
   token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  pointsInfo: PointsInfo | null;
+  currentSession: any | null;
+  hasActiveSession: boolean;
+  agentAvailability: Record<string, AgentAvailability> | null;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   signup: (name: string, email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   googleAuth: (googleUser: any) => Promise<{ success: boolean; error?: string; isNewUser?: boolean }>;
   logout: () => void;
   refreshToken: () => Promise<boolean>;
   updateUser: (updates: Partial<User>) => void;
-  spendPoints: (amount: number) => Promise<boolean>;
+  spendPoints: (amount: number, reason?: string) => Promise<boolean>;
+  bookPrivateSession: (agentId: string) => Promise<{ success: boolean; session?: any; error?: string }>;
+  getPointsHistory: () => Promise<any[]>;
+  refreshPointsInfo: () => Promise<void>;
+  getCurrentSession: () => Promise<any>;
+  cancelSession: (sessionId: string) => Promise<{ success: boolean; error?: string }>;
+  getAgentAvailability: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -105,11 +146,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [pointsInfo, setPointsInfo] = useState<PointsInfo | null>(null);
+  const [currentSession, setCurrentSession] = useState<any | null>(null);
+  const [agentAvailability, setAgentAvailability] = useState<Record<string, AgentAvailability> | null>(null);
 
   // API base URL - use bor-server for authentication
   const API_BASE_URL = process.env.VITE_BOR_SERVER_URL || 'http://localhost:6969';
 
   const isAuthenticated = !!user && !!token;
+  const hasActiveSession = !!currentSession && (currentSession.status === 'active' || currentSession.status === 'queued');
 
   // Initialize auth state from localStorage
   useEffect(() => {
@@ -317,7 +362,55 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const spendPoints = async (amount: number): Promise<boolean> => {
+  // Refresh points info from server
+  const refreshPointsInfo = async (): Promise<void> => {
+    if (!token) return;
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/users/points-info`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setPointsInfo(data);
+        // Also update user points in case they changed
+        if (user && data.points !== user.points) {
+          updateUser({ points: data.points });
+        }
+      }
+    } catch (error) {
+      console.error('Refresh points info error:', error);
+    }
+  };
+
+  // Load points info and session info after login
+  useEffect(() => {
+    if (isAuthenticated) {
+      if (!pointsInfo) {
+        refreshPointsInfo();
+      }
+      getCurrentSession();
+    }
+    // Always get agent availability (doesn't require authentication)
+    getAgentAvailability();
+  }, [isAuthenticated]);
+
+  // Poll for session updates every 10 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (isAuthenticated) {
+        getCurrentSession();
+      }
+      getAgentAvailability(); // Always poll agent availability
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, [isAuthenticated]);
+
+  const spendPoints = async (amount: number, reason?: string): Promise<boolean> => {
     if (!user || !token || user.points < amount) return false;
 
     try {
@@ -327,13 +420,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({ amount, reason: 'Points spent via UI' }),
+        body: JSON.stringify({ amount, reason: reason || 'Points spent via UI' }),
       });
 
       if (!response.ok) return false;
 
       const data = await response.json();
       updateUser({ points: data.newBalance });
+      refreshPointsInfo(); // Refresh full points info
       
       return true;
     } catch (error) {
@@ -342,11 +436,132 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const bookPrivateSession = async (agentId: string): Promise<{ success: boolean; session?: any; error?: string }> => {
+    if (!token) return { success: false, error: 'Not authenticated' };
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/sessions/book-private`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ agentId }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return { success: false, error: data.error || 'Failed to book session' };
+      }
+
+      // Update user points
+      updateUser({ points: data.newBalance });
+      refreshPointsInfo();
+
+      return { success: true, session: data.session };
+    } catch (error) {
+      console.error('Book private session error:', error);
+      return { success: false, error: 'Network error. Please try again.' };
+    }
+  };
+
+  const getPointsHistory = async (): Promise<any[]> => {
+    if (!token) return [];
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/users/points-history`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        return data.transactions || [];
+      }
+    } catch (error) {
+      console.error('Get points history error:', error);
+    }
+
+    return [];
+  };
+
+  const getCurrentSession = async (): Promise<any> => {
+    if (!token) return null;
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/sessions/current`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setCurrentSession(data.session);
+        return data.session;
+      }
+    } catch (error) {
+      console.error('Get current session error:', error);
+    }
+
+    setCurrentSession(null);
+    return null;
+  };
+
+  const getAgentAvailability = async (): Promise<void> => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/agents/availability`);
+
+      if (response.ok) {
+        const data = await response.json();
+        setAgentAvailability(data.agents);
+      }
+    } catch (error) {
+      console.error('Get agent availability error:', error);
+    }
+  };
+
+  const cancelSession = async (sessionId: string): Promise<{ success: boolean; error?: string }> => {
+    if (!token) return { success: false, error: 'Not authenticated' };
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/sessions/cancel`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ sessionId }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return { success: false, error: data.error || 'Failed to cancel session' };
+      }
+
+      // Refresh points after refund and clear session
+      refreshPointsInfo();
+      setCurrentSession(null);
+
+      return { success: true };
+    } catch (error) {
+      console.error('Cancel session error:', error);
+      return { success: false, error: 'Network error. Please try again.' };
+    }
+  };
+
   const value: AuthContextType = {
     user,
     token,
     isAuthenticated,
     isLoading,
+    pointsInfo,
+    currentSession,
+    hasActiveSession,
+    agentAvailability,
     login,
     signup,
     googleAuth,
@@ -354,6 +569,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     refreshToken,
     updateUser,
     spendPoints,
+    bookPrivateSession,
+    getPointsHistory,
+    refreshPointsInfo,
+    getCurrentSession,
+    cancelSession,
+    getAgentAvailability,
   };
 
   return (

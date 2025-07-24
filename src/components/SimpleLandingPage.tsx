@@ -6,9 +6,12 @@ import { AgentSelection } from './AgentSelection';
 import { useUserScenes } from '../hooks/useUserScenes';
 import { NewStreamConfig } from '../utils/constants';
 import { AuthModal } from './AuthModal';
+import { PointsDisplay } from './PointsDisplay';
+import { useNavigate } from 'react-router-dom';
 
 export const SimpleLandingPage: React.FC = () => {
-  const { isAuthenticated, user, token, logout } = useAuth();
+  const { isAuthenticated, user, token, logout, bookPrivateSession, hasActiveSession, currentSession, agentAvailability } = useAuth();
+  const navigate = useNavigate();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [selectedTab, setSelectedTab] = useState<'agents' | 'dashboard' | 'sessions'>('agents');
   const [showWelcome, setShowWelcome] = useState(false);
@@ -51,6 +54,17 @@ export const SimpleLandingPage: React.FC = () => {
     }
   }, [isAuthenticated, user]);
 
+  // Request updated peer count on component mount
+  React.useEffect(() => {
+    // Small delay to ensure socket is connected
+    const timer = setTimeout(() => {
+      if (window.socket?.connected) {
+        window.socket.emit('request_peer_count');
+      }
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -88,10 +102,7 @@ export const SimpleLandingPage: React.FC = () => {
 
               {isAuthenticated ? (
                 <div className="flex items-center space-x-3">
-                  <div className="flex items-center space-x-1 bg-yellow-100 px-2 py-1 rounded-full">
-                    <span className="text-yellow-600">💰</span>
-                    <span className="text-sm font-medium">{user?.points || 0}</span>
-                  </div>
+                  <PointsDisplay />
                   <div className="text-sm font-medium text-gray-700">
                     Welcome, {user?.name || 'User'}!
                     {socketAuthenticated && (
@@ -240,7 +251,11 @@ export const SimpleLandingPage: React.FC = () => {
                 rating: 4.7,
                 isOnline: false
               }
-            ].map((agent, index) => (
+            ].map((agent, index) => {
+              const agentId = `agent-${index + 1}`;
+              const availability = agentAvailability?.[agentId];
+              
+              return (
               <div key={index} className="bg-gray-50 p-6 rounded-lg border border-gray-200 hover:shadow-md transition-shadow">
                 <div className="flex items-center space-x-3 mb-3">
                   <div className="relative">
@@ -270,13 +285,76 @@ export const SimpleLandingPage: React.FC = () => {
                   {agent.description}
                 </p>
 
-                <div className="flex items-center justify-between text-sm mb-4">
-                  <span className="text-gray-500">
-                    👥 {agent.viewers} watching
-                  </span>
-                  <span className="text-yellow-600">
-                    💰 10 points
-                  </span>
+                {/* Agent Status */}
+                <div className="mb-4">
+                  {availability ? (
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-500">
+                          👥 {agent.viewers} watching
+                        </span>
+                        <span className="text-yellow-600">
+                          💰 10 points
+                        </span>
+                      </div>
+                      
+                      {/* Availability Status */}
+                      <div className={`text-xs px-2 py-1 rounded-full ${
+                        availability.isAvailable 
+                          ? 'bg-green-100 text-green-700' 
+                          : 'bg-orange-100 text-orange-700'
+                      }`}>
+                        {availability.isAvailable ? (
+                          '🟢 Available now'
+                        ) : (
+                          `🟡 Queue: ${availability.queueLength} people (${availability.estimatedWaitTime}min wait)`
+                        )}
+                      </div>
+                      
+                      {/* Current Session Info */}
+                      {availability.currentSession && (
+                        <div className="text-xs bg-blue-50 border border-blue-200 p-2 rounded mt-2">
+                          <div className="font-medium text-blue-800 mb-1">
+                            🎮 Active Session
+                          </div>
+                          <div className="text-blue-700">
+                            👤 {availability.currentSession.name}
+                          </div>
+                          <div className="text-blue-600">
+                            ⏱️ {Math.floor(availability.currentSession.remainingSeconds / 60)}:{(availability.currentSession.remainingSeconds % 60).toString().padStart(2, '0')} left
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* Queue Details */}
+                      {availability.queueDetails && availability.queueDetails.length > 0 && (
+                        <div className="text-xs bg-yellow-50 border border-yellow-200 p-2 rounded mt-2">
+                          <div className="font-medium text-yellow-800 mb-1">
+                            📋 Queue Details
+                          </div>
+                          {availability.queueDetails.slice(0, 2).map((queueItem, idx) => (
+                            <div key={idx} className="text-yellow-700 mb-1">
+                              #{queueItem.position} {queueItem.userName}
+                            </div>
+                          ))}
+                          {availability.queueDetails.length > 2 && (
+                            <div className="text-yellow-600">
+                              +{availability.queueDetails.length - 2} more...
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-gray-500">
+                        👥 {agent.viewers} watching
+                      </span>
+                      <span className="text-yellow-600">
+                        💰 10 points
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex space-x-2">
@@ -287,20 +365,68 @@ export const SimpleLandingPage: React.FC = () => {
                     🌍 Join Chat
                   </button>
                   <button 
-                    className="flex-1 px-3 py-2 bg-blue-600 text-white rounded text-sm hover:bg-blue-700"
-                    onClick={() => {
+                    className={`flex-1 px-3 py-2 rounded text-sm font-medium ${
+                      hasActiveSession 
+                        ? 'bg-gray-400 text-gray-200 cursor-not-allowed' 
+                        : 'bg-blue-600 text-white hover:bg-blue-700'
+                    }`}
+                    disabled={hasActiveSession}
+                    onClick={async () => {
                       if (!isAuthenticated) {
                         setShowAuthModal(true);
-                      } else {
-                        window.location.href = '/app';
+                      } else if (!hasActiveSession) {
+                        const agentId = `agent-${index + 1}`;
+                        
+                        // Show confirmation with detailed queue information
+                        let confirmMessage = `Book private session with ${agent.name}?\n\nCost: 10 points\nDuration: 5 minutes\n\n`;
+                        
+                        if (availability && !availability.isAvailable) {
+                          confirmMessage += `⚠️ Agent is currently busy!\n\n`;
+                          
+                          // Show current session info
+                          if (availability.currentSession) {
+                            const mins = Math.floor(availability.currentSession.remainingSeconds / 60);
+                            const secs = availability.currentSession.remainingSeconds % 60;
+                            confirmMessage += `Current session: ${availability.currentSession.name}\nTime remaining: ${mins}:${secs.toString().padStart(2, '0')}\n\n`;
+                          }
+                          
+                          confirmMessage += `You will be added to queue:\n• Position: ${availability.queueLength + 1}\n• Estimated wait: ${(availability.queueLength + 1) * 5} minutes\n\n`;
+                          
+                          // Show queue details
+                          if (availability.queueDetails && availability.queueDetails.length > 0) {
+                            confirmMessage += `Current queue:\n`;
+                            availability.queueDetails.slice(0, 3).forEach(item => {
+                              confirmMessage += `  #${item.position} ${item.userName}\n`;
+                            });
+                            if (availability.queueDetails.length > 3) {
+                              confirmMessage += `  +${availability.queueDetails.length - 3} more...\n`;
+                            }
+                            confirmMessage += `\n`;
+                          }
+                          
+                          confirmMessage += `Proceed?`;
+                        } else {
+                          confirmMessage += '✅ Agent is available now!\nSession will start immediately.';
+                        }
+                        
+                        if (confirm(confirmMessage)) {
+                          const result = await bookPrivateSession(agentId);
+                          if (result.success) {
+                            navigate(`/private-session/${agentId}`);
+                          } else {
+                            alert(`Failed to book session: ${result.error}`);
+                          }
+                        }
                       }
                     }}
+                    title={hasActiveSession ? 'You already have an active session' : 'Book a private session'}
                   >
-                    🔒 Private Session
+                    {hasActiveSession ? '🔒 Session Active' : '🔒 Private Session'}
                   </button>
                 </div>
               </div>
-            ))}
+            )
+            })}
           </div>
         </div>
       </section>
@@ -347,6 +473,32 @@ export const SimpleLandingPage: React.FC = () => {
                     </div>
                   )}
                 </div>
+
+                {/* Current Session Status */}
+                {hasActiveSession && currentSession && (
+                  <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg max-w-md mx-auto">
+                    <h4 className="font-semibold text-blue-900 mb-2">Current Session Status</h4>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm text-blue-700">
+                          {currentSession.status === 'active' ? '🎮 Session Active' : '⏰ In Queue'}
+                          {currentSession.status === 'queued' && currentSession.queuePosition && 
+                            ` - Position #${currentSession.queuePosition}`
+                          }
+                        </p>
+                        <p className="text-xs text-blue-600">
+                          Agent: {currentSession.agentId}
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => navigate(`/private-session/${currentSession.agentId}`)}
+                        className="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700"
+                      >
+                        View Session
+                      </button>
+                    </div>
+                  </div>
+                )}
                 
                 <AgentSelection
                   onAgentSelect={handleAgentSelect}
@@ -360,6 +512,10 @@ export const SimpleLandingPage: React.FC = () => {
                 <h3 className="text-2xl font-bold mb-6 text-center">Your Dashboard</h3>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {/* Points Display */}
+                  <div className="md:col-span-1">
+                    <PointsDisplay showDetails={true} />
+                  </div>
                   {/* Session Stats */}
                   <div className="bg-white p-6 rounded-lg border border-gray-200">
                     <h4 className="font-semibold mb-4">Session Statistics</h4>
@@ -443,10 +599,68 @@ export const SimpleLandingPage: React.FC = () => {
                       </div>
                       
                       <button 
-                        className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium"
-                        onClick={() => recordSession(selectedAgentId, 10)}
+                        className={`px-6 py-3 rounded-md font-medium ${
+                          hasActiveSession 
+                            ? 'bg-gray-400 text-gray-200 cursor-not-allowed' 
+                            : 'bg-blue-600 text-white hover:bg-blue-700'
+                        }`}
+                        disabled={hasActiveSession}
+                        onClick={async () => {
+                          if (selectedAgentId && !hasActiveSession) {
+                            const availability = agentAvailability?.[selectedAgentId];
+                            
+                            // Show confirmation with detailed queue information
+                            let confirmMessage = `Book private session with Agent ${selectedAgentId}?\n\nCost: 10 points\nDuration: 5 minutes\n\n`;
+                            
+                            if (availability && !availability.isAvailable) {
+                              confirmMessage += `⚠️ Agent is currently busy!\n\n`;
+                              
+                              // Show current session info
+                              if (availability.currentSession) {
+                                const mins = Math.floor(availability.currentSession.remainingSeconds / 60);
+                                const secs = availability.currentSession.remainingSeconds % 60;
+                                confirmMessage += `Current session: ${availability.currentSession.name}\nTime remaining: ${mins}:${secs.toString().padStart(2, '0')}\n\n`;
+                              }
+                              
+                              confirmMessage += `You will be added to queue:\n• Position: ${availability.queueLength + 1}\n• Estimated wait: ${(availability.queueLength + 1) * 5} minutes\n\n`;
+                              
+                              // Show queue details
+                              if (availability.queueDetails && availability.queueDetails.length > 0) {
+                                confirmMessage += `Current queue:\n`;
+                                availability.queueDetails.slice(0, 3).forEach(item => {
+                                  confirmMessage += `  #${item.position} ${item.userName}\n`;
+                                });
+                                if (availability.queueDetails.length > 3) {
+                                  confirmMessage += `  +${availability.queueDetails.length - 3} more...\n`;
+                                }
+                                confirmMessage += `\n`;
+                              }
+                              
+                              confirmMessage += `Proceed?`;
+                            } else {
+                              confirmMessage += '✅ Agent is available now!\nSession will start immediately.';
+                            }
+                            
+                            if (confirm(confirmMessage)) {
+                              const result = await bookPrivateSession(selectedAgentId);
+                              if (result.success) {
+                                recordSession(selectedAgentId, 10);
+                                
+                                // Navigate to private session page
+                                navigate(`/private-session/${selectedAgentId}`);
+                              } else {
+                                alert(`Failed to book session: ${result.error}`);
+                              }
+                            }
+                          }
+                        }}
+                        title={hasActiveSession ? 'You already have an active session' : 'Start a private session'}
                       >
-                        Start Private Session (10 points)
+                        {hasActiveSession ? (
+                          '🔒 You have an active session'
+                        ) : (
+                          'Start Private Session (10 points)'
+                        )}
                       </button>
                     </div>
                   ) : (

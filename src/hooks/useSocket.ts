@@ -31,6 +31,9 @@ export const useSocket = (authToken?: string) => {
     });
 
     const socket = socketInstance;
+    
+    // Make socket globally available
+    (window as any).socket = socket;
 
     socket.on('connect', () => {
       console.log('✅ Connected to bor-server');
