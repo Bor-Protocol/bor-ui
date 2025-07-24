@@ -10,6 +10,7 @@ interface User {
 
 interface AuthContextType {
   user: User | null;
+  token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
@@ -25,14 +26,15 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const isAuthenticated = !!user;
+  const isAuthenticated = !!user && !!token;
 
   const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
     setIsLoading(true);
     
-    // Mock login - replace with real API call
+    // Mock login - replace with real API call to Protocol auth
     setTimeout(() => {
       setUser({
         id: '1',
@@ -40,6 +42,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         email: email,
         points: 100
       });
+      // Mock JWT token - in real implementation, this comes from the API
+      setToken('mock-jwt-token-replace-with-real-from-protocol-auth');
       setIsLoading(false);
     }, 1000);
 
@@ -49,7 +53,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const signup = async (name: string, email: string, password: string): Promise<{ success: boolean; error?: string }> => {
     setIsLoading(true);
     
-    // Mock signup - replace with real API call
+    // Mock signup - replace with real API call to Protocol auth
     setTimeout(() => {
       setUser({
         id: '1',
@@ -57,6 +61,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         email: email,
         points: 100
       });
+      // Mock JWT token - in real implementation, this comes from the API
+      setToken('mock-jwt-token-replace-with-real-from-protocol-auth');
       setIsLoading(false);
     }, 1000);
 
@@ -65,10 +71,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const logout = () => {
     setUser(null);
+    setToken(null);
   };
 
   const value: AuthContextType = {
     user,
+    token,
     isAuthenticated,
     isLoading,
     login,
