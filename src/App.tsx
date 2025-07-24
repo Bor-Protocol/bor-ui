@@ -1,6 +1,8 @@
 import { LiveStream } from './components/LiveStream';
+import { SimpleLandingPage } from './components/SimpleLandingPage';
 
 import { SceneProvider } from './contexts/ScenesContext';
+import { AuthProvider } from './contexts/SimpleAuthContext';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { DocsPage } from './components/DocsPage';
@@ -19,18 +21,23 @@ export default function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-              <Router>
-                  <SceneProvider>
-                      <SceneEngineProvider>
-                          <Routes>
-                            <Route path="/:modelName" element={<InnerApp />} />
-                            <Route path="/" element={<InnerApp />} />
-                            <Route path="/configure" element={<StreamConfigEditor />} />
-                            <Route path="/docs" element={<DocsPage />} />
-                          </Routes>      
-                      </SceneEngineProvider>
-                  </SceneProvider>
-              </Router>
+      <AuthProvider>
+        <Router>
+          <SceneProvider>
+            <SceneEngineProvider>
+              <Routes>
+                <Route path="/agent/:agentId/public" element={<InnerApp />} />
+                <Route path="/agent/:agentId/private" element={<InnerApp />} />
+                <Route path="/:modelName" element={<InnerApp />} />
+                <Route path="/app" element={<InnerApp />} />
+                <Route path="/configure" element={<StreamConfigEditor />} />
+                <Route path="/docs" element={<DocsPage />} />
+                <Route path="/" element={<SimpleLandingPage />} />
+              </Routes>      
+            </SceneEngineProvider>
+          </SceneProvider>
+        </Router>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }

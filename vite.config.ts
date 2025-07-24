@@ -9,6 +9,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
+      '@': resolve(__dirname, './src'),
       process: 'process/browser',
       stream: 'stream-browserify',
       zlib: 'browserify-zlib',
