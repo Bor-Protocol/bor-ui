@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useAuth } from '../contexts/SimpleAuthContext';
+import { useAuth } from '../contexts/AuthContext';
 import { NewStreamConfig, NEW_STREAM_CONFIGS } from '../utils/constants';
 
 interface UserScenePreferences {

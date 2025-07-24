@@ -7,45 +7,58 @@ let socketInstance: Socket | null = null; // Single socket instance outside the 
 
 export const useSocket = (authToken?: string) => {
   const [peerCount, setPeerCount] = useState(0);
-  const [isServerOnline, setIsServerOnline] = useState(true);
+  const [isServerOnline, setIsServerOnline] = useState(false); // Start as false until connected
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [authenticatedUser, setAuthenticatedUser] = useState<{ id: string; email: string } | null>(null);
 
   useEffect(() => {
-    if (!socketInstance) {
-      socketInstance = io(SOCKET_URL, {
-        reconnectionDelay: 1000,
-        reconnection: true,
-        reconnectionAttempts: 10,
-        transports: ['websocket'],
-        agent: false,
-        upgrade: false,
-        rejectUnauthorized: false,
-        auth: {
-          token: authToken // Pass JWT token for authentication
-        }
-      });
+    // Always recreate socket when authToken changes
+    if (socketInstance) {
+      socketInstance.disconnect();
     }
+    
+    socketInstance = io(SOCKET_URL, {
+      reconnectionDelay: 1000,
+      reconnection: true,
+      reconnectionAttempts: 10,
+      transports: ['websocket'],
+      agent: false,
+      upgrade: false,
+      rejectUnauthorized: false,
+      auth: {
+        token: authToken // Pass JWT token for authentication
+      }
+    });
 
     const socket = socketInstance;
 
-    socket.on(SOCKET_EVENTS.CONNECTION, () => {
-      // console.log('Connected to server');
+    socket.on('connect', () => {
+      console.log('✅ Connected to bor-server');
       setIsServerOnline(true);
-      socket.emit(SOCKET_EVENTS.REQUEST_PEER_COUNT);
+      socket.emit('request_peer_count');
     });
 
-    socket.on(SOCKET_EVENTS.INITIAL_STATE, (data: { 
+    socket.on('disconnect', () => {
+      console.log('❌ Disconnected from bor-server');
+      setIsServerOnline(false);
+      setIsAuthenticated(false);
+      setAuthenticatedUser(null);
+    });
+
+    socket.on('initial_state', (data: { 
       peerCount: number; 
+      commentCount?: number;
       authenticated: boolean; 
       user: { id: string; email: string } | null;
     }) => {
+      console.log('ℹ️ Initial state received:', data);
       setPeerCount(data.peerCount);
       setIsAuthenticated(data.authenticated);
       setAuthenticatedUser(data.user);
     });
 
-    socket.on(SOCKET_EVENTS.PEER_COUNT, (data: { count: number }) => {
+    socket.on('peer_count', (data: { count: number }) => {
+      console.log('὆4 Peer count updated:', data.count);
       setPeerCount(data.count);
     });
 
@@ -63,10 +76,11 @@ export const useSocket = (authToken?: string) => {
     });
 
     return () => {
-      // Don't disconnect on cleanup, just remove listeners
-      socket.off(SOCKET_EVENTS.CONNECTION);
-      socket.off(SOCKET_EVENTS.INITIAL_STATE);
-      socket.off(SOCKET_EVENTS.PEER_COUNT);
+      // Clean up event listeners
+      socket.off('connect');
+      socket.off('disconnect');
+      socket.off('initial_state');
+      socket.off('peer_count');
       socket.off('comment_error');
       socket.off('stream_join_error');
       socket.off('stream_joined');

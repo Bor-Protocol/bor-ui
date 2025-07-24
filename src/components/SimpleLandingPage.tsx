@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { useAuth } from '../contexts/SimpleAuthContext';
+import { Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import { useSocket } from '../hooks/useSocket';
 import { AgentSelection } from './AgentSelection';
 import { useUserScenes } from '../hooks/useUserScenes';
@@ -61,6 +62,14 @@ export const SimpleLandingPage: React.FC = () => {
                 <span className="text-white font-bold">B</span>
               </div>
               <h1 className="text-xl font-bold text-gray-900">BOR Platform</h1>
+              <nav className="hidden md:flex items-center space-x-4 ml-8">
+                <Link 
+                  to="/app" 
+                  className="text-sm text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md transition-colors"
+                >
+                  Live Agents
+                </Link>
+              </nav>
             </div>
             
             <div className="flex items-center space-x-4">
@@ -151,9 +160,16 @@ export const SimpleLandingPage: React.FC = () => {
             </button>
             <button 
               className="px-6 py-3 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 font-medium"
-              onClick={() => window.location.href = '/demo'}
+              onClick={() => {
+                if (!isAuthenticated) {
+                  setShowAuthModal(true);
+                } else {
+                  setSelectedTab('agents');
+                  document.getElementById('agents-section')?.scrollIntoView({ behavior: 'smooth' });
+                }
+              }}
             >
-              View Integration Demo ▶
+              Select Your Agent ✨
             </button>
           </div>
 
@@ -266,9 +282,9 @@ export const SimpleLandingPage: React.FC = () => {
                 <div className="flex space-x-2">
                   <button 
                     className="flex-1 px-3 py-2 border border-gray-300 text-gray-700 rounded text-sm hover:bg-gray-50"
-                    onClick={() => window.location.href = `/agent/${index + 1}/public`}
+                    onClick={() => window.location.href = '/app'}
                   >
-                    🌍 Free Chat
+                    🌍 Join Chat
                   </button>
                   <button 
                     className="flex-1 px-3 py-2 bg-blue-600 text-white rounded text-sm hover:bg-blue-700"
@@ -276,11 +292,11 @@ export const SimpleLandingPage: React.FC = () => {
                       if (!isAuthenticated) {
                         setShowAuthModal(true);
                       } else {
-                        window.location.href = `/agent/${index + 1}/private`;
+                        window.location.href = '/app';
                       }
                     }}
                   >
-                    🔒 Private
+                    🔒 Private Session
                   </button>
                 </div>
               </div>
@@ -291,7 +307,7 @@ export const SimpleLandingPage: React.FC = () => {
 
       {/* Agent Selection Section for Authenticated Users */}
       {isAuthenticated && (
-        <section className="py-16 px-4 bg-gray-50">
+        <section id="agents-section" className="py-16 px-4 bg-gray-50">
           <div className="max-w-6xl mx-auto">
             {/* Navigation Tabs */}
             <div className="flex space-x-1 p-1 bg-white rounded-lg border border-gray-200 mb-8 max-w-md mx-auto">

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../contexts/SimpleAuthContext';
+import { useAuth } from '../contexts/AuthContext';
 import { NewStreamConfig, SceneConfig } from '../utils/constants';
 
 interface AgentOption {

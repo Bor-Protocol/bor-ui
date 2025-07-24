@@ -2,7 +2,7 @@ import { LiveStream } from './components/LiveStream';
 import { SimpleLandingPage } from './components/SimpleLandingPage';
 
 import { SceneProvider } from './contexts/ScenesContext';
-import { AuthProvider } from './contexts/SimpleAuthContext';
+import { AuthProvider } from './contexts/AuthContext';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { DocsPage } from './components/DocsPage';
@@ -12,6 +12,7 @@ import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import SceneConfigurator from './components/SceneConfigurator';
 import { StreamConfigEditor } from './components/StreamConfigEditor';
 import { AgentIntegrationDemo } from './components/AgentIntegrationDemo';
+import { AuthTestPage } from './pages/AuthTestPage';
 
 const queryClient = new QueryClient();
 
@@ -34,6 +35,7 @@ export default function App() {
                 <Route path="/configure" element={<StreamConfigEditor />} />
                 <Route path="/docs" element={<DocsPage />} />
                 <Route path="/demo" element={<AgentIntegrationDemo />} />
+                <Route path="/auth-test" element={<AuthTestPage />} />
                 <Route path="/" element={<SimpleLandingPage />} />
               </Routes>      
             </SceneEngineProvider>

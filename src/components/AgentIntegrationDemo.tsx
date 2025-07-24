@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useAgentIntegration } from '../hooks/useAgentIntegration';
-import { useAuth } from '../contexts/SimpleAuthContext';
+import { useAuth } from '../contexts/AuthContext';
 import { useSocket } from '../hooks/useSocket';
 
 export const AgentIntegrationDemo: React.FC = () => {

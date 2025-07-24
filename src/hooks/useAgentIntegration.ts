@@ -1,7 +1,7 @@
 import { useEffect, useCallback } from 'react';
 import { useScene } from '../contexts/ScenesContext';
 import { useUserScenes } from './useUserScenes';
-import { useAuth } from '../contexts/SimpleAuthContext';
+import { useAuth } from '../contexts/AuthContext';
 import { NewStreamConfig } from '../utils/constants';
 
 /**

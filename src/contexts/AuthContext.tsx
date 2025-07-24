@@ -23,6 +23,7 @@ export interface AuthContextType {
   isLoading: boolean;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   signup: (name: string, email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  googleAuth: (googleUser: any) => Promise<{ success: boolean; error?: string; isNewUser?: boolean }>;
   logout: () => void;
   refreshToken: () => Promise<boolean>;
   updateUser: (updates: Partial<User>) => void;
@@ -72,12 +73,26 @@ const clearStoredAuth = () => {
   localStorage.removeItem(USER_KEY);
 };
 
-// JWT decode utility (simple)
+// JWT decode utility for real JWT tokens
 const isTokenExpired = (token: string): boolean => {
   try {
-    const payload = JSON.parse(atob(token.split('.')[1]));
+    // Check if it's a real JWT token (has 3 parts separated by dots)
+    const parts = token.split('.');
+    if (parts.length !== 3) {
+      return true;
+    }
+    
+    // Decode the payload (middle part)
+    const payload = JSON.parse(atob(parts[1]));
+    
+    // Check if token has expiration and if it's expired
+    if (!payload.exp) {
+      return false; // If no expiration, assume valid
+    }
+    
     return payload.exp * 1000 < Date.now();
-  } catch {
+  } catch (error) {
+    console.error('Error decoding JWT token:', error);
     return true;
   }
 };
@@ -91,8 +106,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // API base URL - update this to match your Protocol backend
-  const API_BASE_URL = process.env.VITE_PROTOCOL_API_URL || 'http://localhost:3000/api';
+  // API base URL - use bor-server for authentication
+  const API_BASE_URL = process.env.VITE_BOR_SERVER_URL || 'http://localhost:6969';
 
   const isAuthenticated = !!user && !!token;
 
@@ -138,7 +153,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       setIsLoading(true);
       
-      const response = await fetch(`${API_BASE_URL}/auth/login`, {
+      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -177,7 +192,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       setIsLoading(true);
 
-      const response = await fetch(`${API_BASE_URL}/auth/signup`, {
+      const response = await fetch(`${API_BASE_URL}/api/auth/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -223,7 +238,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const refresh = getStoredRefreshToken();
       if (!refresh) return false;
 
-      const response = await fetch(`${API_BASE_URL}/auth/refresh`, {
+      const response = await fetch(`${API_BASE_URL}/api/auth/refresh`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -260,17 +275,59 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setStoredUser(updatedUser);
   };
 
+  const googleAuth = async (googleUser: any): Promise<{ success: boolean; error?: string; isNewUser?: boolean }> => {
+    try {
+      setIsLoading(true);
+
+      const response = await fetch(`${API_BASE_URL}/api/auth/google`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          googleUser,
+          credential: googleUser.credential 
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return { success: false, error: data.error || 'Google authentication failed' };
+      }
+
+      const { user: userData, token: authToken, refreshToken: refresh, isNewUser } = data;
+
+      // Store auth data
+      setToken(authToken);
+      setUser(userData);
+      setStoredToken(authToken);
+      setStoredUser(userData);
+      
+      if (refresh) {
+        setStoredRefreshToken(refresh);
+      }
+
+      return { success: true, isNewUser };
+    } catch (error) {
+      console.error('Google auth error:', error);
+      return { success: false, error: 'Network error. Please try again.' };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const spendPoints = async (amount: number): Promise<boolean> => {
     if (!user || !token || user.points < amount) return false;
 
     try {
-      const response = await fetch(`${API_BASE_URL}/users/spend-points`, {
+      const response = await fetch(`${API_BASE_URL}/api/users/spend-points`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({ amount }),
+        body: JSON.stringify({ amount, reason: 'Points spent via UI' }),
       });
 
       if (!response.ok) return false;
@@ -292,6 +349,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     isLoading,
     login,
     signup,
+    googleAuth,
     logout,
     refreshToken,
     updateUser,

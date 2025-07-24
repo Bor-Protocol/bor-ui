@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { useAuth } from '../contexts/SimpleAuthContext';
+import { useAuth } from '../contexts/AuthContext';
+import { GoogleAuthButton } from './auth/GoogleAuthButton';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -7,7 +8,7 @@ interface AuthModalProps {
 }
 
 export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
-  const { login, signup, isLoading } = useAuth();
+  const { login, signup, googleAuth, isLoading } = useAuth();
   const [mode, setMode] = useState<'login' | 'signup'>('login');
   const [formData, setFormData] = useState({
     name: '',
@@ -26,6 +27,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
       if (mode === 'login') {
         const result = await login(formData.email, formData.password);
         if (result.success) {
+          setFormData({ name: '', email: '', password: '' });
+          setError('');
           onClose();
         } else {
           setError(result.error || 'Login failed');
@@ -33,6 +36,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
       } else {
         const result = await signup(formData.name, formData.email, formData.password);
         if (result.success) {
+          setFormData({ name: '', email: '', password: '' });
+          setError('');
           onClose();
         } else {
           setError(result.error || 'Signup failed');
@@ -50,8 +55,45 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
     }));
   };
 
+  const handleGoogleSuccess = async (googleUser: any) => {
+    try {
+      setError('');
+      
+      // Use real Google OAuth authentication
+      const result = await googleAuth(googleUser);
+      
+      if (result.success) {
+        if (result.isNewUser) {
+          console.log('New user created via Google OAuth:', googleUser.email);
+        } else {
+          console.log('Existing user logged in via Google OAuth:', googleUser.email);
+        }
+        setFormData({ name: '', email: '', password: '' });
+        setError('');
+        onClose();
+      } else {
+        setError(result.error || 'Google authentication failed');
+      }
+    } catch (err) {
+      console.error('Google auth error:', err);
+      setError('Google authentication failed');
+    }
+  };
+
+  const handleGoogleError = (error: any) => {
+    console.error('Google OAuth error:', error);
+    setError('Google authentication was cancelled or failed');
+  };
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div 
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          onClose();
+        }
+      }}
+    >
       <div className="bg-white rounded-lg max-w-md w-full p-6">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
@@ -60,7 +102,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
           </h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 text-2xl"
+            className="text-gray-400 hover:text-gray-600 text-2xl font-bold px-2 py-1 rounded hover:bg-gray-100 transition-colors"
+            type="button"
           >
             ×
           </button>
@@ -88,6 +131,22 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
           >
             Sign Up
           </button>
+        </div>
+
+        {/* Google OAuth Button */}
+        <div className="mb-4">
+          <GoogleAuthButton
+            onSuccess={handleGoogleSuccess}
+            onError={handleGoogleError}
+            mode={mode}
+          />
+        </div>
+
+        {/* Divider */}
+        <div className="flex items-center mb-4">
+          <div className="flex-1 border-t border-gray-300"></div>
+          <span className="px-3 text-sm text-gray-500">or continue with email</span>
+          <div className="flex-1 border-t border-gray-300"></div>
         </div>
 
         {/* Form */}
@@ -149,16 +208,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
             </div>
           )}
 
-          {/* Quick Demo Instructions */}
-          <div className="p-3 bg-blue-50 border border-blue-200 rounded-md">
-            <p className="text-sm text-blue-700 mb-2">
-              <strong>Demo Mode:</strong> Use any email and password to test the system.
-            </p>
-            <div className="text-xs text-blue-600 space-y-1">
-              <p><strong>Quick Test:</strong> demo@bor.ai / password123</p>
-              <p>You'll get 100 starting points!</p>
-            </div>
-          </div>
 
           {/* Submit Button */}
           <button
@@ -193,7 +242,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
           </p>
         </div>
 
-        {/* Demo Features */}
+        {/* Features */}
         <div className="mt-4 p-3 bg-gray-50 rounded-md">
           <h4 className="text-sm font-medium text-gray-900 mb-2">What you'll get:</h4>
           <ul className="text-sm text-gray-600 space-y-1">
