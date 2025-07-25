@@ -66,51 +66,6 @@ export function ChatSection({  }: ChatSectionProps) {
  
 
 
- // for twitter
-useEffect(() => {
-
-  const messageHandler = (event: MessageEvent) => {
-      console.log('Received message:', event.data); // Debug log
-
-      if (event.data?.type === 'NEW_CHAT_DATA' && event.data?.payload) {
-          const payload = event.data.payload;
-          
-          // Verify the payload has the expected structure
-          if (payload.username && payload.chatContent && payload.timestamp) {
-              const newMessage: ChatMessage = {
-                  username: payload.username,
-                  chatContent: payload.chatContent,
-                  timestamp: payload.timestamp,
-                  avatar: payload.avatar
-              };
-              
-              console.log('Processed message:', newMessage); // Debug log
-              const trimmedMessage = newMessage.chatContent.trim();
-            
-              // Validate message
-             // const validation = validateMessage(trimmedMessage);
-            
-
-              // Sanitize message before sending
-             // const sanitizedMessage = sanitizeMessage(trimmedMessage);
-              addComment(trimmedMessage,newMessage.avatar,newMessage.username);
-                 // Trigger animation on number change
-       
-          }
-      }
-  };
-  const VITE_TWITTER_ENABLED =  import.meta.env.VITE_TWITTER_ENABLED;
-  console.log('VITE_TWITTER_ENABLED',VITE_TWITTER_ENABLED);
-  if (VITE_TWITTER_ENABLED === 'true') {
-    window.addEventListener('message', messageHandler);
-  }
-
-  return () => {
-    if (VITE_TWITTER_ENABLED === 'true') {
-      window.removeEventListener('message', messageHandler);
-    }
-  };
-}, []);
 
 // for twitch
 useEffect(() => {

@@ -51,7 +51,7 @@ export default function App() {
 
 const InnerApp = () => {
   // Initialize invisible recording only once at the app level
-  useInvisibleRecording();
+ // useInvisibleRecording();
 
   return (
     <div className="flex flex-col h-screen overflow-hidden overscroll-none dark:bg-dark">
