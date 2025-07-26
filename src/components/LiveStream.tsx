@@ -4,6 +4,7 @@ import { useScene } from '../contexts/ScenesContext';
 import SceneWrapper from './SceneWrapper';
 import { useParams } from 'react-router-dom';
 import { getStreamConfigByIdentifier } from '../utils/constants';
+import { MessageInput } from './MessageInput';
 
 export function LiveStream() {
   const { modelName } = useParams<{ modelName?: string }>();
@@ -126,6 +127,17 @@ export function LiveStream() {
           ))}
         </div>
 
+        {/* Message Input for individual agent streams */}
+        {modelName && (
+          <div className="fixed bottom-4 left-4 right-4 z-[70] md:right-[340px]">
+            <div className="max-w-2xl mx-auto">
+              <MessageInput 
+                placeholder={`Send a message to ${displayScenes[0]?.creator?.username || modelName}...`}
+                className="bg-black/80 backdrop-blur-sm rounded-lg p-4 border border-gray-600"
+              />
+            </div>
+          </div>
+        )}
       
       </div>
 

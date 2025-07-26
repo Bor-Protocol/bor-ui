@@ -115,7 +115,7 @@ export const NEW_STREAM_CONFIGS: NewStreamConfig[] = [
        "environmentURL": "tt.glb",
        "models": [
          {
-           "model": "bor_model.vrm",
+           "model": "testtrump.vrm",
            "name": "Agent Alpha",
            "agentId": "c9a175eb-deb5-06b1-886b-ef4f876a5be2",
            "description": "Agent Alpha - Technical Coordinator",
@@ -136,7 +136,8 @@ export const NEW_STREAM_CONFIGS: NewStreamConfig[] = [
    ],
    stats: { comments: 0 },
    clothes: "professional"
- },
+ }
+ /*,
  {
    id: 3,
    title: "Agent Beta Stream",
@@ -220,7 +221,7 @@ export const NEW_STREAM_CONFIGS: NewStreamConfig[] = [
    ],
    stats: { comments: 0 },
    clothes: "formal"
- }
+ }*/
 ]
 
 export const ANIMATION_MAP: { [key: string]: string } = {

@@ -2,6 +2,7 @@ import { createContext, useContext, useState, ReactNode, useEffect, useMemo, use
 import { SceneConfig } from '../utils/constants.js';
 
 import { useSocket } from '../hooks/useSocket';
+import { useAuth } from './AuthContext';
 import axios from 'axios';
 import { API_URL, NEW_STREAM_CONFIGS, NewStreamConfig } from '../utils/constants';
 //import { useSceneManager } from '../hooks/useSceneManager';
@@ -82,8 +83,9 @@ export function SceneProvider({ children }: { children: ReactNode }) {
 
   const [newScenes, setNewScenes] = useState<NewStreamConfig[]>(NEW_STREAM_CONFIGS);
 
-  const { emit, socket } = useSocket();
-  const [userId] = useState<string>("Anonymous");
+  const { token, user } = useAuth();
+  const { emit, socket } = useSocket(token);
+  const userId = user?.email || "Anonymous";
 
 
   const [currentAgentId, setCurrentAgentId] = useState('');
@@ -196,7 +198,11 @@ export function SceneProvider({ children }: { children: ReactNode }) {
       
       setCommentCount(data.commentCount);
 
-      if (data.newComment.user === userId) return;
+      // Skip adding comment if it's from the current user (already added locally)
+      if (data.newComment.user === userId) {
+        console.log('Skipping own comment from socket listener');
+        return;
+      }
       const comment: Comment = {
         id: data.newComment.id.toString(),
         agentId: data.newComment.agentId,
