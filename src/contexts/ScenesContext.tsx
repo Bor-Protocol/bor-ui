@@ -4,7 +4,7 @@ import { SceneConfig } from '../utils/constants.js';
 import { useSocket } from '../hooks/useSocket';
 import { useAuth } from './AuthContext';
 import axios from 'axios';
-import { API_URL, NEW_STREAM_CONFIGS, NewStreamConfig } from '../utils/constants';
+import { API_URL, NEW_STREAM_CONFIGS, NewStreamConfig, FREE_MODEL_AGENT_ID } from '../utils/constants';
 //import { useSceneManager } from '../hooks/useSceneManager';
 // import Splash from '../components/Splash';
 
@@ -12,6 +12,7 @@ interface Comment {
   id: string;
   agentId: string;
   user: string;
+  sender?: string; // Added to match API response
   message: string;
   createdAt: string;
   avatar: string;
@@ -82,13 +83,13 @@ export function SceneProvider({ children }: { children: ReactNode }) {
   //const { isLoading, error } = useSceneManager();
 
   const [newScenes, setNewScenes] = useState<NewStreamConfig[]>(NEW_STREAM_CONFIGS);
+  const [currentAgentId, setCurrentAgentId] = useState('');
 
   const { token, user } = useAuth();
+  // Always use token if user is authenticated, even for free model
   const { emit, socket } = useSocket(token);
-  const userId = user?.email || "Anonymous";
-
-
-  const [currentAgentId, setCurrentAgentId] = useState('');
+  // Use authenticated email if available, otherwise anonymous
+  const userId = user?.email || "anonymous";
 
   // Comments
   const [comments, setComments] = useState<Comment[]>([]);
@@ -164,11 +165,13 @@ export function SceneProvider({ children }: { children: ReactNode }) {
 
   // Initial scene stats
   useEffect(() => {
+    if (!currentAgentId) return; // Skip if no agent ID
+    
     const fetchSceneStats = async () => {
       try {
         const res = await axios.get(`${API_URL}/api/streams/${currentAgentId}/stats`);
         // console.log(`Scene stats for ${currentAgentId}:`, res.data);
-        setCommentCount(res.data.comments || []);
+        setCommentCount(res.data.comments || 0);
       } catch (error) {
         console.error(`Failed to fetch scene stats for ${currentAgentId}:`, error);
       }
@@ -266,10 +269,10 @@ export function SceneProvider({ children }: { children: ReactNode }) {
     const newComment: Comment = {
       id: Date.now().toString(),
       agentId: currentAgentId,
-      user: userId ? userId : isSystem ? 'System' : '',
+      user: userId,
       message,
       avatar: avatar ?? randomAvatar,
-      handle: handle ?? 'Anonymous',
+      handle: handle ?? (user ? user.email.split('@')[0] : 'Anonymous'),
       createdAt: new Date().toISOString(),
       __v: 0,
       _id: Date.now().toString(),
@@ -294,7 +297,8 @@ export function SceneProvider({ children }: { children: ReactNode }) {
 
   // On scene change
   useEffect(() => {
-    if (scene) {
+    console.log('Scene change effect:', { scene: !!scene, currentAgentId, hasToken: !!token });
+    if (scene && currentAgentId) {
       // console.log('new scene', scene);
       setComments([]);
 
@@ -302,11 +306,18 @@ export function SceneProvider({ children }: { children: ReactNode }) {
       const fetchComments = async () => {
         try {
           const url = `${API_URL}/api/agents/${currentAgentId}/chat-history?limit=15`;
-          // console.log('fetching comments from', url);
-          const res = await axios.get(url);
+          console.log('Fetching comments from:', url);
+          
+          // Include auth token if available
+          const headers: any = {};
+          if (token) {
+            headers.Authorization = `Bearer ${token}`;
+          }
+          
+          const res = await axios.get(url, { headers });
           // Reverse the array to get the latest comments first   
           const reversedComments = res.data.chatHistory.reverse();
-          // console.log({ comments: reversedComments })
+          console.log('Fetched comments:', reversedComments.length, 'comments');
           setComments(reversedComments);
         } catch (error) {
           console.error(`Failed to fetch comments for ${currentAgentId}:`, error);
@@ -316,7 +327,7 @@ export function SceneProvider({ children }: { children: ReactNode }) {
      
       fetchComments();
     }
-  }, [scene, currentAgentId]);
+  }, [scene, currentAgentId, token]);
 
   const updateScene = (updatedScene: NewStreamConfig) => {
     setNewScenes(prev => prev.map(scene => 

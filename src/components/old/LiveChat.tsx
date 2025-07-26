@@ -1,5 +1,8 @@
+import React from 'react';
 import { Diamond } from 'lucide-react';
 import { useScene } from '../../contexts/ScenesContext';
+import { useAuth } from '../../contexts/AuthContext';
+import { FREE_MODEL_AGENT_ID } from '../../utils/constants';
 
 
 
@@ -11,14 +14,56 @@ const truncateText = (text: string, maxLength: number): string => {
 };
 
 export function LiveChat() {
-  const { comments } = useScene();
+  const { comments, currentAgentId } = useScene();
+  const { user } = useAuth();
 
+  // Filter comments for private sessions
+  const filteredComments = React.useMemo(() => {
+    console.log('LiveChat filtering:', {
+      commentsCount: comments.length,
+      currentAgentId,
+      isFreeModel: currentAgentId === FREE_MODEL_AGENT_ID,
+      userEmail: user?.email,
+      firstCommentSender: comments[0]?.sender,
+      firstCommentUser: comments[0]?.user,
+      firstComment: comments[0]
+    });
+    
+    // For free model, show all comments
+    if (currentAgentId === FREE_MODEL_AGENT_ID) {
+      return comments;
+    }
+    
+    // For private models, only show authenticated user's comments
+    if (user && user.email) {
+      const filtered = comments.filter(comment => 
+        comment.sender === user.email || 
+        comment.user === user.email || // Support both field names
+        comment.messageType === 'system' // Always show system messages
+      );
+      console.log('Filtered comments:', filtered.length, 'out of', comments.length);
+      return filtered;
+    }
+    
+    // If not authenticated, don't show any comments for private models
+    return [];
+  }, [comments, currentAgentId, user]);
  
+  const isPrivateSession = currentAgentId !== FREE_MODEL_AGENT_ID;
+  
   return (
     <div className="absolute bottom-0 left-0 right-0 z-[0] p-4 bg-gradient-to-t from-black/70 to-transparent">
+      {/* Private session indicator */}
+      {isPrivateSession && user && (
+        <div className="mb-2 text-center">
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-purple-600/80 text-white">
+            🔒 Private Session - Only your messages are shown
+          </span>
+        </div>
+      )}
       <div className="mb-4 space-y-0.5 overflow-hidden">
-        {comments
-          .slice(Math.max(comments.length - 7, 0))
+        {filteredComments
+          .slice(Math.max(filteredComments.length - 7, 0))
           .map((comment) => (
             <div
               key={comment.id}

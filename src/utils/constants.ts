@@ -358,6 +358,9 @@ export const AGENT_MAP: { [agentId: string]: { name: string } } = {
 export const SOCKET_URL = 'ws://localhost:6969'
 export const API_URL = 'http://localhost:6969'
 
+// Model access configuration
+export const FREE_MODEL_AGENT_ID = '795df77f-1620-07db-bd9a-0e2dfefef248'; // Trump model
+
 
 export const SOCKET_EVENTS = {
    CONNECTION: 'connection',

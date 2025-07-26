@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useScene } from '../contexts/ScenesContext';
+import { useAuth } from '../contexts/AuthContext';
 
 interface MessageInputProps {
   placeholder?: string;
@@ -13,6 +14,7 @@ export function MessageInput({
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { addComment } = useScene();
+  const { user } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,10 +27,14 @@ export function MessageInput({
     try {
       // Use the same addComment method that handleMessage uses
       // This will add the message to the current agent's chat
+      // Use authenticated user info if available
+      const userAvatar = user?.avatar || 'https://static-cdn.jtvnw.net/user-default-pictures-uv/13e5fa74-defa-11e9-809c-784f43822e80-profile_image-70x70.png';
+      const userHandle = user ? (user.name || user.email.split('@')[0]) : 'Anonymous';
+      
       addComment(
         trimmedMessage,
-        'https://static-cdn.jtvnw.net/user-default-pictures-uv/13e5fa74-defa-11e9-809c-784f43822e80-profile_image-70x70.png', // Default avatar
-        'Viewer', // Username
+        userAvatar,
+        userHandle,
         false, // Not system message
         true   // Emit to server
       );

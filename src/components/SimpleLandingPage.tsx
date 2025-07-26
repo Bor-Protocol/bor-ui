@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useSocket } from '../hooks/useSocket';
 import { AgentSelection } from './AgentSelection';
 import { useUserScenes } from '../hooks/useUserScenes';
-import { NewStreamConfig } from '../utils/constants';
+import { NewStreamConfig, FREE_MODEL_AGENT_ID } from '../utils/constants';
 import { AuthModal } from './AuthModal';
 import { PointsDisplay } from './PointsDisplay';
 import { useNavigate } from 'react-router-dom';
@@ -163,11 +163,17 @@ export const SimpleLandingPage: React.FC = () => {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+            <Link 
+              to="/trump"
+              className="px-6 py-3 bg-red-600 text-white rounded-md hover:bg-red-700 font-medium transition-colors"
+            >
+              🇺🇸 Chat with Trump FREE →
+            </Link>
             <button 
               className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium"
               onClick={() => window.location.href = '/app'}
             >
-              Start Free Chat →
+              Explore All Models
             </button>
             <button 
               className="px-6 py-3 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 font-medium"
@@ -180,17 +186,17 @@ export const SimpleLandingPage: React.FC = () => {
                 }
               }}
             >
-              Select Your Agent ✨
+              Premium Sessions ✨
             </button>
           </div>
 
           {/* Features */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
             <div className="bg-white p-6 rounded-lg border border-gray-200">
-              <div className="text-2xl mb-2">🌍</div>
-              <h3 className="font-semibold mb-2">Free Public Rooms</h3>
+              <div className="text-2xl mb-2">🇺🇸</div>
+              <h3 className="font-semibold mb-2">Free Trump Model</h3>
               <p className="text-gray-600 text-sm">
-                Join ongoing conversations with AI agents. No signup required for public chats.
+                Chat with the Trump AI model completely free. No signup or authentication required.
               </p>
             </div>
 
