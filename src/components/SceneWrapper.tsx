@@ -75,7 +75,7 @@ export function SceneLoader() {
 
 
 
-function SceneContent({  isActive, }: {
+function SceneContent({ scene, isActive, }: {
     scene: any,
     isActive: boolean,
     debugMode: boolean,
@@ -83,10 +83,10 @@ function SceneContent({  isActive, }: {
 }) {
     const { scenes, activeScene, sceneConfigIndex } = useScene();
     const { playBackgroundMusic, stopBackgroundMusic } = useSceneEngine();
-    const currentScene = scenes[activeScene];
+    const currentScene = scene; // Use the passed scene prop instead of looking it up
     const prevSceneRef = useRef<string | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
     const [currentTrackIndex, ] = useState(0);
+    const [isInitialized, setIsInitialized] = useState(false);
 
     useEffect(() => {
         let currentBgm = currentScene.bgm;
@@ -110,48 +110,52 @@ function SceneContent({  isActive, }: {
 
     useEffect(() => {
         if (prevSceneRef.current !== String(currentScene.id)) {
-            setIsLoading(true);
-
-            // Cleanup previous scene
-            if (prevSceneRef.current) {
+            // Only cleanup if this is a real scene change (not initial load)
+            if (prevSceneRef.current && isInitialized) {
                 // Signal ThreeScene to cleanup
                 window.dispatchEvent(new CustomEvent('cleanup-scene', {
                     detail: { sceneId: prevSceneRef.current }
                 }));
             }
 
-            // Load new scene after a short delay to ensure cleanup
-            const loadTimer = setTimeout(() => {
-                prevSceneRef.current = String(currentScene.id);
-                setIsLoading(false);
-            }, 300);
-
-            return () => clearTimeout(loadTimer);
+            // Update to new scene
+            prevSceneRef.current = String(currentScene.id);
+            setIsInitialized(true);
         }
-    }, [currentScene.id]);
+    }, [currentScene.id, isInitialized]);
 
-    if (!isActive) return null;
+    // Don't return null for inactive scenes - we need them rendered for smooth scrolling
+    // if (!isActive) return null;
+
+    if (!isActive) {
+        // For inactive scenes, show a placeholder to maintain scroll positioning
+        return (
+            <div className="w-full h-full bg-gray-900 flex items-center justify-center">
+                <div className="text-white text-lg">{currentScene.title}</div>
+            </div>
+        );
+    }
 
     return (
         <Suspense fallback={<SceneLoader />}>
-            {isLoading ? (
-                <SceneLoader />
-            ) : (
-                <Canvas
-                    frameloop="always"
-                    dpr={[1, 2]}
-                    performance={{ min: 0.5 }}
-                    gl={{ 
-                        antialias: true,
-                        alpha: false,
-                        powerPreference: "high-performance",
-                        preserveDrawingBuffer: true
-                    }}
-                >
-                    <ThreeScene key={currentScene.id} debugMode={false} />
-                    {false && <OrbitControls />}
-                </Canvas>
-            )}
+            <Canvas
+                frameloop="always"
+                dpr={[1, 2]}
+                performance={{ min: 0.5 }}
+                gl={{ 
+                    antialias: true,
+                    alpha: false,
+                    powerPreference: "high-performance",
+                    preserveDrawingBuffer: true
+                }}
+            >
+                <ThreeScene 
+                    key={`threescene-${currentScene.id}-${currentScene.agentId}-${currentScene.title}`} 
+                    debugMode={false} 
+                    sceneOverride={currentScene} 
+                />
+                {false && <OrbitControls />}
+            </Canvas>
         </Suspense>
     );
 }

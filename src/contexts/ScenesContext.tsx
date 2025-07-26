@@ -86,7 +86,7 @@ export function SceneProvider({ children }: { children: ReactNode }) {
   const [userId] = useState<string>("Anonymous");
 
 
-  const [currentAgentId, setCurrentAgentId] = useState(newScenes[0]?.agentId || '');
+  const [currentAgentId, setCurrentAgentId] = useState('');
 
   // Comments
   const [comments, setComments] = useState<Comment[]>([]);
@@ -110,8 +110,8 @@ export function SceneProvider({ children }: { children: ReactNode }) {
     [newScenes, getCurrentSceneIndex]
   );
 
-  const [currentSceneIndex, setCurrentSceneIndex] = useState(0);
-  const [activeScene, setActiveScene] = useState<number>(0);
+  const [currentSceneIndex, setCurrentSceneIndex] = useState(-1); // Start with -1 to avoid race condition
+  const [activeScene, setActiveScene] = useState<number>(-1);
 
   // Scene configs (clothes etc)
   const [sceneConfigIndex, setSceneConfigIndex] = useState(0);
@@ -151,12 +151,11 @@ export function SceneProvider({ children }: { children: ReactNode }) {
 
   // Update currentAgentId when scenes change
   useEffect(() => {
-    if (newScenes.length > 0) {
+    if (newScenes.length > 0 && currentSceneIndex >= 0) {
       const currentScene = newScenes[currentSceneIndex];
-      // console.log('setting current agent id to', currentScene.agentId);
-      setCurrentAgentId(currentScene.agentId);
-      
-      // Update URL with scene identifier
+      if (currentScene) {
+        setCurrentAgentId(currentScene.agentId);
+      }
     }
   }, [newScenes, currentSceneIndex]);
 
@@ -188,6 +187,13 @@ export function SceneProvider({ children }: { children: ReactNode }) {
     // Create a single handler function
     const handleCommentReceived = (data: { commentCount: number, newComment: Comment }) => {
       console.log("comment received for agent:", currentAgentId, data);
+      
+      // Only process comments for the current agent
+      if (data.newComment.agentId !== currentAgentId) {
+        console.log(`Ignoring comment for agent ${data.newComment.agentId}, current agent is ${currentAgentId}`);
+        return;
+      }
+      
       setCommentCount(data.commentCount);
 
       if (data.newComment.user === userId) return;

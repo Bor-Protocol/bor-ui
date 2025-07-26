@@ -131,7 +131,7 @@ const CafeEnvironment: React.FC<{ environmentUrl: string, config: SceneConfig }>
 
 
 
-export function ThreeScene({ debugMode }: { debugMode: boolean }) {
+export function ThreeScene({ debugMode, sceneOverride }: { debugMode: boolean; sceneOverride?: any }) {
   const modelRefs = useRef<(Group | undefined)[]>([]);
   const vrmRefs = useRef<any[]>([]);
   const mixerRefs = useRef<(AnimationMixer | undefined)[]>([]); 
@@ -143,24 +143,39 @@ export function ThreeScene({ debugMode }: { debugMode: boolean }) {
 
   const { animation, animationFile, audioData } = useSceneEngine();
   const { newScenes, activeScene, sceneConfigIndex } = useScene();
-  const scene = newScenes[activeScene];
-
-  const activeSceneConfig: SceneConfig = useMemo(() => scene?.sceneConfigs[sceneConfigIndex], [scene, sceneConfigIndex])
-  const environmentUrl = activeSceneConfig?.environmentURL
-
-  const models = activeSceneConfig?.models || [];
-
+  
+  // Use sceneOverride if provided, otherwise use global context
+  const scene = sceneOverride || newScenes[activeScene];
+  
+  // CRITICAL: Use different config index logic based on whether we have an override
+  const activeSceneConfig = useMemo(() => {
+    if (!scene?.sceneConfigs?.length) return null;
+    
+    // When sceneOverride is provided, always use the first config (index 0)
+    // When no override, use the global sceneConfigIndex
+    const configIndex = sceneOverride ? 0 : sceneConfigIndex;
+    const config = scene.sceneConfigs[configIndex];
+    
+    
+    return config;
+  }, [scene, sceneConfigIndex, sceneOverride]);
+  
   // This is the config we use for the scene
-  const [sceneConfig, setSceneConfig] = useState<SceneConfig>(activeSceneConfig);
+  const [sceneConfig, setSceneConfig] = useState<SceneConfig | null>(null);
+  
+  // Use activeSceneConfig as fallback if sceneConfig is not set yet
+  const currentConfig = sceneConfig || activeSceneConfig;
+  
+  const environmentUrl = currentConfig?.environmentURL;
+  const models = currentConfig?.models || [];
 
-  console.log({sceneConfig})
 
   // This is the index of the model we are currently using (editor)
 
-  // Add camera position state
-  const [cameraPosition, setCameraPosition] = useState<[number, number, number]>(sceneConfig.cameraPosition);
-  const [cameraRotation, setCameraRotation] = useState<number>(sceneConfig.cameraRotation);
-  const [cameraPitch, setCameraPitch] = useState<number>(sceneConfig.cameraPitch);
+  // Add camera position state with default values
+  const [cameraPosition, setCameraPosition] = useState<[number, number, number]>([2.86, 0.76, -7.73]);
+  const [cameraRotation, setCameraRotation] = useState<number>(-4.708758241001718);
+  const [cameraPitch, setCameraPitch] = useState<number>(0);
 
   console.log("THIS IS THE SCENE CONFIG", { ...sceneConfig, cameraPosition, cameraRotation, cameraPitch })
 
@@ -306,7 +321,7 @@ export function ThreeScene({ debugMode }: { debugMode: boolean }) {
 
   // Modify the model loading effect
   useEffect(() => {
-    if (!sceneConfig) return;
+    if (!currentConfig) return;
 
     // Initialize loading states
     setModelsLoaded(new Array(models.length).fill(false));
@@ -509,9 +524,9 @@ export function ThreeScene({ debugMode }: { debugMode: boolean }) {
         modelRotation: modelRotationsRef.current[index] || model.modelRotation,
         modelScale: modelRefs.current[index]?.scale.toArray() || model.modelScale,
       })),
-      environmentScale: sceneConfig.environmentScale,
-      environmentPosition: sceneConfig.environmentPosition,
-      environmentRotation: sceneConfig.environmentRotation,
+      environmentScale: currentConfig.environmentScale,
+      environmentPosition: currentConfig.environmentPosition,
+      environmentRotation: currentConfig.environmentRotation,
       cameraPitch,
       cameraPosition,
       cameraRotation,
@@ -526,16 +541,16 @@ export function ThreeScene({ debugMode }: { debugMode: boolean }) {
     if (activeSceneConfig) {
       setSceneConfig(activeSceneConfig);
       // Update camera settings from the new config
-      setCameraPosition(activeSceneConfig.cameraPosition);
-      setCameraRotation(activeSceneConfig.cameraRotation);
-      setCameraPitch(activeSceneConfig.cameraPitch);
+      setCameraPosition(activeSceneConfig.cameraPosition || [2.86, 0.76, -7.73]);
+      setCameraRotation(activeSceneConfig.cameraRotation || -4.708758241001718);
+      setCameraPitch(activeSceneConfig.cameraPitch || 0);
     }
   }, [activeSceneConfig]);
 
   useEffect(() => {
-    if (!sceneConfig?.models) return;
+    if (!currentConfig?.models) return;
     
-    sceneConfig.models.forEach((modelConfig, index) => {
+    currentConfig.models.forEach((modelConfig, index) => {
       if (modelRefs.current[index]) {
         // Update position
         modelRefs.current[index].position.set(...modelConfig.modelPosition);
@@ -549,14 +564,14 @@ export function ThreeScene({ debugMode }: { debugMode: boolean }) {
         modelRefs.current[index].scale.set(...modelConfig.modelScale);
       }
     });
-  }, [sceneConfig]);
+  }, [currentConfig]);
 
   // Add this if you want to log on every change
   useEffect(() => {
     if (debugMode) {
       logSceneConfig();
     }
-  }, [sceneConfig, cameraPosition, cameraPitch, cameraRotation, models]);
+  }, [currentConfig, cameraPosition, cameraPitch, cameraRotation, models]);
 
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
@@ -582,9 +597,9 @@ export function ThreeScene({ debugMode }: { debugMode: boolean }) {
 
 
 
-  if (!sceneConfig) return null;
+  if (!currentConfig) return null;
 
-  const modelConfigs = sceneConfig?.models || [];
+  const modelConfigs = currentConfig?.models || [];
 
   return (
     <>
@@ -593,18 +608,14 @@ export function ThreeScene({ debugMode }: { debugMode: boolean }) {
         position={cameraPosition}
         rotation={[cameraPitch, cameraRotation, 0]}
       />
-      <CafeEnvironment environmentUrl={environmentUrl} config={sceneConfig} />
+      <CafeEnvironment environmentUrl={environmentUrl} config={currentConfig} />
+      
       {modelConfigs
         // Add filter to prevent duplicate agentIds
         .filter((model, index, self) => 
           index === self.findIndex(m => m.agentId === model.agentId)
         )
         .map((modelConfig, index) => {
-          console.log(`Rendering model ${index}:`, {
-            ref: modelRefs.current[index],
-            position: modelConfig.modelPosition,
-            agentId: modelConfig.agentId
-          });
           return (
             <primitive 
               key={`model-${modelConfig.agentId}`} // Change key to use agentId

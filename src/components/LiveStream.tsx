@@ -1,17 +1,94 @@
 import { ChatSection } from './ChatSection';
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import { useScene } from '../contexts/ScenesContext';
 import SceneWrapper from './SceneWrapper';
-//import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import { getStreamConfigByIdentifier } from '../utils/constants';
 
 export function LiveStream() {
-
+  const { modelName } = useParams<{ modelName?: string }>();
+  
   const {
-   // setCurrentSceneIndex,
-   // setActiveScene,
-    newScenes: scenes
+    setCurrentSceneIndex,
+    setActiveScene,
+    newScenes: scenes,
+    currentAgentId
   } = useScene();
+  
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Filter scenes based on URL parameter
+  const displayScenes = modelName 
+    ? scenes.filter(scene => scene.identifier === modelName)
+    : scenes;
+
+  // When modelName changes, update the current scene
+  useEffect(() => {
+    if (modelName) {
+      const targetScene = scenes.find(scene => scene.identifier === modelName);
+      if (targetScene) {
+        const sceneIndex = scenes.findIndex(scene => scene.identifier === modelName);
+        if (sceneIndex !== -1) {
+          setCurrentSceneIndex(sceneIndex);
+          setActiveScene(sceneIndex);
+        }
+      }
+    } else {
+      // If no modelName, default to first scene (for /app route)
+      if (scenes.length > 0) {
+        setCurrentSceneIndex(0);
+        setActiveScene(0);
+      }
+    }
+  }, [modelName, scenes, setCurrentSceneIndex, setActiveScene]);
+
+  // Handle scroll observation for multiple scenes
+  useEffect(() => {
+    // Only set up scroll observer when showing all scenes (no specific modelName)
+    if (modelName) return;
+    
+    const container = containerRef.current;
+    if (!container) return;
+
+    let timeout: NodeJS.Timeout;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const index = Number(entry.target.getAttribute('data-index'));
+            if (!isNaN(index)) {
+              if (timeout) clearTimeout(timeout);
+              
+              timeout = setTimeout(() => {
+                const actualSceneIndex = scenes.findIndex(s => s.id === displayScenes[index].id);
+                setCurrentSceneIndex(actualSceneIndex);
+                setActiveScene(actualSceneIndex);
+                console.log('Scrolled to scene:', {
+                  displayIndex: index,
+                  actualIndex: actualSceneIndex,
+                  sceneName: displayScenes[index].modelName
+                });
+              }, 50);
+            }
+          }
+        });
+      },
+      {
+        root: container,
+        threshold: 0.6,
+        rootMargin: '-10% 0px',
+      }
+    );
+
+    const sceneElements = container.querySelectorAll('[data-index]');
+    sceneElements.forEach((scene) => observer.observe(scene));
+
+    return () => {
+      observer.disconnect();
+      if (timeout) clearTimeout(timeout);
+    };
+  }, [modelName, displayScenes, scenes, setCurrentSceneIndex, setActiveScene]);
 
   return (
     <div className="flex flex-1 h-full w-full">
@@ -26,7 +103,7 @@ export function LiveStream() {
           `}
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
-          {scenes.map((scene, index) => (
+          {displayScenes.map((scene, index) => (
             <div
               key={scene.id || `scene-${index}`}
               data-index={index}
@@ -43,7 +120,7 @@ export function LiveStream() {
                     description: scene.creator.title,
                   }
                 }}
-                index={index}
+                index={scenes.findIndex(s => s.id === scene.id)}
               />
             </div>
           ))}

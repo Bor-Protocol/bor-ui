@@ -13,12 +13,54 @@ export const BGM_URLS = {
 export const NEW_STREAM_CONFIGS: NewStreamConfig[] = [
  {
    id: 0,
-   title: "Trump stream",
+   title: "Trump Live Stream",
+   agentId: "795df77f-1620-07db-bd9a-0e2dfefef248", // Will be replaced with actual Trump agent ID
+   twitter: "@realDonaldTrump",
+   modelName: "Trump",
+   identifier: "trump",
+   description: "Make America Great Again - Live!",
+   color: "#FF0000",
+   type: "stream",
+   component: "ThreeScene",
+   creator: { avatar: "/images/trump-avatar.webp", title: "MAGA Rally", username: "Trump" },
+   bgm: BGM_URLS.BORP.DEFAULT,
+   sceneConfigs: [
+     {
+       "id": 0,
+       "name": "Trump Rally Stage",
+       "environmentURL": "tt.glb",
+       "models": [
+         {
+           "model": "trump.vrm",
+           "name": "Trump",
+           "agentId": "795df77f-1620-07db-bd9a-0e2dfefef248",
+           "description": "Donald Trump",
+           "clothes": "suit",
+           "defaultAnimation": "idlet",
+           "modelPosition": [1.51, -0.5, -7.65],
+           "modelRotation": [0, 7.8, 0],
+           "modelScale": [0.96, 0.96, 0.96]
+         }
+       ],
+       "environmentScale": [1, 1, 1],
+       "environmentPosition": [3, -1, -3.5],
+       "environmentRotation": [0, 1.5707963267948966, 0],
+       "cameraPitch": 0,
+       "cameraPosition": [2.86, 0.76, -7.73],
+       "cameraRotation": -4.708758241001718
+     }
+   ],
+   stats: { comments: 0 },
+   clothes: "suit"
+ },
+ {
+   id: 1,
+   title: "Borp Original Stream",
    agentId: "c9a175eb-deb5-06b1-886b-ef4f876a5be2",
    twitter: "@bor_live",
-   modelName: "Trump",
-   identifier: "Trump",
-   description: "My first stream!",
+   modelName: "Borp",
+   identifier: "borp",
+   description: "The original Borp experience!",
    color: "#FE2C55",
    type: "stream",
    component: "ThreeScene",
@@ -26,64 +68,159 @@ export const NEW_STREAM_CONFIGS: NewStreamConfig[] = [
    bgm: BGM_URLS.BORP.DEFAULT,
    sceneConfigs: [
      {
-       "id": 0,
+       "id": 1,
        "name": "Cafe",
        "environmentURL": "tt.glb",
        "models": [
          {
-           "model": "tromp.vrm",
+           "model": "bor_model.vrm",
            "name": "Bor",
            "agentId": "c9a175eb-deb5-06b1-886b-ef4f876a5be2",
            "description": "Bor",
            "clothes": "casual",
            "defaultAnimation": "idlet",
-           "modelPosition": [
-             1.51,
-             -0.4999999999999999,
-             -7.650000000000005
-           ],
-           "modelRotation": [
-             0,
-             7.799999999999988,
-             0
-           ],
-           "modelScale": [
-             0.9605960100000004,
-             0.9605960100000004,
-             0.9605960100000004
-           ]
+           "modelPosition": [1.51, -0.5, -7.65],
+           "modelRotation": [0, 7.8, 0],
+           "modelScale": [0.96, 0.96, 0.96]
          }
        ],
-       "environmentScale": [
-         1,
-         1,
-         1
-       ],
-       "environmentPosition": [
-         3, //depth
-         -1, //up was -1
-         -3.5 // lef right
-       ],
-       "environmentRotation": [
-         0,
-         1.5707963267948966,
-         0
-       ],
+       "environmentScale": [1, 1, 1],
+       "environmentPosition": [3, -1, -3.5],
+       "environmentRotation": [0, 1.5707963267948966, 0],
        "cameraPitch": 0,
-       "cameraPosition": [
-         2.86339364354024,
-         0.75999999999999,
-         -7.734076601144114
-       ],
+       "cameraPosition": [2.86, 0.76, -7.73],
        "cameraRotation": -4.708758241001718
-     },
-
+     }
    ],
-   stats: {
-     comments: 0,
-   },
+   stats: { comments: 0 },
    clothes: "casual"
  },
+ {
+   id: 2,
+   title: "Agent Alpha Stream",
+   agentId: "c9a175eb-deb5-06b1-886b-ef4f876a5be2", // Will be replaced with actual Alpha agent ID
+   twitter: "@agent_alpha",
+   modelName: "Agent-Alpha",
+   identifier: "alpha",
+   description: "Technical Operations Hub",
+   color: "#0066FF",
+   type: "stream",
+   component: "ThreeScene",
+   creator: { avatar: "/images/alpha-avatar.webp", title: "System Coordinator", username: "Alpha" },
+   bgm: BGM_URLS.BORP.DEFAULT,
+   sceneConfigs: [
+     {
+       "id": 2,
+       "name": "Tech Lab",
+       "environmentURL": "tt.glb",
+       "models": [
+         {
+           "model": "bor_model.vrm",
+           "name": "Agent Alpha",
+           "agentId": "c9a175eb-deb5-06b1-886b-ef4f876a5be2",
+           "description": "Agent Alpha - Technical Coordinator",
+           "clothes": "professional",
+           "defaultAnimation": "idle",
+           "modelPosition": [1.51, -0.5, -7.65],
+           "modelRotation": [0, 7.8, 0],
+           "modelScale": [0.96, 0.96, 0.96]
+         }
+       ],
+       "environmentScale": [1, 1, 1],
+       "environmentPosition": [3, -1, -3.5],
+       "environmentRotation": [0, 1.5707963267948966, 0],
+       "cameraPitch": 0,
+       "cameraPosition": [2.86, 0.76, -7.73],
+       "cameraRotation": -4.708758241001718
+     }
+   ],
+   stats: { comments: 0 },
+   clothes: "professional"
+ },
+ {
+   id: 3,
+   title: "Agent Beta Stream",
+   agentId: "agent-beta-id", // Will be replaced with actual Beta agent ID
+   twitter: "@agent_beta",
+   modelName: "Agent-Beta",
+   identifier: "beta",
+   description: "Monitoring & Analysis Hub",
+   color: "#00FF66",
+   type: "stream",
+   component: "ThreeScene",
+   creator: { avatar: "/images/beta-avatar.webp", title: "System Monitor", username: "Beta" },
+   bgm: BGM_URLS.BORP.DEFAULT,
+   sceneConfigs: [
+     {
+       "id": 3,
+       "name": "Control Room",
+       "environmentURL": "tt.glb",
+       "models": [
+         {
+           "model": "bor_model.vrm",
+           "name": "Agent Beta",
+           "agentId": "agent-beta-id",
+           "description": "Agent Beta - Monitoring Specialist",
+           "clothes": "tech",
+           "defaultAnimation": "idle_basic",
+           "modelPosition": [1.51, -0.5, -7.65],
+           "modelRotation": [0, 7.8, 0],
+           "modelScale": [0.96, 0.96, 0.96]
+         }
+       ],
+       "environmentScale": [1, 1, 1],
+       "environmentPosition": [3, -1, -3.5],
+       "environmentRotation": [0, 1.5707963267948966, 0],
+       "cameraPitch": 0,
+       "cameraPosition": [2.86, 0.76, -7.73],
+       "cameraRotation": -4.708758241001718
+     }
+   ],
+   stats: { comments: 0 },
+   clothes: "tech"
+ },
+ {
+   id: 4,
+   title: "Agent Gamma Stream",
+   agentId: "agent-gamma-id", // Will be replaced with actual Gamma agent ID
+   twitter: "@agent_gamma",
+   modelName: "Agent-Gamma",
+   identifier: "gamma",
+   description: "Data Analytics Hub",
+   color: "#FF6600",
+   type: "stream",
+   component: "ThreeScene",
+   creator: { avatar: "/images/gamma-avatar.webp", title: "Data Analyst", username: "Gamma" },
+   bgm: BGM_URLS.BORP.DEFAULT,
+   sceneConfigs: [
+     {
+       "id": 4,
+       "name": "Data Center",
+       "environmentURL": "tt.glb",
+       "models": [
+         {
+           "model": "bor_model.vrm",
+           "name": "Agent Gamma",
+           "agentId": "agent-gamma-id",
+           "description": "Agent Gamma - Data Specialist",
+           "clothes": "formal",
+           "defaultAnimation": "offensive_idle",
+           "modelPosition": [1.51, -0.5, -7.65],
+           "modelRotation": [0, 7.8, 0],
+           "modelScale": [0.96, 0.96, 0.96]
+         }
+       ],
+       "environmentScale": [1, 1, 1],
+       "environmentPosition": [3, -1, -3.5],
+       "environmentRotation": [0, 1.5707963267948966, 0],
+       "cameraPitch": 0,
+       "cameraPosition": [2.86, 0.76, -7.73],
+       "cameraRotation": -4.708758241001718
+     }
+   ],
+   stats: { comments: 0 },
+   clothes: "formal"
+ }
 ]
 
 export const ANIMATION_MAP: { [key: string]: string } = {
@@ -306,3 +443,59 @@ export const DEFAULT_STREAM_CONFIG = {
   defaultModelPosition: [1.51, -0.5, -7.65],
   defaultEnvironmentPosition: [3, -1, -3.5],
 } as const;
+
+// Function to update stream configs with real agent IDs
+export const updateStreamConfigsWithAgentIds = (agentIds: {
+  trump?: string;
+  borp?: string;
+  alpha?: string;
+  beta?: string;
+  gamma?: string;
+}) => {
+  NEW_STREAM_CONFIGS.forEach(config => {
+    switch (config.identifier) {
+      case 'trump':
+        if (agentIds.trump) {
+          config.agentId = agentIds.trump;
+          config.sceneConfigs[0].models[0].agentId = agentIds.trump;
+        }
+        break;
+      case 'borp':
+        if (agentIds.borp) {
+          config.agentId = agentIds.borp;
+          config.sceneConfigs[0].models[0].agentId = agentIds.borp;
+        }
+        break;
+      case 'alpha':
+        if (agentIds.alpha) {
+          config.agentId = agentIds.alpha;
+          config.sceneConfigs[0].models[0].agentId = agentIds.alpha;
+        }
+        break;
+      case 'beta':
+        if (agentIds.beta) {
+          config.agentId = agentIds.beta;
+          config.sceneConfigs[0].models[0].agentId = agentIds.beta;
+        }
+        break;
+      case 'gamma':
+        if (agentIds.gamma) {
+          config.agentId = agentIds.gamma;
+          config.sceneConfigs[0].models[0].agentId = agentIds.gamma;
+        }
+        break;
+    }
+  });
+  
+  console.log('Updated stream configs with agent IDs:', agentIds);
+};
+
+// Function to get stream config by agent ID
+export const getStreamConfigByAgentId = (agentId: string): NewStreamConfig | undefined => {
+  return NEW_STREAM_CONFIGS.find(config => config.agentId === agentId);
+};
+
+// Function to get stream config by identifier
+export const getStreamConfigByIdentifier = (identifier: string): NewStreamConfig | undefined => {
+  return NEW_STREAM_CONFIGS.find(config => config.identifier === identifier);
+};

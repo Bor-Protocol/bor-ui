@@ -14,6 +14,7 @@ import SceneConfigurator from './components/SceneConfigurator';
 import { StreamConfigEditor } from './components/StreamConfigEditor';
 import { AgentIntegrationDemo } from './components/AgentIntegrationDemo';
 import { AuthTestPage } from './pages/AuthTestPage';
+import { StreamSelector } from './components/StreamSelector';
 
 const queryClient = new QueryClient();
 
@@ -38,6 +39,7 @@ export default function App() {
                 <Route path="/docs" element={<DocsPage />} />
                 <Route path="/demo" element={<AgentIntegrationDemo />} />
                 <Route path="/auth-test" element={<AuthTestPage />} />
+                <Route path="/streams" element={<StreamSelector />} />
                 <Route path="/" element={<SimpleLandingPage />} />
               </Routes>      
             </SceneEngineProvider>
