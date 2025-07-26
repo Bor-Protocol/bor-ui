@@ -14,7 +14,7 @@ export const NEW_STREAM_CONFIGS: NewStreamConfig[] = [
  {
    id: 0,
    title: "Trump stream",
-   agentId: "795df77f-1620-07db-bd9a-0e2dfefef248",
+   agentId: "c9a175eb-deb5-06b1-886b-ef4f876a5be2",
    twitter: "@bor_live",
    modelName: "Trump",
    identifier: "Trump",
@@ -33,7 +33,7 @@ export const NEW_STREAM_CONFIGS: NewStreamConfig[] = [
          {
            "model": "tromp.vrm",
            "name": "Bor",
-           "agentId": "795df77f-1620-07db-bd9a-0e2dfefef248",
+           "agentId": "c9a175eb-deb5-06b1-886b-ef4f876a5be2",
            "description": "Bor",
            "clothes": "casual",
            "defaultAnimation": "idlet",
