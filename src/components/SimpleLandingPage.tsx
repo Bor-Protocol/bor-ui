@@ -436,20 +436,47 @@ export const SimpleLandingPage: React.FC = () => {
               <div className="relative bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm rounded-3xl border border-white/20 overflow-hidden shadow-2xl">
                 <div className="absolute inset-0 bg-gradient-to-tr from-pink-500/10 via-transparent to-cyan-500/10"></div>
                 
-                {/* Placeholder video */}
-                <div className="relative aspect-video bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center">
-                  <div className="text-center">
-                    <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-pink-500 to-cyan-500 rounded-full flex items-center justify-center animate-pulse">
-                      <svg className="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
-                      </svg>
+                {/* Real Demo Video */}
+                <div className="relative aspect-video bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl overflow-hidden">
+                  <video 
+                    className="w-full h-full object-cover"
+                    controls
+                    controlsList="nodownload"
+                    poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1920 1080'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23ec4899;stop-opacity:0.3'/%3E%3Cstop offset='100%25' style='stop-color:%2306b6d4;stop-opacity:0.3'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23grad)'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial,sans-serif' font-size='48' fill='white' text-anchor='middle' dy='0.3em'%3E▶ AI Demo%3C/text%3E%3C/svg%3E"
+                    preload="metadata"
+                    onError={(e) => {
+                      console.log('Video error:', e);
+                      const target = e.currentTarget as HTMLVideoElement;
+                      target.style.display = 'none';
+                      const fallback = target.nextElementSibling as HTMLElement;
+                      if (fallback) fallback.style.display = 'flex';
+                    }}
+                    onLoadStart={() => console.log('Video loading started')}
+                    onCanPlay={() => console.log('Video can play')}
+                  >
+                    {/* MP4 format (universal compatibility) */}
+                    <source src="/test-demo.mp4" type="video/mp4" />
+                    <source src="./test-demo.mp4" type="video/mp4" />
+                    
+                    Your browser does not support the video tag.
+                  </video>
+                  
+                  {/* Fallback content when video fails */}
+                  <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-slate-800 to-slate-900" style={{ display: 'none' }}>
+                    <div className="text-center">
+                      <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-pink-500 to-cyan-500 rounded-full flex items-center justify-center animate-pulse">
+                        <svg className="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <h3 className="text-xl font-bold text-white mb-2">Demo Video Coming Soon</h3>
+                      <p className="text-gray-300 text-sm">Experience real-time conversations with 3D AI agents</p>
+                      <p className="text-gray-400 text-xs mt-2">Video file: /test-demo.mp4</p>
                     </div>
-                    <h3 className="text-xl font-bold text-white mb-2">Live AI Interaction Demo</h3>
-                    <p className="text-gray-300 text-sm">Experience real-time conversations with 3D AI agents</p>
-                    <button className="mt-4 px-6 py-3 bg-gradient-to-r from-pink-500 to-cyan-500 text-white rounded-xl font-medium hover:from-pink-600 hover:to-cyan-600 transition-all duration-200 transform hover:scale-105">
-                      ▶ Watch Demo
-                    </button>
                   </div>
+                  
+                  {/* Video overlay with anime-inspired effects */}
+                  <div className="absolute inset-0 bg-gradient-to-tr from-pink-500/10 via-transparent to-cyan-500/10 pointer-events-none"></div>
                 </div>
                 
                 {/* Decorative elements */}
