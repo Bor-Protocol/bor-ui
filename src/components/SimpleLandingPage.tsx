@@ -175,17 +175,20 @@ export const SimpleLandingPage: React.FC = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <div className="min-h-screen bg-slate-900">
+      {/* Optimized Background */}
+      <div className="fixed inset-0 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 -z-10"></div>
+      
       {/* Header */}
-      <header className="relative z-50 bg-black/20 backdrop-blur-xl border-b border-white/10">
+      <header className="relative z-50 bg-black/50 border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <div className="relative">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+                <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center">
                   <span className="text-white font-bold text-lg">B</span>
                 </div>
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full"></div>
               </div>
               <div>
                 <h1 className="text-xl font-bold text-white">BOR Platform</h1>
@@ -208,11 +211,11 @@ export const SimpleLandingPage: React.FC = () => {
               {/* Enhanced Connection Status */}
               <div className={`flex items-center space-x-2 px-3 py-2 rounded-full text-xs font-medium ${
                 isServerOnline 
-                  ? 'bg-green-500/20 text-green-300 border border-green-500/30' 
-                  : 'bg-red-500/20 text-red-300 border border-red-500/30'
+                  ? 'bg-green-900/50 text-green-300 border border-green-500/50' 
+                  : 'bg-red-900/50 text-red-300 border border-red-500/50'
               }`}>
                 <div className={`w-2 h-2 rounded-full ${
-                  isServerOnline ? 'bg-green-400 animate-pulse' : 'bg-red-400'
+                  isServerOnline ? 'bg-green-400' : 'bg-red-400'
                 }`} />
                 <span>{isServerOnline ? 'LIVE' : 'Offline'}</span>
                 <span className="text-gray-400">•</span>
@@ -222,7 +225,7 @@ export const SimpleLandingPage: React.FC = () => {
 
               {isAuthenticated ? (
                 <div className="flex items-center space-x-4">
-                  <div className="bg-black/30 backdrop-blur-sm rounded-lg px-3 py-2 border border-white/10">
+                  <div className="bg-black/50 rounded-lg px-3 py-2 border border-white/10">
                     <PointsDisplay />
                   </div>
                   <div className="text-sm font-medium text-white">
@@ -241,17 +244,16 @@ export const SimpleLandingPage: React.FC = () => {
               ) : (
                 <div className="flex space-x-3">
                   <button 
-                    className="group relative px-6 py-2.5 bg-black/20 backdrop-blur-sm border border-white/20 text-gray-300 hover:text-white rounded-xl font-medium transition-all duration-200 hover:border-white/40 hover:bg-white/10 overflow-hidden"
+                    className="px-6 py-2.5 bg-black/40 border border-white/20 text-gray-300 hover:text-white rounded-xl font-medium transition-colors duration-200 hover:border-white/40 hover:bg-white/10"
                     onClick={() => setShowAuthModal(true)}
                   >
-                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
-                    <div className="relative flex items-center gap-2">
+                    <div className="flex items-center gap-2">
                       <span>🔑</span>
                       Sign In
                     </div>
                   </button>
                   <button 
-                    className="group relative px-6 py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-lg font-medium transform hover:scale-105 overflow-hidden"
+                    className="px-6 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors duration-200 font-medium"
                     onClick={() => {
                       setShowAuthModal(true);
                       // Smooth scroll to agents section after a brief delay
@@ -263,11 +265,10 @@ export const SimpleLandingPage: React.FC = () => {
                       }, 100);
                     }}
                   >
-                    <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
-                    <div className="relative flex items-center gap-2">
+                    <div className="flex items-center gap-2">
                       <span>🚀</span>
                       Get Started
-                      <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="currentColor" viewBox="0 0 20 20">
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
                       </svg>
                     </div>
@@ -281,7 +282,7 @@ export const SimpleLandingPage: React.FC = () => {
 
       {/* Welcome Banner */}
       {showWelcome && isAuthenticated && (
-        <div className="bg-gradient-to-r from-green-500/20 to-blue-500/20 border-b border-white/10 py-4 px-4">
+        <div className="bg-green-900/30 border-b border-white/10 py-4 px-4">
           <div className="max-w-7xl mx-auto text-center">
             <p className="text-white">
               🎉 Welcome back, <span className="font-bold text-green-400">{user?.name}</span>! 
@@ -293,15 +294,14 @@ export const SimpleLandingPage: React.FC = () => {
       )}
 
       {/* Hero Section */}
-      <section className="relative py-24 px-4 overflow-hidden">
-        {/* Background Effects */}
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 via-purple-600/20 to-pink-600/20"></div>
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width=%2260%22%20height=%2260%22%20viewBox=%220%200%2060%2060%22%20xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cg%20fill=%22none%22%20fill-rule=%22evenodd%22%3E%3Cg%20fill=%22%239C92AC%22%20fill-opacity=%220.1%22%3E%3Ccircle%20cx=%2230%22%20cy=%2230%22%20r=%221%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-40"></div>
+      <section className="relative py-24 px-4">
+        {/* Simplified Background Effects */}
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 to-purple-900/20"></div>
         
         <div className="relative max-w-6xl mx-auto text-center">
           <div className="mb-8">
-            <div className="inline-flex items-center px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 text-sm text-gray-300 mb-6">
-              <span className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></span>
+            <div className="inline-flex items-center px-4 py-2 bg-black/50 rounded-full border border-white/20 text-sm text-gray-300 mb-6">
+              <span className="w-2 h-2 bg-green-400 rounded-full mr-2"></span>
               Live AI Agents • Real-time Interaction • 3D Experience
             </div>
           </div>
@@ -323,32 +323,30 @@ export const SimpleLandingPage: React.FC = () => {
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16">
             <Link 
               to="/trump"
-              className="group relative px-8 py-4 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl font-bold text-lg hover:from-red-600 hover:to-red-700 transform hover:scale-105 transition-all duration-200 shadow-2xl"
+              className="px-8 py-4 bg-red-600 text-white rounded-xl font-bold text-lg hover:bg-red-700 transition-colors duration-200"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-red-400 to-red-500 rounded-xl blur opacity-50 group-hover:opacity-75 transition-opacity"></div>
-              <div className="relative flex items-center gap-3">
+              <div className="flex items-center gap-3">
                 🇺🇸 Try Trump FREE
-                <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="currentColor" viewBox="0 0 20 20">
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
                 </svg>
               </div>
             </Link>
             
             <button 
-              className="group relative px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl font-bold text-lg hover:from-blue-600 hover:to-purple-700 transform hover:scale-105 transition-all duration-200 shadow-2xl"
+              className="px-8 py-4 bg-blue-600 text-white rounded-xl font-bold text-lg hover:bg-blue-700 transition-colors duration-200"
               onClick={() => navigate('/agents')}
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-purple-500 rounded-xl blur opacity-50 group-hover:opacity-75 transition-opacity"></div>
-              <div className="relative flex items-center gap-3">
+              <div className="flex items-center gap-3">
                 🎭 Explore All Agents
-                <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="currentColor" viewBox="0 0 20 20">
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
                 </svg>
               </div>
             </button>
             
             <button 
-              className="group relative px-8 py-4 border-2 border-white/30 text-white rounded-xl font-bold text-lg hover:bg-white/10 hover:border-white/50 transition-all duration-200 transform hover:scale-105 overflow-hidden"
+              className="px-8 py-4 border-2 border-white/30 text-white rounded-xl font-bold text-lg hover:bg-white/10 hover:border-white/50 transition-colors duration-200"
               onClick={() => {
                 if (!isAuthenticated) {
                   setShowAuthModal(true);
@@ -367,36 +365,35 @@ export const SimpleLandingPage: React.FC = () => {
                 }
               }}
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-pink-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
-              <div className="relative flex items-center gap-3">
+              <div className="flex items-center gap-3">
                 ✨ Premium Access
-                <svg className="w-5 h-5 group-hover:rotate-12 transition-transform" fill="currentColor" viewBox="0 0 20 20">
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                 </svg>
               </div>
             </button>
           </div>
 
-          {/* Enhanced Features Grid */}
+          {/* Optimized Features Grid */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-            <div className="group bg-black/20 backdrop-blur-sm p-8 rounded-2xl border border-white/10 hover:border-white/20 transition-all duration-300 hover:transform hover:scale-105">
-              <div className="text-4xl mb-4 group-hover:scale-110 transition-transform">🚀</div>
+            <div className="bg-black/50 p-8 rounded-2xl border border-white/10 hover:border-white/20 transition-colors duration-200">
+              <div className="text-4xl mb-4">🚀</div>
               <h3 className="text-xl font-bold text-white mb-3">Instant Access</h3>
               <p className="text-gray-300">
                 Jump into conversations immediately. No downloads, no setup. Just pure AI interaction.
               </p>
             </div>
 
-            <div className="group bg-black/20 backdrop-blur-sm p-8 rounded-2xl border border-white/10 hover:border-white/20 transition-all duration-300 hover:transform hover:scale-105">
-              <div className="text-4xl mb-4 group-hover:scale-110 transition-transform">🎯</div>
+            <div className="bg-black/50 p-8 rounded-2xl border border-white/10 hover:border-white/20 transition-colors duration-200">
+              <div className="text-4xl mb-4">🎯</div>
               <h3 className="text-xl font-bold text-white mb-3">Private Sessions</h3>
               <p className="text-gray-300">
                 Book exclusive one-on-one time with AI agents. Personalized conversations tailored to you.
               </p>
             </div>
 
-            <div className="group bg-black/20 backdrop-blur-sm p-8 rounded-2xl border border-white/10 hover:border-white/20 transition-all duration-300 hover:transform hover:scale-105">
-              <div className="text-4xl mb-4 group-hover:scale-110 transition-transform">⚡</div>
+            <div className="bg-black/50 p-8 rounded-2xl border border-white/10 hover:border-white/20 transition-colors duration-200">
+              <div className="text-4xl mb-4">⚡</div>
               <h3 className="text-xl font-bold text-white mb-3">Real-time 3D</h3>
               <p className="text-gray-300">
                 Watch AI agents react and respond in stunning 3D environments. The future is here.
@@ -407,18 +404,18 @@ export const SimpleLandingPage: React.FC = () => {
       </section>
 
       {/* Video Showcase Section */}
-      <section className="relative py-24 px-4 bg-gradient-to-b from-slate-900 via-indigo-900 to-slate-900 overflow-hidden">
-        {/* Anime-inspired background elements */}
+      <section className="relative py-24 px-4 bg-slate-900">
+        {/* Simplified background elements */}
         <div className="absolute inset-0">
-          <div className="absolute top-20 left-10 w-32 h-32 bg-pink-500/20 rounded-full blur-xl animate-pulse"></div>
-          <div className="absolute top-40 right-20 w-24 h-24 bg-cyan-500/20 rounded-full blur-lg animate-bounce"></div>
-          <div className="absolute bottom-20 left-1/3 w-20 h-20 bg-purple-500/20 rounded-full blur-md animate-pulse"></div>
+          <div className="absolute top-20 left-10 w-32 h-32 bg-pink-500/5 rounded-full"></div>
+          <div className="absolute top-40 right-20 w-24 h-24 bg-cyan-500/5 rounded-full"></div>
+          <div className="absolute bottom-20 left-1/3 w-20 h-20 bg-purple-500/5 rounded-full"></div>
         </div>
         
         <div className="relative max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-pink-500/20 to-cyan-500/20 backdrop-blur-sm rounded-full border border-white/20 text-sm text-gray-300 mb-6">
-              <span className="w-2 h-2 bg-pink-400 rounded-full mr-2 animate-pulse"></span>
+            <div className="inline-flex items-center px-4 py-2 bg-black/50 rounded-full border border-white/20 text-sm text-gray-300 mb-6">
+              <span className="w-2 h-2 bg-pink-400 rounded-full mr-2"></span>
               Live AI Interaction Demo • Real-time Experience
             </div>
             <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-pink-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
@@ -432,9 +429,9 @@ export const SimpleLandingPage: React.FC = () => {
 
           <div className="max-w-5xl mx-auto">
             <div className="relative group">
-              {/* Video container with anime-inspired styling */}
-              <div className="relative bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm rounded-3xl border border-white/20 overflow-hidden shadow-2xl">
-                <div className="absolute inset-0 bg-gradient-to-tr from-pink-500/10 via-transparent to-cyan-500/10"></div>
+              {/* Video container with optimized styling */}
+              <div className="relative bg-slate-800 rounded-3xl border border-white/20 overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-tr from-pink-500/3 via-transparent to-cyan-500/3"></div>
                 
                 {/* Real Demo Video */}
                 <div className="relative aspect-video bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl overflow-hidden">
@@ -476,22 +473,22 @@ export const SimpleLandingPage: React.FC = () => {
                   </div>
                   
                   {/* Video overlay with anime-inspired effects */}
-                  <div className="absolute inset-0 bg-gradient-to-tr from-pink-500/10 via-transparent to-cyan-500/10 pointer-events-none"></div>
+                  <div className="absolute inset-0 bg-gradient-to-tr from-pink-500/5 via-transparent to-cyan-500/5 pointer-events-none"></div>
                 </div>
                 
                 {/* Decorative elements */}
                 <div className="absolute top-4 right-4 flex space-x-2">
-                  <div className="w-3 h-3 bg-red-400 rounded-full animate-pulse"></div>
-                  <div className="w-3 h-3 bg-yellow-400 rounded-full animate-pulse delay-75"></div>
-                  <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse delay-150"></div>
+                  <div className="w-3 h-3 bg-red-400 rounded-full"></div>
+                  <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
+                  <div className="w-3 h-3 bg-green-400 rounded-full"></div>
                 </div>
               </div>
               
               {/* Floating elements */}
-              <div className="absolute -top-6 -left-6 w-12 h-12 bg-gradient-to-br from-pink-500 to-purple-600 rounded-2xl flex items-center justify-center rotate-12 group-hover:rotate-45 transition-transform duration-500">
+              <div className="absolute -top-6 -left-6 w-12 h-12 bg-pink-600 rounded-2xl flex items-center justify-center rotate-12">
                 <span className="text-white text-lg">✨</span>
               </div>
-              <div className="absolute -bottom-6 -right-6 w-12 h-12 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center -rotate-12 group-hover:-rotate-45 transition-transform duration-500">
+              <div className="absolute -bottom-6 -right-6 w-12 h-12 bg-cyan-600 rounded-2xl flex items-center justify-center -rotate-12">
                 <span className="text-white text-lg">🎯</span>
               </div>
             </div>
@@ -500,11 +497,11 @@ export const SimpleLandingPage: React.FC = () => {
       </section>
 
       {/* Step-by-Step Guide Section */}
-      <section className="relative py-24 px-4 bg-gradient-to-b from-slate-900 to-black">
+      <section className="relative py-24 px-4 bg-black">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-purple-500/20 to-blue-500/20 backdrop-blur-sm rounded-full border border-white/20 text-sm text-gray-300 mb-6">
-              <span className="w-2 h-2 bg-purple-400 rounded-full mr-2 animate-pulse"></span>
+            <div className="inline-flex items-center px-4 py-2 bg-black/50 rounded-full border border-white/20 text-sm text-gray-300 mb-6">
+              <span className="w-2 h-2 bg-purple-400 rounded-full mr-2"></span>
               Easy Setup • 3 Simple Steps
             </div>
             <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-purple-400 via-blue-400 to-indigo-400 bg-clip-text text-transparent">
@@ -517,10 +514,10 @@ export const SimpleLandingPage: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
             {/* Step 1 */}
-            <div className="group relative">
-              <div className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 backdrop-blur-sm rounded-3xl border border-white/20 p-8 hover:border-white/40 transition-all duration-300 hover:transform hover:scale-105">
+            <div className="relative">
+              <div className="bg-purple-500/10 rounded-3xl border border-white/20 p-8 hover:border-white/40 transition-colors duration-200">
                 <div className="relative">
-                  <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center mb-6 group-hover:rotate-12 transition-transform duration-300">
+                  <div className="w-16 h-16 bg-purple-600 rounded-2xl flex items-center justify-center mb-6">
                     <span className="text-2xl">🚀</span>
                   </div>
                   <div className="absolute -top-2 -right-2 w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
@@ -549,10 +546,10 @@ export const SimpleLandingPage: React.FC = () => {
             </div>
 
             {/* Step 2 */}
-            <div className="group relative">
-              <div className="bg-gradient-to-br from-blue-500/20 to-cyan-500/20 backdrop-blur-sm rounded-3xl border border-white/20 p-8 hover:border-white/40 transition-all duration-300 hover:transform hover:scale-105">
+            <div className="relative">
+              <div className="bg-blue-500/10 rounded-3xl border border-white/20 p-8 hover:border-white/40 transition-colors duration-200">
                 <div className="relative">
-                  <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-2xl flex items-center justify-center mb-6 group-hover:rotate-12 transition-transform duration-300">
+                  <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mb-6">
                     <span className="text-2xl">🎭</span>
                   </div>
                   <div className="absolute -top-2 -right-2 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
@@ -581,10 +578,10 @@ export const SimpleLandingPage: React.FC = () => {
             </div>
 
             {/* Step 3 */}
-            <div className="group relative">
-              <div className="bg-gradient-to-br from-green-500/20 to-emerald-500/20 backdrop-blur-sm rounded-3xl border border-white/20 p-8 hover:border-white/40 transition-all duration-300 hover:transform hover:scale-105">
+            <div className="relative">
+              <div className="bg-green-500/10 rounded-3xl border border-white/20 p-8 hover:border-white/40 transition-colors duration-200">
                 <div className="relative">
-                  <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center mb-6 group-hover:rotate-12 transition-transform duration-300">
+                  <div className="w-16 h-16 bg-green-600 rounded-2xl flex items-center justify-center mb-6">
                     <span className="text-2xl">💬</span>
                   </div>
                   <div className="absolute -top-2 -right-2 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
@@ -616,7 +613,7 @@ export const SimpleLandingPage: React.FC = () => {
           {/* Call to action */}
           <div className="text-center">
             <button 
-              className="group relative px-12 py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-2xl font-bold text-lg hover:from-purple-700 hover:to-blue-700 transition-all duration-200 transform hover:scale-105 shadow-2xl overflow-hidden"
+              className="px-12 py-4 bg-purple-600 text-white rounded-2xl font-bold text-lg hover:bg-purple-700 transition-colors duration-200"
               onClick={() => {
                 if (!isAuthenticated) {
                   setShowAuthModal(true);
@@ -625,11 +622,10 @@ export const SimpleLandingPage: React.FC = () => {
                 }
               }}
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-pink-500/20 to-cyan-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
-              <div className="relative flex items-center gap-3">
+              <div className="flex items-center gap-3">
                 <span>🌟</span>
                 Get Started Now
-                <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="currentColor" viewBox="0 0 20 20">
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
                 </svg>
               </div>
@@ -639,18 +635,18 @@ export const SimpleLandingPage: React.FC = () => {
       </section>
 
       {/* Feedback & Collaboration Section */}
-      <section className="relative py-24 px-4 bg-gradient-to-b from-black via-slate-900 to-black">
-        {/* Anime-inspired floating elements */}
+      <section className="relative py-24 px-4 bg-slate-900">
+        {/* Simplified floating elements */}
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-1/4 left-20 w-2 h-2 bg-pink-400 rounded-full animate-ping"></div>
-          <div className="absolute top-1/2 right-32 w-1 h-1 bg-cyan-400 rounded-full animate-pulse"></div>
-          <div className="absolute bottom-1/3 left-1/4 w-1.5 h-1.5 bg-purple-400 rounded-full animate-bounce"></div>
+          <div className="absolute top-1/4 left-20 w-2 h-2 bg-pink-400 rounded-full opacity-30"></div>
+          <div className="absolute top-1/2 right-32 w-1 h-1 bg-cyan-400 rounded-full opacity-30"></div>
+          <div className="absolute bottom-1/3 left-1/4 w-1.5 h-1.5 bg-purple-400 rounded-full opacity-30"></div>
         </div>
         
         <div className="relative max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-pink-500/20 to-purple-500/20 backdrop-blur-sm rounded-full border border-white/20 text-sm text-gray-300 mb-6">
-              <span className="w-2 h-2 bg-pink-400 rounded-full mr-2 animate-pulse"></span>
+            <div className="inline-flex items-center px-4 py-2 bg-pink-900/30 rounded-full border border-white/20 text-sm text-gray-300 mb-6">
+              <span className="w-2 h-2 bg-pink-400 rounded-full mr-2"></span>
               Community Driven • Open Collaboration
             </div>
             <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent">
@@ -664,9 +660,9 @@ export const SimpleLandingPage: React.FC = () => {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
             {/* Feedback Section */}
-            <div className="bg-gradient-to-br from-pink-500/10 to-purple-500/10 backdrop-blur-sm rounded-3xl border border-white/20 p-8">
+            <div className="bg-pink-900/20 rounded-3xl border border-white/20 p-8">
               <div className="flex items-center mb-6">
-                <div className="w-12 h-12 bg-gradient-to-br from-pink-500 to-purple-600 rounded-2xl flex items-center justify-center mr-4">
+                <div className="w-12 h-12 bg-pink-600 rounded-2xl flex items-center justify-center mr-4">
                   <span className="text-xl">💭</span>
                 </div>
                 <h3 className="text-2xl font-bold text-white">Share Your Feedback</h3>
@@ -680,7 +676,7 @@ export const SimpleLandingPage: React.FC = () => {
               <div className="space-y-4">
                 <div className="bg-black/30 rounded-lg p-4">
                   <div className="flex items-center mb-2">
-                    <div className="w-8 h-8 bg-gradient-to-br from-pink-400 to-purple-500 rounded-full flex items-center justify-center mr-3">
+                    <div className="w-8 h-8 bg-pink-500 rounded-full flex items-center justify-center mr-3">
                       <span className="text-sm">⭐</span>
                     </div>
                     <span className="text-white font-medium">Feature Requests</span>
@@ -690,7 +686,7 @@ export const SimpleLandingPage: React.FC = () => {
                 
                 <div className="bg-black/30 rounded-lg p-4">
                   <div className="flex items-center mb-2">
-                    <div className="w-8 h-8 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-full flex items-center justify-center mr-3">
+                    <div className="w-8 h-8 bg-cyan-500 rounded-full flex items-center justify-center mr-3">
                       <span className="text-sm">🐛</span>
                     </div>
                     <span className="text-white font-medium">Bug Reports</span>
@@ -700,7 +696,7 @@ export const SimpleLandingPage: React.FC = () => {
                 
                 <div className="bg-black/30 rounded-lg p-4">
                   <div className="flex items-center mb-2">
-                    <div className="w-8 h-8 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center mr-3">
+                    <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center mr-3">
                       <span className="text-sm">💡</span>
                     </div>
                     <span className="text-white font-medium">Ideas & Innovation</span>
@@ -709,15 +705,15 @@ export const SimpleLandingPage: React.FC = () => {
                 </div>
               </div>
               
-              <button className="w-full mt-6 py-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-xl font-medium hover:from-pink-600 hover:to-purple-700 transition-all duration-200 transform hover:scale-105">
+              <button className="w-full mt-6 py-3 bg-pink-600 text-white rounded-xl font-medium hover:bg-pink-700 transition-colors duration-200">
                 📝 Submit Feedback
               </button>
             </div>
 
             {/* Collaboration Section */}
-            <div className="bg-gradient-to-br from-cyan-500/10 to-blue-500/10 backdrop-blur-sm rounded-3xl border border-white/20 p-8">
+            <div className="bg-cyan-900/20 rounded-3xl border border-white/20 p-8">
               <div className="flex items-center mb-6">
-                <div className="w-12 h-12 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center mr-4">
+                <div className="w-12 h-12 bg-cyan-600 rounded-2xl flex items-center justify-center mr-4">
                   <span className="text-xl">🤝</span>
                 </div>
                 <h3 className="text-2xl font-bold text-white">Collaborate With Us</h3>
@@ -731,7 +727,7 @@ export const SimpleLandingPage: React.FC = () => {
               <div className="space-y-4">
                 <div className="bg-black/30 rounded-lg p-4">
                   <div className="flex items-center mb-2">
-                    <div className="w-8 h-8 bg-gradient-to-br from-purple-400 to-indigo-500 rounded-full flex items-center justify-center mr-3">
+                    <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center mr-3">
                       <span className="text-sm">👨‍💻</span>
                     </div>
                     <span className="text-white font-medium">Developer Program</span>
@@ -741,7 +737,7 @@ export const SimpleLandingPage: React.FC = () => {
                 
                 <div className="bg-black/30 rounded-lg p-4">
                   <div className="flex items-center mb-2">
-                    <div className="w-8 h-8 bg-gradient-to-br from-green-400 to-teal-500 rounded-full flex items-center justify-center mr-3">
+                    <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center mr-3">
                       <span className="text-sm">🎨</span>
                     </div>
                     <span className="text-white font-medium">Design Partnership</span>
@@ -751,7 +747,7 @@ export const SimpleLandingPage: React.FC = () => {
                 
                 <div className="bg-black/30 rounded-lg p-4">
                   <div className="flex items-center mb-2">
-                    <div className="w-8 h-8 bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center mr-3">
+                    <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center mr-3">
                       <span className="text-sm">🚀</span>
                     </div>
                     <span className="text-white font-medium">Beta Program</span>
@@ -760,7 +756,7 @@ export const SimpleLandingPage: React.FC = () => {
                 </div>
               </div>
               
-              <button className="w-full mt-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-xl font-medium hover:from-cyan-600 hover:to-blue-700 transition-all duration-200 transform hover:scale-105">
+              <button className="w-full mt-6 py-3 bg-cyan-600 text-white rounded-xl font-medium hover:bg-cyan-700 transition-colors duration-200">
                 🌟 Join Community
               </button>
             </div>
@@ -768,19 +764,19 @@ export const SimpleLandingPage: React.FC = () => {
 
           {/* Community Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
-            <div className="text-center bg-gradient-to-br from-purple-500/20 to-pink-500/20 backdrop-blur-sm rounded-2xl border border-white/20 p-6">
+            <div className="text-center bg-purple-900/20 rounded-2xl border border-white/20 p-6">
               <div className="text-3xl font-bold text-white mb-2">1.2K+</div>
               <div className="text-gray-300 text-sm">Active Users</div>
             </div>
-            <div className="text-center bg-gradient-to-br from-cyan-500/20 to-blue-500/20 backdrop-blur-sm rounded-2xl border border-white/20 p-6">
+            <div className="text-center bg-cyan-900/20 rounded-2xl border border-white/20 p-6">
               <div className="text-3xl font-bold text-white mb-2">250+</div>
               <div className="text-gray-300 text-sm">Feedback Items</div>
             </div>
-            <div className="text-center bg-gradient-to-br from-green-500/20 to-emerald-500/20 backdrop-blur-sm rounded-2xl border border-white/20 p-6">
+            <div className="text-center bg-green-900/20 rounded-2xl border border-white/20 p-6">
               <div className="text-3xl font-bold text-white mb-2">48</div>
               <div className="text-gray-300 text-sm">Contributors</div>
             </div>
-            <div className="text-center bg-gradient-to-br from-orange-500/20 to-red-500/20 backdrop-blur-sm rounded-2xl border border-white/20 p-6">
+            <div className="text-center bg-orange-900/20 rounded-2xl border border-white/20 p-6">
               <div className="text-3xl font-bold text-white mb-2">95%</div>
               <div className="text-gray-300 text-sm">Satisfaction</div>
             </div>
@@ -792,8 +788,8 @@ export const SimpleLandingPage: React.FC = () => {
       <section id="agents-section" className="relative py-24 px-4 bg-gradient-to-b from-slate-900 to-black">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <div className="inline-flex items-center px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 text-sm text-gray-300 mb-6">
-              <span className="w-2 h-2 bg-blue-400 rounded-full mr-2 animate-pulse"></span>
+            <div className="inline-flex items-center px-4 py-2 bg-white/10 rounded-full border border-white/20 text-sm text-gray-300 mb-6">
+              <span className="w-2 h-2 bg-blue-400 rounded-full mr-2"></span>
               {peerCount} users currently online
             </div>
             <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
@@ -809,7 +805,7 @@ export const SimpleLandingPage: React.FC = () => {
           <div className="relative max-w-6xl mx-auto">
             {/* Carousel Navigation */}
             <div className="flex justify-center mb-6">
-              <div className="flex items-center gap-4 bg-black/20 backdrop-blur-sm rounded-full px-6 py-3 border border-white/20">
+              <div className="flex items-center gap-4 bg-black/50 rounded-full px-6 py-3 border border-white/20">
                 <button
                   onClick={() => setCarouselIndex(Math.max(0, carouselIndex - 2))}
                   disabled={carouselIndex === 0}
@@ -844,7 +840,7 @@ export const SimpleLandingPage: React.FC = () => {
               return (
                 <div 
                   key={model.modelName} 
-                  className={`group relative bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-sm rounded-3xl border border-white/20 overflow-hidden transition-all duration-500 hover:transform hover:scale-105 hover:border-white/40 flex-shrink-0 ${
+                  className={`group relative bg-white/5 rounded-3xl border border-white/20 overflow-hidden transition-all duration-300 hover:border-white/40 flex-shrink-0 ${
                     isCurrentlyActive ? 'ring-2 ring-blue-500 ring-opacity-50' : ''
                   }`}
                   style={{ width: 'calc(50% - 12px)' }}
@@ -854,7 +850,7 @@ export const SimpleLandingPage: React.FC = () => {
                   {/* Premium Badge */}
                   {!isFree && (
                     <div className="absolute top-3 right-3 z-10">
-                      <div className="bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-2 py-1 rounded-full text-xs font-bold">
+                      <div className="bg-yellow-500 text-black px-2 py-1 rounded-full text-xs font-bold">
                         PREMIUM
                       </div>
                     </div>
@@ -863,17 +859,17 @@ export const SimpleLandingPage: React.FC = () => {
                   {/* Avatar Section */}
                   <div className="relative p-4 text-center">
                     <div className="relative inline-block">
-                      <div className={`w-16 h-16 rounded-xl flex items-center justify-center text-2xl font-bold transition-all duration-300 ${
+                      <div className={`w-16 h-16 rounded-xl flex items-center justify-center text-2xl font-bold transition-all duration-200 ${
                         isFree 
-                          ? 'bg-gradient-to-br from-green-400 to-green-600 text-white' 
-                          : 'bg-gradient-to-br from-blue-500 to-purple-600 text-white'
-                      } ${isHovered ? 'scale-110 rotate-3' : ''}`}>
+                          ? 'bg-green-600 text-white' 
+                          : 'bg-blue-600 text-white'
+                      } ${isHovered ? 'scale-105' : ''}`}>
                         {model.displayName === 'Trump AI' ? '🇺🇸' : 
                          model.displayName === 'Borp AI' ? '🤖' : 
                          model.displayName === 'Agent Alpha' ? '⚡' : 
                          model.displayName.charAt(0)}
                       </div>
-                      <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-400 border-2 border-white rounded-full animate-pulse"></div>
+                      <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-400 border-2 border-white rounded-full"></div>
                     </div>
                     
                     <h3 className="text-lg font-bold text-white mt-3 mb-2">
@@ -883,8 +879,8 @@ export const SimpleLandingPage: React.FC = () => {
                     <div className="flex items-center justify-center gap-2 mb-3">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                         isFree 
-                          ? 'bg-green-500/20 text-green-300 border border-green-500/30' 
-                          : 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
+                          ? 'bg-green-900/50 text-green-300 border border-green-500/30' 
+                          : 'bg-purple-900/50 text-purple-300 border border-purple-500/30'
                       }`}>
                         {isFree ? '🌍 FREE' : `💎 ${model.pointsCost}pts`}
                       </span>
@@ -901,7 +897,7 @@ export const SimpleLandingPage: React.FC = () => {
                     </p>
 
                     {/* Session Info */}
-                    <div className="bg-black/30 rounded-lg p-3 mb-4 space-y-2">
+                    <div className="bg-black/50 rounded-lg p-3 mb-4 space-y-2">
                       <div className="flex justify-between items-center text-xs">
                         <span className="text-gray-400">Duration:</span>
                         <span className="text-white font-medium">
@@ -918,7 +914,7 @@ export const SimpleLandingPage: React.FC = () => {
 
                     {/* Current Session Status */}
                     {isCurrentlyActive && (
-                      <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 rounded-lg p-3 mb-4">
+                      <div className="bg-blue-900/30 border border-blue-500/30 rounded-lg p-3 mb-4">
                         <div className="text-center">
                           <div className="text-blue-300 font-medium mb-1 text-sm">🎮 Active Session</div>
                           <div className="text-xs text-gray-300">
@@ -937,7 +933,7 @@ export const SimpleLandingPage: React.FC = () => {
                     <div className="space-y-2 flex flex-col items-center">
                       {isFree ? (
                         <button 
-                          className="w-3/4 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg font-bold text-sm hover:from-green-600 hover:to-green-700 transition-all duration-200 transform hover:scale-105 shadow-lg"
+                          className="w-3/4 py-3 bg-green-600 text-white rounded-lg font-bold text-sm hover:bg-green-700 transition-colors duration-200"
                           onClick={() => navigate(`/${model.modelName}`)}
                         >
                           🌍 Start Free Session
@@ -945,7 +941,7 @@ export const SimpleLandingPage: React.FC = () => {
                       ) : (
                         <div className="space-y-2 w-full">
                           {!isAuthenticated ? (
-                            <div className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 rounded-lg p-2 mb-2">
+                            <div className="bg-yellow-900/30 border border-yellow-500/30 rounded-lg p-2 mb-2">
                               <p className="text-xs text-yellow-300 text-center mb-2">
                                 🔐 Private sessions require an account
                               </p>
@@ -954,7 +950,7 @@ export const SimpleLandingPage: React.FC = () => {
                               </p>
                             </div>
                           ) : currentSession && !isCurrentlyActive && (
-                            <div className="bg-gradient-to-r from-red-500/20 to-pink-500/20 border border-red-500/30 rounded-lg p-2 mb-2">
+                            <div className="bg-red-900/30 border border-red-500/30 rounded-lg p-2 mb-2">
                               <p className="text-xs text-red-300 text-center mb-1">
                                 ⏳ Active session with another agent
                               </p>
@@ -966,12 +962,12 @@ export const SimpleLandingPage: React.FC = () => {
                           
                           <div className="flex justify-center">
                             <button 
-                              className={`w-3/4 py-3 rounded-lg font-bold text-sm transition-all duration-200 transform hover:scale-105 shadow-lg relative group ${
+                              className={`w-3/4 py-3 rounded-lg font-bold text-sm transition-colors duration-200 relative group ${
                                 isCurrentlyActive
-                                  ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700' 
+                                  ? 'bg-blue-600 text-white hover:bg-blue-700' 
                                   : currentSession && !isCurrentlyActive
                                   ? 'bg-gray-600 text-gray-400 cursor-not-allowed' 
-                                  : 'bg-gradient-to-r from-purple-500 to-purple-600 text-white hover:from-purple-600 hover:to-purple-700'
+                                  : 'bg-purple-600 text-white hover:bg-purple-700'
                               }`}
                               disabled={currentSession && !isCurrentlyActive}
                               onClick={() => {
@@ -1003,7 +999,7 @@ export const SimpleLandingPage: React.FC = () => {
                   </div>
 
                   {/* Hover Effect Overlay */}
-                  <div className={`absolute inset-0 bg-gradient-to-t from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-3xl`}></div>
+                  <div className={`absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none rounded-3xl`}></div>
                 </div>
               );
             })}
@@ -1043,7 +1039,7 @@ export const SimpleLandingPage: React.FC = () => {
 
             {/* Enhanced Current Session Status */}
             {currentSession && (
-              <div className="mb-12 p-8 bg-gradient-to-r from-blue-500/20 to-purple-500/20 backdrop-blur-sm border border-white/20 rounded-3xl max-w-4xl mx-auto">
+              <div className="mb-12 p-8 bg-blue-900/20 border border-white/20 rounded-3xl max-w-4xl mx-auto">
                 <div className="text-center">
                   <h4 className="text-2xl font-bold text-white mb-4">🎮 Active Session</h4>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
@@ -1070,7 +1066,7 @@ export const SimpleLandingPage: React.FC = () => {
                     <div>
                       <button
                         onClick={() => navigate(`/${currentSession.modelName || 'borp'}?session=${currentSession.id}`)}
-                        className="w-full px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl font-bold hover:from-blue-600 hover:to-blue-700 transition-all duration-200 transform hover:scale-105"
+                        className="w-full px-6 py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-colors duration-200"
                       >
                         Continue Session →
                       </button>
@@ -1082,7 +1078,7 @@ export const SimpleLandingPage: React.FC = () => {
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {/* Enhanced Points Display */}
-              <div className="bg-gradient-to-br from-yellow-500/20 to-orange-500/20 backdrop-blur-sm border border-white/20 rounded-3xl p-8">
+              <div className="bg-yellow-900/20 border border-white/20 rounded-3xl p-8">
                 <div className="text-center">
                   <div className="text-4xl mb-4">💰</div>
                   <h4 className="text-xl font-bold text-white mb-4">Your Balance</h4>
@@ -1091,7 +1087,7 @@ export const SimpleLandingPage: React.FC = () => {
               </div>
               
               {/* Usage Statistics */}
-              <div className="bg-gradient-to-br from-blue-500/20 to-purple-500/20 backdrop-blur-sm border border-white/20 rounded-3xl p-8">
+              <div className="bg-blue-900/20 border border-white/20 rounded-3xl p-8">
                 <div className="text-center">
                   <div className="text-4xl mb-4">📊</div>
                   <h4 className="text-xl font-bold text-white mb-4">Usage Stats</h4>
@@ -1113,20 +1109,20 @@ export const SimpleLandingPage: React.FC = () => {
               </div>
 
               {/* Quick Launch */}
-              <div className="bg-gradient-to-br from-green-500/20 to-blue-500/20 backdrop-blur-sm border border-white/20 rounded-3xl p-8">
+              <div className="bg-green-900/20 border border-white/20 rounded-3xl p-8">
                 <div className="text-center">
                   <div className="text-4xl mb-4">🚀</div>
                   <h4 className="text-xl font-bold text-white mb-4">Quick Launch</h4>
                   <div className="space-y-3">
                     <button
                       onClick={() => navigate('/trump')}
-                      className="w-full px-4 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl font-medium hover:from-red-600 hover:to-red-700 transition-all duration-200"
+                      className="w-full px-4 py-3 bg-red-600 text-white rounded-xl font-medium hover:bg-red-700 transition-colors duration-200"
                     >
                       🇺🇸 Trump (Free)
                     </button>
                     <button
                       onClick={() => handleModelBook('borp')}
-                      className="w-full px-4 py-3 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-xl font-medium hover:from-purple-600 hover:to-purple-700 transition-all duration-200"
+                      className="w-full px-4 py-3 bg-purple-600 text-white rounded-xl font-medium hover:bg-purple-700 transition-colors duration-200"
                       disabled={!!currentSession}
                     >
                       🤖 Book Borp
@@ -1146,7 +1142,7 @@ export const SimpleLandingPage: React.FC = () => {
             {/* Brand */}
             <div className="col-span-1 md:col-span-2">
               <div className="flex items-center space-x-3 mb-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+                <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center">
                   <span className="text-white font-bold text-xl">B</span>
                 </div>
                 <div>
@@ -1175,7 +1171,7 @@ export const SimpleLandingPage: React.FC = () => {
               <h4 className="text-white font-semibold mb-4">Live Stats</h4>
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                  <div className="w-2 h-2 bg-green-400 rounded-full"></div>
                   <span className="text-gray-400">{peerCount} users online</span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -1197,7 +1193,7 @@ export const SimpleLandingPage: React.FC = () => {
               </p>
               <div className="flex items-center gap-4 mt-4 md:mt-0">
                 <div className="flex items-center gap-2 text-sm text-gray-400">
-                  <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                  <span className="w-2 h-2 bg-green-400 rounded-full"></span>
                   <span>All systems operational</span>
                 </div>
               </div>
