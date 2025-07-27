@@ -406,6 +406,361 @@ export const SimpleLandingPage: React.FC = () => {
         </div>
       </section>
 
+      {/* Video Showcase Section */}
+      <section className="relative py-24 px-4 bg-gradient-to-b from-slate-900 via-indigo-900 to-slate-900 overflow-hidden">
+        {/* Anime-inspired background elements */}
+        <div className="absolute inset-0">
+          <div className="absolute top-20 left-10 w-32 h-32 bg-pink-500/20 rounded-full blur-xl animate-pulse"></div>
+          <div className="absolute top-40 right-20 w-24 h-24 bg-cyan-500/20 rounded-full blur-lg animate-bounce"></div>
+          <div className="absolute bottom-20 left-1/3 w-20 h-20 bg-purple-500/20 rounded-full blur-md animate-pulse"></div>
+        </div>
+        
+        <div className="relative max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-pink-500/20 to-cyan-500/20 backdrop-blur-sm rounded-full border border-white/20 text-sm text-gray-300 mb-6">
+              <span className="w-2 h-2 bg-pink-400 rounded-full mr-2 animate-pulse"></span>
+              Live AI Interaction Demo • Real-time Experience
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-pink-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
+              See the Magic in Action
+            </h2>
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
+              Watch how our AI agents come to life with real-time 3D interactions, 
+              natural conversations, and immersive experiences that blur the line between digital and reality.
+            </p>
+          </div>
+
+          <div className="max-w-5xl mx-auto">
+            <div className="relative group">
+              {/* Video container with anime-inspired styling */}
+              <div className="relative bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm rounded-3xl border border-white/20 overflow-hidden shadow-2xl">
+                <div className="absolute inset-0 bg-gradient-to-tr from-pink-500/10 via-transparent to-cyan-500/10"></div>
+                
+                {/* Placeholder video */}
+                <div className="relative aspect-video bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center">
+                  <div className="text-center">
+                    <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-pink-500 to-cyan-500 rounded-full flex items-center justify-center animate-pulse">
+                      <svg className="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <h3 className="text-xl font-bold text-white mb-2">Live AI Interaction Demo</h3>
+                    <p className="text-gray-300 text-sm">Experience real-time conversations with 3D AI agents</p>
+                    <button className="mt-4 px-6 py-3 bg-gradient-to-r from-pink-500 to-cyan-500 text-white rounded-xl font-medium hover:from-pink-600 hover:to-cyan-600 transition-all duration-200 transform hover:scale-105">
+                      ▶ Watch Demo
+                    </button>
+                  </div>
+                </div>
+                
+                {/* Decorative elements */}
+                <div className="absolute top-4 right-4 flex space-x-2">
+                  <div className="w-3 h-3 bg-red-400 rounded-full animate-pulse"></div>
+                  <div className="w-3 h-3 bg-yellow-400 rounded-full animate-pulse delay-75"></div>
+                  <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse delay-150"></div>
+                </div>
+              </div>
+              
+              {/* Floating elements */}
+              <div className="absolute -top-6 -left-6 w-12 h-12 bg-gradient-to-br from-pink-500 to-purple-600 rounded-2xl flex items-center justify-center rotate-12 group-hover:rotate-45 transition-transform duration-500">
+                <span className="text-white text-lg">✨</span>
+              </div>
+              <div className="absolute -bottom-6 -right-6 w-12 h-12 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center -rotate-12 group-hover:-rotate-45 transition-transform duration-500">
+                <span className="text-white text-lg">🎯</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Step-by-Step Guide Section */}
+      <section className="relative py-24 px-4 bg-gradient-to-b from-slate-900 to-black">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-purple-500/20 to-blue-500/20 backdrop-blur-sm rounded-full border border-white/20 text-sm text-gray-300 mb-6">
+              <span className="w-2 h-2 bg-purple-400 rounded-full mr-2 animate-pulse"></span>
+              Easy Setup • 3 Simple Steps
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-purple-400 via-blue-400 to-indigo-400 bg-clip-text text-transparent">
+              How It Works
+            </h2>
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
+              Get started with AI conversations in minutes. Our platform is designed for simplicity without compromising on power.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+            {/* Step 1 */}
+            <div className="group relative">
+              <div className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 backdrop-blur-sm rounded-3xl border border-white/20 p-8 hover:border-white/40 transition-all duration-300 hover:transform hover:scale-105">
+                <div className="relative">
+                  <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center mb-6 group-hover:rotate-12 transition-transform duration-300">
+                    <span className="text-2xl">🚀</span>
+                  </div>
+                  <div className="absolute -top-2 -right-2 w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                    1
+                  </div>
+                </div>
+                <h3 className="text-xl font-bold text-white mb-4">Create Account</h3>
+                <p className="text-gray-300 leading-relaxed mb-4">
+                  Sign up in seconds and get 100 free points to start your AI journey. No credit card required.
+                </p>
+                <div className="space-y-2 text-sm text-gray-400">
+                  <div className="flex items-center">
+                    <span className="w-2 h-2 bg-purple-400 rounded-full mr-2"></span>
+                    Instant access
+                  </div>
+                  <div className="flex items-center">
+                    <span className="w-2 h-2 bg-pink-400 rounded-full mr-2"></span>
+                    100 free points
+                  </div>
+                  <div className="flex items-center">
+                    <span className="w-2 h-2 bg-indigo-400 rounded-full mr-2"></span>
+                    No setup required
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Step 2 */}
+            <div className="group relative">
+              <div className="bg-gradient-to-br from-blue-500/20 to-cyan-500/20 backdrop-blur-sm rounded-3xl border border-white/20 p-8 hover:border-white/40 transition-all duration-300 hover:transform hover:scale-105">
+                <div className="relative">
+                  <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-2xl flex items-center justify-center mb-6 group-hover:rotate-12 transition-transform duration-300">
+                    <span className="text-2xl">🎭</span>
+                  </div>
+                  <div className="absolute -top-2 -right-2 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                    2
+                  </div>
+                </div>
+                <h3 className="text-xl font-bold text-white mb-4">Choose Agent</h3>
+                <p className="text-gray-300 leading-relaxed mb-4">
+                  Browse our diverse collection of AI agents. From casual chat to professional assistance.
+                </p>
+                <div className="space-y-2 text-sm text-gray-400">
+                  <div className="flex items-center">
+                    <span className="w-2 h-2 bg-blue-400 rounded-full mr-2"></span>
+                    Multiple personalities
+                  </div>
+                  <div className="flex items-center">
+                    <span className="w-2 h-2 bg-cyan-400 rounded-full mr-2"></span>
+                    Free & premium options
+                  </div>
+                  <div className="flex items-center">
+                    <span className="w-2 h-2 bg-indigo-400 rounded-full mr-2"></span>
+                    Specialized expertise
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Step 3 */}
+            <div className="group relative">
+              <div className="bg-gradient-to-br from-green-500/20 to-emerald-500/20 backdrop-blur-sm rounded-3xl border border-white/20 p-8 hover:border-white/40 transition-all duration-300 hover:transform hover:scale-105">
+                <div className="relative">
+                  <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center mb-6 group-hover:rotate-12 transition-transform duration-300">
+                    <span className="text-2xl">💬</span>
+                  </div>
+                  <div className="absolute -top-2 -right-2 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                    3
+                  </div>
+                </div>
+                <h3 className="text-xl font-bold text-white mb-4">Start Chatting</h3>
+                <p className="text-gray-300 leading-relaxed mb-4">
+                  Jump into immersive 3D conversations with lifelike AI agents. Experience the future today.
+                </p>
+                <div className="space-y-2 text-sm text-gray-400">
+                  <div className="flex items-center">
+                    <span className="w-2 h-2 bg-green-400 rounded-full mr-2"></span>
+                    Real-time 3D interaction
+                  </div>
+                  <div className="flex items-center">
+                    <span className="w-2 h-2 bg-emerald-400 rounded-full mr-2"></span>
+                    Natural conversations
+                  </div>
+                  <div className="flex items-center">
+                    <span className="w-2 h-2 bg-teal-400 rounded-full mr-2"></span>
+                    Unlimited possibilities
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Call to action */}
+          <div className="text-center">
+            <button 
+              className="group relative px-12 py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-2xl font-bold text-lg hover:from-purple-700 hover:to-blue-700 transition-all duration-200 transform hover:scale-105 shadow-2xl overflow-hidden"
+              onClick={() => {
+                if (!isAuthenticated) {
+                  setShowAuthModal(true);
+                } else {
+                  document.getElementById('agents-section')?.scrollIntoView({ behavior: 'smooth' });
+                }
+              }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-pink-500/20 to-cyan-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+              <div className="relative flex items-center gap-3">
+                <span>🌟</span>
+                Get Started Now
+                <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                </svg>
+              </div>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Feedback & Collaboration Section */}
+      <section className="relative py-24 px-4 bg-gradient-to-b from-black via-slate-900 to-black">
+        {/* Anime-inspired floating elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-1/4 left-20 w-2 h-2 bg-pink-400 rounded-full animate-ping"></div>
+          <div className="absolute top-1/2 right-32 w-1 h-1 bg-cyan-400 rounded-full animate-pulse"></div>
+          <div className="absolute bottom-1/3 left-1/4 w-1.5 h-1.5 bg-purple-400 rounded-full animate-bounce"></div>
+        </div>
+        
+        <div className="relative max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-pink-500/20 to-purple-500/20 backdrop-blur-sm rounded-full border border-white/20 text-sm text-gray-300 mb-6">
+              <span className="w-2 h-2 bg-pink-400 rounded-full mr-2 animate-pulse"></span>
+              Community Driven • Open Collaboration
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent">
+              Join Our Mission
+            </h2>
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
+              We're building the future of AI interaction together. Share your feedback, contribute ideas, 
+              and help shape the next generation of digital conversations.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
+            {/* Feedback Section */}
+            <div className="bg-gradient-to-br from-pink-500/10 to-purple-500/10 backdrop-blur-sm rounded-3xl border border-white/20 p-8">
+              <div className="flex items-center mb-6">
+                <div className="w-12 h-12 bg-gradient-to-br from-pink-500 to-purple-600 rounded-2xl flex items-center justify-center mr-4">
+                  <span className="text-xl">💭</span>
+                </div>
+                <h3 className="text-2xl font-bold text-white">Share Your Feedback</h3>
+              </div>
+              
+              <p className="text-gray-300 mb-6 leading-relaxed">
+                Your thoughts and suggestions drive our innovation. Help us create better AI experiences 
+                by sharing what matters most to you.
+              </p>
+              
+              <div className="space-y-4">
+                <div className="bg-black/30 rounded-lg p-4">
+                  <div className="flex items-center mb-2">
+                    <div className="w-8 h-8 bg-gradient-to-br from-pink-400 to-purple-500 rounded-full flex items-center justify-center mr-3">
+                      <span className="text-sm">⭐</span>
+                    </div>
+                    <span className="text-white font-medium">Feature Requests</span>
+                  </div>
+                  <p className="text-gray-400 text-sm">Suggest new AI agent capabilities and interactions</p>
+                </div>
+                
+                <div className="bg-black/30 rounded-lg p-4">
+                  <div className="flex items-center mb-2">
+                    <div className="w-8 h-8 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-full flex items-center justify-center mr-3">
+                      <span className="text-sm">🐛</span>
+                    </div>
+                    <span className="text-white font-medium">Bug Reports</span>
+                  </div>
+                  <p className="text-gray-400 text-sm">Help us improve by reporting issues you encounter</p>
+                </div>
+                
+                <div className="bg-black/30 rounded-lg p-4">
+                  <div className="flex items-center mb-2">
+                    <div className="w-8 h-8 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center mr-3">
+                      <span className="text-sm">💡</span>
+                    </div>
+                    <span className="text-white font-medium">Ideas & Innovation</span>
+                  </div>
+                  <p className="text-gray-400 text-sm">Share creative concepts for the future of AI</p>
+                </div>
+              </div>
+              
+              <button className="w-full mt-6 py-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-xl font-medium hover:from-pink-600 hover:to-purple-700 transition-all duration-200 transform hover:scale-105">
+                📝 Submit Feedback
+              </button>
+            </div>
+
+            {/* Collaboration Section */}
+            <div className="bg-gradient-to-br from-cyan-500/10 to-blue-500/10 backdrop-blur-sm rounded-3xl border border-white/20 p-8">
+              <div className="flex items-center mb-6">
+                <div className="w-12 h-12 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center mr-4">
+                  <span className="text-xl">🤝</span>
+                </div>
+                <h3 className="text-2xl font-bold text-white">Collaborate With Us</h3>
+              </div>
+              
+              <p className="text-gray-300 mb-6 leading-relaxed">
+                Join our community of developers, designers, and AI enthusiasts. Let's build something 
+                amazing together that will change how humans interact with AI.
+              </p>
+              
+              <div className="space-y-4">
+                <div className="bg-black/30 rounded-lg p-4">
+                  <div className="flex items-center mb-2">
+                    <div className="w-8 h-8 bg-gradient-to-br from-purple-400 to-indigo-500 rounded-full flex items-center justify-center mr-3">
+                      <span className="text-sm">👨‍💻</span>
+                    </div>
+                    <span className="text-white font-medium">Developer Program</span>
+                  </div>
+                  <p className="text-gray-400 text-sm">Build custom AI agents and integrations</p>
+                </div>
+                
+                <div className="bg-black/30 rounded-lg p-4">
+                  <div className="flex items-center mb-2">
+                    <div className="w-8 h-8 bg-gradient-to-br from-green-400 to-teal-500 rounded-full flex items-center justify-center mr-3">
+                      <span className="text-sm">🎨</span>
+                    </div>
+                    <span className="text-white font-medium">Design Partnership</span>
+                  </div>
+                  <p className="text-gray-400 text-sm">Help shape the visual and UX experience</p>
+                </div>
+                
+                <div className="bg-black/30 rounded-lg p-4">
+                  <div className="flex items-center mb-2">
+                    <div className="w-8 h-8 bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center mr-3">
+                      <span className="text-sm">🚀</span>
+                    </div>
+                    <span className="text-white font-medium">Beta Program</span>
+                  </div>
+                  <p className="text-gray-400 text-sm">Early access to new features and agents</p>
+                </div>
+              </div>
+              
+              <button className="w-full mt-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-xl font-medium hover:from-cyan-600 hover:to-blue-700 transition-all duration-200 transform hover:scale-105">
+                🌟 Join Community
+              </button>
+            </div>
+          </div>
+
+          {/* Community Stats */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
+            <div className="text-center bg-gradient-to-br from-purple-500/20 to-pink-500/20 backdrop-blur-sm rounded-2xl border border-white/20 p-6">
+              <div className="text-3xl font-bold text-white mb-2">1.2K+</div>
+              <div className="text-gray-300 text-sm">Active Users</div>
+            </div>
+            <div className="text-center bg-gradient-to-br from-cyan-500/20 to-blue-500/20 backdrop-blur-sm rounded-2xl border border-white/20 p-6">
+              <div className="text-3xl font-bold text-white mb-2">250+</div>
+              <div className="text-gray-300 text-sm">Feedback Items</div>
+            </div>
+            <div className="text-center bg-gradient-to-br from-green-500/20 to-emerald-500/20 backdrop-blur-sm rounded-2xl border border-white/20 p-6">
+              <div className="text-3xl font-bold text-white mb-2">48</div>
+              <div className="text-gray-300 text-sm">Contributors</div>
+            </div>
+            <div className="text-center bg-gradient-to-br from-orange-500/20 to-red-500/20 backdrop-blur-sm rounded-2xl border border-white/20 p-6">
+              <div className="text-3xl font-bold text-white mb-2">95%</div>
+              <div className="text-gray-300 text-sm">Satisfaction</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* AI Agents Showcase */}
       <section id="agents-section" className="relative py-24 px-4 bg-gradient-to-b from-slate-900 to-black">
         <div className="max-w-7xl mx-auto">
