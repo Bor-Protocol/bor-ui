@@ -61,81 +61,75 @@ export const PointsDisplay: React.FC<PointsDisplayProps> = ({
     );
   }
 
-  // Detailed display
+  // Detailed display with dark theme
   return (
-    <div className={`bg-white p-6 rounded-lg border border-gray-200 ${className}`}>
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold">Points Balance</h3>
-        <div className="flex items-center space-x-2">
-          <span className="text-2xl">💰</span>
-          <span className="text-2xl font-bold text-yellow-600">
+    <div className={className}>
+      <div className="text-center">
+        <div className="flex flex-col items-center mb-4">
+          <div className="text-3xl font-bold text-yellow-400 mb-2">
             {user.points}
-          </span>
+          </div>
           {pointsInfo && (
-            <span className="text-gray-500">/ {pointsInfo.maxPoints}</span>
+            <div className="text-sm text-gray-400">
+              of {pointsInfo.maxPoints} points
+            </div>
           )}
         </div>
-      </div>
 
-      {/* Progress bar */}
-      {pointsInfo && (
-        <div className="mb-4">
-          <div className="flex justify-between text-sm text-gray-600 mb-1">
-            <span>Progress to maximum</span>
-            <span>{Math.round((user.points / pointsInfo.maxPoints) * 100)}%</span>
+        {/* Progress bar */}
+        {pointsInfo && (
+          <div className="mb-4">
+            <div className="w-full bg-black/30 rounded-full h-2 mb-2">
+              <div 
+                className="bg-gradient-to-r from-yellow-400 to-yellow-500 h-2 rounded-full transition-all duration-300"
+                style={{ width: `${Math.min((user.points / pointsInfo.maxPoints) * 100, 100)}%` }}
+              />
+            </div>
+            <div className="text-xs text-gray-400">
+              {Math.round((user.points / pointsInfo.maxPoints) * 100)}% capacity
+            </div>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
-            <div 
-              className="bg-yellow-500 h-2 rounded-full transition-all duration-300"
-              style={{ width: `${Math.min((user.points / pointsInfo.maxPoints) * 100, 100)}%` }}
-            />
-          </div>
-        </div>
-      )}
+        )}
 
-      {/* Regeneration info */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between text-sm">
-          <span className="text-gray-600">Daily regeneration:</span>
-          <span className="font-medium">
+        {/* Daily regeneration info */}
+        <div className="bg-black/20 rounded-lg p-3 mb-3">
+          <div className="text-xs text-gray-400 mb-1">Daily regeneration</div>
+          <div className="text-sm text-white font-medium">
             +{pointsInfo?.dailyRegenAmount || 50} points
-          </span>
+          </div>
         </div>
 
+        {/* Status info */}
         {isAtMax ? (
-          <div className="flex items-center space-x-2 text-green-600 bg-green-50 p-3 rounded-md">
-            <span>✅</span>
-            <span className="text-sm font-medium">
-              You're at maximum points! Use some points to make room for regeneration.
-            </span>
+          <div className="bg-green-500/20 border border-green-500/30 rounded-lg p-3 mb-3">
+            <div className="text-green-300 text-xs">
+              ✅ At maximum capacity
+            </div>
           </div>
         ) : canRegenerate ? (
-          <div className="flex items-center space-x-2 text-blue-600 bg-blue-50 p-3 rounded-md">
-            <span>🔄</span>
-            <span className="text-sm font-medium">
-              Points are ready to regenerate! They'll be added automatically.
-            </span>
+          <div className="bg-blue-500/20 border border-blue-500/30 rounded-lg p-3 mb-3">
+            <div className="text-blue-300 text-xs">
+              🔄 Points ready to regenerate
+            </div>
           </div>
         ) : (
-          <div className="text-center bg-gray-50 p-3 rounded-md">
-            <div className="text-sm text-gray-600 mb-1">Next regeneration in:</div>
-            <div className="text-lg font-mono font-bold text-gray-900">
+          <div className="bg-black/20 rounded-lg p-3 mb-3">
+            <div className="text-xs text-gray-400 mb-1">Next regeneration</div>
+            <div className="text-sm font-mono text-white">
               {timeLeft || 'Calculating...'}
             </div>
           </div>
         )}
 
-        {/* Usage info */}
-        <div className="pt-3 border-t border-gray-200">
-          <div className="text-sm text-gray-600 space-y-1">
-            <div className="flex justify-between">
-              <span>Private session cost:</span>
-              <span className="font-medium">10 points</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Session duration:</span>
-              <span className="font-medium">5 minutes</span>
-            </div>
+        {/* Quick usage info */}
+        <div className="grid grid-cols-2 gap-2 text-xs">
+          <div className="bg-black/20 rounded-lg p-2">
+            <div className="text-gray-400">Session cost</div>
+            <div className="text-white font-medium">10 pts</div>
+          </div>
+          <div className="bg-black/20 rounded-lg p-2">
+            <div className="text-gray-400">Duration</div>
+            <div className="text-white font-medium">5 min</div>
           </div>
         </div>
       </div>

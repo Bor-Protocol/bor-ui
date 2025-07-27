@@ -2,13 +2,15 @@ import { ChatSection } from './ChatSection';
 import { useRef, useEffect } from 'react';
 import { useScene } from '../contexts/ScenesContext';
 import SceneWrapper from './SceneWrapper';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { getStreamConfigByIdentifier } from '../utils/constants';
 import { MessageInput } from './MessageInput';
 import { SessionTimer } from './SessionTimer';
 
 export function LiveStream() {
   const { modelName } = useParams<{ modelName?: string }>();
+  const [searchParams] = useSearchParams();
+  const isPreview = searchParams.get('preview') === 'true';
   
   const {
     setCurrentSceneIndex,
@@ -97,6 +99,18 @@ export function LiveStream() {
       {/* Session Timer and Home Button */}
       <SessionTimer />
       
+      {/* Preview Mode Banner */}
+      {isPreview && (
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-[90] bg-gradient-to-r from-orange-500/90 to-red-500/90 backdrop-blur-sm text-white px-6 py-3 rounded-full border border-white/20 shadow-lg">
+          <div className="flex items-center gap-2 text-sm font-medium">
+            <span>👁️</span>
+            <span>Preview Mode</span>
+            <span className="text-orange-200">•</span>
+            <span className="text-orange-200">Sign up to book private sessions</span>
+          </div>
+        </div>
+      )}
+      
       {/* Main content area */}
       <div className="flex-1 flex-col min-w-0">
 
@@ -135,10 +149,27 @@ export function LiveStream() {
         {modelName && (
           <div className="fixed bottom-4 left-4 right-4 z-[70] md:right-[340px]">
             <div className="max-w-2xl mx-auto">
-              <MessageInput 
-                placeholder={`Send a message to ${displayScenes[0]?.creator?.username || modelName}...`}
-                className="bg-black/80 backdrop-blur-sm rounded-lg p-4 border border-gray-600"
-              />
+              {isPreview ? (
+                <div className="bg-gradient-to-r from-orange-500/20 to-red-500/20 backdrop-blur-sm rounded-lg p-4 border border-orange-500/30">
+                  <div className="text-center text-white">
+                    <p className="text-sm font-medium mb-2">👁️ Preview Mode - Limited Access</p>
+                    <p className="text-xs text-orange-200 mb-3">
+                      Sign up to send messages and book private sessions
+                    </p>
+                    <button 
+                      onClick={() => window.location.href = '/'}
+                      className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg text-sm font-medium hover:from-blue-600 hover:to-purple-700 transition-all duration-200"
+                    >
+                      Sign Up Now
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <MessageInput 
+                  placeholder={`Send a message to ${displayScenes[0]?.creator?.username || modelName}...`}
+                  className="bg-black/80 backdrop-blur-sm rounded-lg p-4 border border-gray-600"
+                />
+              )}
             </div>
           </div>
         )}

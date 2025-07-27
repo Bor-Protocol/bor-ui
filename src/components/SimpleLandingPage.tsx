@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useSocket } from '../hooks/useSocket';
 import { NewStreamConfig, FREE_MODEL_AGENT_ID } from '../utils/constants';
 import { AuthModal } from './AuthModal';
+import { BookingAuthModal } from './BookingAuthModal';
 import { PointsDisplay } from './PointsDisplay';
 import { useNavigate } from 'react-router-dom';
 import { useSessionBooking } from '../hooks/useSessionBooking';
@@ -12,9 +13,12 @@ export const SimpleLandingPage: React.FC = () => {
   const { isAuthenticated, user, token, logout } = useAuth();
   const navigate = useNavigate();
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showBookingAuthModal, setShowBookingAuthModal] = useState(false);
+  const [selectedModelForBooking, setSelectedModelForBooking] = useState<any>(null);
   const [showWelcome, setShowWelcome] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [hoveredModel, setHoveredModel] = useState<string | null>(null);
+  const [carouselIndex, setCarouselIndex] = useState(0);
   
   // New session booking system
   const { 
@@ -39,7 +43,61 @@ export const SimpleLandingPage: React.FC = () => {
   // Handle model booking with new system
   const handleModelBook = async (modelName: string) => {
     try {
-      // First check access
+      // For premium models, check if user is authenticated first
+      const model = models.find(m => m.modelName === modelName);
+      
+      // If model not found in local list, try to check access
+      if (!model) {
+        const accessCheck = await checkAccess(modelName);
+        
+        if (!accessCheck.success) {
+          alert(accessCheck.error || 'Cannot access this model');
+          return;
+        }
+
+        // For free models, redirect directly
+        if (accessCheck.modelConfig.accessType === 'free') {
+          navigate(`/${modelName}`);
+          return;
+        }
+
+        // For premium models, require authentication
+        if (!isAuthenticated) {
+          setSelectedModelForBooking(accessCheck.modelConfig);
+          setShowBookingAuthModal(true);
+          return;
+        }
+
+        // Continue with the booking flow...
+        await proceedWithBooking(modelName, accessCheck.modelConfig);
+        return;
+      }
+
+      // For free models, redirect directly
+      if (model.accessType === 'free') {
+        navigate(`/${modelName}`);
+        return;
+      }
+
+      // For premium models, require authentication first
+      if (!isAuthenticated) {
+        setSelectedModelForBooking(model);
+        setShowBookingAuthModal(true);
+        return;
+      }
+
+      // User is authenticated, now check access and proceed
+      await proceedWithBooking(modelName, model);
+    } catch (error: any) {
+      console.error('Error in handleModelBook:', error);
+      alert(error.message || 'Failed to book session');
+    }
+  };
+
+  // Separate function to handle the booking flow after authentication
+  const proceedWithBooking = async (modelName: string, modelConfig: any) => {
+    try {
+      // Now check access with authentication
       const accessCheck = await checkAccess(modelName);
       
       if (!accessCheck.success) {
@@ -48,18 +106,6 @@ export const SimpleLandingPage: React.FC = () => {
           return;
         }
         alert(accessCheck.error || 'Cannot access this model');
-        return;
-      }
-
-      // For free models, redirect directly
-      if (accessCheck.modelConfig.accessType === 'free') {
-        navigate(`/${modelName}`);
-        return;
-      }
-
-      // For premium models, require authentication
-      if (!isAuthenticated) {
-        setShowAuthModal(true);
         return;
       }
 
@@ -95,7 +141,8 @@ export const SimpleLandingPage: React.FC = () => {
         }
       }
     } catch (error: any) {
-      alert(error.message || 'Failed to book session');
+      console.error('Error in proceedWithBooking:', error);
+      alert(error.message || 'Failed to proceed with booking');
     }
   };
 
@@ -146,10 +193,10 @@ export const SimpleLandingPage: React.FC = () => {
               </div>
               <nav className="hidden md:flex items-center space-x-6 ml-8">
                 <Link 
-                  to="/app" 
+                  to="/free-agents" 
                   className="text-sm text-gray-300 hover:text-white px-3 py-2 rounded-lg hover:bg-white/10 transition-all duration-200"
                 >
-                  🎭 Live Agents
+                  🌍 Free Live Agents
                 </Link>
                 <div className="text-sm text-gray-400">
                   🔴 LIVE • {currentTime.toLocaleTimeString()}
@@ -194,16 +241,36 @@ export const SimpleLandingPage: React.FC = () => {
               ) : (
                 <div className="flex space-x-3">
                   <button 
-                    className="px-4 py-2 text-gray-300 hover:text-white transition-colors duration-200"
+                    className="group relative px-6 py-2.5 bg-black/20 backdrop-blur-sm border border-white/20 text-gray-300 hover:text-white rounded-xl font-medium transition-all duration-200 hover:border-white/40 hover:bg-white/10 overflow-hidden"
                     onClick={() => setShowAuthModal(true)}
                   >
-                    Sign In
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+                    <div className="relative flex items-center gap-2">
+                      <span>🔑</span>
+                      Sign In
+                    </div>
                   </button>
                   <button 
-                    className="px-6 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-lg font-medium"
-                    onClick={() => setShowAuthModal(true)}
+                    className="group relative px-6 py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-lg font-medium transform hover:scale-105 overflow-hidden"
+                    onClick={() => {
+                      setShowAuthModal(true);
+                      // Smooth scroll to agents section after a brief delay
+                      setTimeout(() => {
+                        document.getElementById('agents-section')?.scrollIntoView({ 
+                          behavior: 'smooth',
+                          block: 'start'
+                        });
+                      }, 100);
+                    }}
                   >
-                    Get Started
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+                    <div className="relative flex items-center gap-2">
+                      <span>🚀</span>
+                      Get Started
+                      <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                      </svg>
+                    </div>
                   </button>
                 </div>
               )}
@@ -269,7 +336,7 @@ export const SimpleLandingPage: React.FC = () => {
             
             <button 
               className="group relative px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl font-bold text-lg hover:from-blue-600 hover:to-purple-700 transform hover:scale-105 transition-all duration-200 shadow-2xl"
-              onClick={() => window.location.href = '/app'}
+              onClick={() => navigate('/agents')}
             >
               <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-purple-500 rounded-xl blur opacity-50 group-hover:opacity-75 transition-opacity"></div>
               <div className="relative flex items-center gap-3">
@@ -281,16 +348,27 @@ export const SimpleLandingPage: React.FC = () => {
             </button>
             
             <button 
-              className="group px-8 py-4 border-2 border-white/30 text-white rounded-xl font-bold text-lg hover:bg-white/10 hover:border-white/50 transition-all duration-200"
+              className="group relative px-8 py-4 border-2 border-white/30 text-white rounded-xl font-bold text-lg hover:bg-white/10 hover:border-white/50 transition-all duration-200 transform hover:scale-105 overflow-hidden"
               onClick={() => {
                 if (!isAuthenticated) {
                   setShowAuthModal(true);
+                  // Smooth scroll to agents section after auth modal opens
+                  setTimeout(() => {
+                    document.getElementById('agents-section')?.scrollIntoView({ 
+                      behavior: 'smooth',
+                      block: 'start'
+                    });
+                  }, 300);
                 } else {
-                  document.getElementById('agents-section')?.scrollIntoView({ behavior: 'smooth' });
+                  document.getElementById('agents-section')?.scrollIntoView({ 
+                    behavior: 'smooth',
+                    block: 'start'
+                  });
                 }
               }}
             >
-              <div className="flex items-center gap-3">
+              <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-pink-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+              <div className="relative flex items-center gap-3">
                 ✨ Premium Access
                 <svg className="w-5 h-5 group-hover:rotate-12 transition-transform" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
@@ -345,9 +423,38 @@ export const SimpleLandingPage: React.FC = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Enhanced Model Cards */}
-            {models.map((model) => {
+          {/* Carousel Container */}
+          <div className="relative max-w-6xl mx-auto">
+            {/* Carousel Navigation */}
+            <div className="flex justify-center mb-6">
+              <div className="flex items-center gap-4 bg-black/20 backdrop-blur-sm rounded-full px-6 py-3 border border-white/20">
+                <button
+                  onClick={() => setCarouselIndex(Math.max(0, carouselIndex - 2))}
+                  disabled={carouselIndex === 0}
+                  className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center text-white transition-all duration-200"
+                >
+                  ←
+                </button>
+                <span className="text-white font-medium">
+                  {Math.floor(carouselIndex / 2) + 1} / {Math.ceil(models.length / 2)}
+                </span>
+                <button
+                  onClick={() => setCarouselIndex(Math.min(models.length - 2, carouselIndex + 2))}
+                  disabled={carouselIndex >= models.length - 2}
+                  className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center text-white transition-all duration-200"
+                >
+                  →
+                </button>
+              </div>
+            </div>
+
+            {/* Carousel Cards */}
+            <div className="overflow-hidden px-4">
+              <div 
+                className="flex transition-transform duration-500 ease-in-out gap-6"
+                style={{ transform: `translateX(-${carouselIndex * 50}%)` }}
+              >
+                {models.map((model) => {
               const isCurrentlyActive = currentSession && model.modelName === currentSession.modelName;
               const isFree = model.accessType === 'free';
               const isHovered = hoveredModel === model.modelName;
@@ -355,25 +462,26 @@ export const SimpleLandingPage: React.FC = () => {
               return (
                 <div 
                   key={model.modelName} 
-                  className={`group relative bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-sm rounded-3xl border border-white/20 overflow-hidden transition-all duration-500 hover:transform hover:scale-105 hover:border-white/40 ${
+                  className={`group relative bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-sm rounded-3xl border border-white/20 overflow-hidden transition-all duration-500 hover:transform hover:scale-105 hover:border-white/40 flex-shrink-0 ${
                     isCurrentlyActive ? 'ring-2 ring-blue-500 ring-opacity-50' : ''
                   }`}
+                  style={{ width: 'calc(50% - 12px)' }}
                   onMouseEnter={() => setHoveredModel(model.modelName)}
                   onMouseLeave={() => setHoveredModel(null)}
                 >
                   {/* Premium Badge */}
                   {!isFree && (
-                    <div className="absolute top-4 right-4 z-10">
-                      <div className="bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-3 py-1 rounded-full text-xs font-bold">
+                    <div className="absolute top-3 right-3 z-10">
+                      <div className="bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-2 py-1 rounded-full text-xs font-bold">
                         PREMIUM
                       </div>
                     </div>
                   )}
 
                   {/* Avatar Section */}
-                  <div className="relative p-8 text-center">
+                  <div className="relative p-4 text-center">
                     <div className="relative inline-block">
-                      <div className={`w-24 h-24 rounded-2xl flex items-center justify-center text-3xl font-bold transition-all duration-300 ${
+                      <div className={`w-16 h-16 rounded-xl flex items-center justify-center text-2xl font-bold transition-all duration-300 ${
                         isFree 
                           ? 'bg-gradient-to-br from-green-400 to-green-600 text-white' 
                           : 'bg-gradient-to-br from-blue-500 to-purple-600 text-white'
@@ -383,43 +491,43 @@ export const SimpleLandingPage: React.FC = () => {
                          model.displayName === 'Agent Alpha' ? '⚡' : 
                          model.displayName.charAt(0)}
                       </div>
-                      <div className="absolute -bottom-2 -right-2 w-6 h-6 bg-green-400 border-4 border-white rounded-full animate-pulse"></div>
+                      <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-400 border-2 border-white rounded-full animate-pulse"></div>
                     </div>
                     
-                    <h3 className="text-2xl font-bold text-white mt-4 mb-2">
+                    <h3 className="text-lg font-bold text-white mt-3 mb-2">
                       {model.displayName}
                     </h3>
                     
-                    <div className="flex items-center justify-center gap-2 mb-4">
-                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                    <div className="flex items-center justify-center gap-2 mb-3">
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                         isFree 
                           ? 'bg-green-500/20 text-green-300 border border-green-500/30' 
                           : 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
                       }`}>
-                        {isFree ? '🌍 FREE ACCESS' : `💎 ${model.pointsCost} points`}
+                        {isFree ? '🌍 FREE' : `💎 ${model.pointsCost}pts`}
                       </span>
                     </div>
                   </div>
 
                   {/* Content Section */}
-                  <div className="px-8 pb-8">
-                    <p className="text-gray-300 text-center mb-6 leading-relaxed">
-                      {model.displayName === 'Trump AI' ? 'Experience conversations with the most requested political figure. Unlimited free access for everyone.' :
-                       model.displayName === 'Borp AI' ? 'Your friendly AI companion with deep knowledge and engaging personality. Perfect for meaningful conversations.' :
-                       model.displayName === 'Agent Alpha' ? 'Advanced AI agent specialized in technical topics and problem-solving. Premium exclusive access.' :
-                       model.description || `Experience ${model.displayName} in immersive 3D conversations.`}
+                  <div className="px-4 pb-4">
+                    <p className="text-gray-300 text-center mb-4 leading-relaxed text-sm">
+                      {model.displayName === 'Trump AI' ? 'Dynamic political conversations. Unlimited free access.' :
+                       model.displayName === 'Borp AI' ? 'Friendly AI companion with deep knowledge and engaging personality.' :
+                       model.displayName === 'Agent Alpha' ? 'Advanced AI specialized in technical topics and problem-solving.' :
+                       model.description || `Experience ${model.displayName} in AI conversations.`}
                     </p>
 
                     {/* Session Info */}
-                    <div className="bg-black/30 rounded-xl p-4 mb-6 space-y-2">
-                      <div className="flex justify-between items-center text-sm">
+                    <div className="bg-black/30 rounded-lg p-3 mb-4 space-y-2">
+                      <div className="flex justify-between items-center text-xs">
                         <span className="text-gray-400">Duration:</span>
                         <span className="text-white font-medium">
-                          {model.sessionDurationMinutes === 0 ? '∞ Unlimited' : `⏱️ ${model.sessionDurationMinutes} min`}
+                          {model.sessionDurationMinutes === 0 ? '∞ Unlimited' : `⏱️ ${model.sessionDurationMinutes}min`}
                         </span>
                       </div>
                       {!isFree && (
-                        <div className="flex justify-between items-center text-sm">
+                        <div className="flex justify-between items-center text-xs">
                           <span className="text-gray-400">Cost:</span>
                           <span className="text-yellow-400 font-medium">💰 {model.pointsCost} points</span>
                         </div>
@@ -428,10 +536,10 @@ export const SimpleLandingPage: React.FC = () => {
 
                     {/* Current Session Status */}
                     {isCurrentlyActive && (
-                      <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 rounded-xl p-4 mb-6">
+                      <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 rounded-lg p-3 mb-4">
                         <div className="text-center">
-                          <div className="text-blue-300 font-medium mb-2">🎮 Your Active Session</div>
-                          <div className="text-sm text-gray-300">
+                          <div className="text-blue-300 font-medium mb-1 text-sm">🎮 Active Session</div>
+                          <div className="text-xs text-gray-300">
                             Status: <span className="text-green-400 font-medium">{currentSession.status}</span>
                           </div>
                           {currentSession.endTime && (
@@ -444,46 +552,69 @@ export const SimpleLandingPage: React.FC = () => {
                     )}
 
                     {/* Action Buttons */}
-                    <div className="space-y-3">
+                    <div className="space-y-2 flex flex-col items-center">
                       {isFree ? (
                         <button 
-                          className="w-full py-4 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl font-bold text-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 transform hover:scale-105 shadow-lg"
+                          className="w-3/4 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg font-bold text-sm hover:from-green-600 hover:to-green-700 transition-all duration-200 transform hover:scale-105 shadow-lg"
                           onClick={() => navigate(`/${model.modelName}`)}
                         >
-                          🌍 Start Free Chat
+                          🌍 Start Free Session
                         </button>
                       ) : (
-                        <div className="space-y-2">
-                          <button 
-                            className="w-full py-3 border border-white/30 text-white rounded-xl font-medium hover:bg-white/10 transition-all duration-200"
-                            onClick={() => navigate(`/${model.modelName}`)}
-                          >
-                            👁️ Preview Agent
-                          </button>
-                          <button 
-                            className={`w-full py-4 rounded-xl font-bold text-lg transition-all duration-200 transform hover:scale-105 shadow-lg ${
-                              isCurrentlyActive
-                                ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700' 
-                                : currentSession
-                                ? 'bg-gray-600 text-gray-400 cursor-not-allowed' 
-                                : 'bg-gradient-to-r from-purple-500 to-purple-600 text-white hover:from-purple-600 hover:to-purple-700'
-                            }`}
-                            disabled={currentSession && !isCurrentlyActive}
-                            onClick={() => {
-                              if (isCurrentlyActive) {
-                                navigate(`/${model.modelName}?session=${currentSession.id}`);
-                              } else {
-                                handleModelBook(model.modelName);
+                        <div className="space-y-2 w-full">
+                          {!isAuthenticated ? (
+                            <div className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 rounded-lg p-2 mb-2">
+                              <p className="text-xs text-yellow-300 text-center mb-2">
+                                🔐 Private sessions require an account
+                              </p>
+                              <p className="text-xs text-gray-300 text-center">
+                                Sign up for free to unlock premium features
+                              </p>
+                            </div>
+                          ) : currentSession && !isCurrentlyActive && (
+                            <div className="bg-gradient-to-r from-red-500/20 to-pink-500/20 border border-red-500/30 rounded-lg p-2 mb-2">
+                              <p className="text-xs text-red-300 text-center mb-1">
+                                ⏳ Active session with another agent
+                              </p>
+                              <p className="text-xs text-gray-300 text-center">
+                                Complete current session first
+                              </p>
+                            </div>
+                          )}
+                          
+                          <div className="flex justify-center">
+                            <button 
+                              className={`w-3/4 py-3 rounded-lg font-bold text-sm transition-all duration-200 transform hover:scale-105 shadow-lg relative group ${
+                                isCurrentlyActive
+                                  ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700' 
+                                  : currentSession && !isCurrentlyActive
+                                  ? 'bg-gray-600 text-gray-400 cursor-not-allowed' 
+                                  : 'bg-gradient-to-r from-purple-500 to-purple-600 text-white hover:from-purple-600 hover:to-purple-700'
+                              }`}
+                              disabled={currentSession && !isCurrentlyActive}
+                              onClick={() => {
+                                if (isCurrentlyActive) {
+                                  navigate(`/${model.modelName}?session=${currentSession.id}`);
+                                } else {
+                                  handleModelBook(model.modelName);
+                                }
+                              }}
+                            >
+                              {isCurrentlyActive 
+                                ? '🎮 Continue Session' 
+                                : currentSession && !isCurrentlyActive
+                                ? '🔒 Currently Busy' 
+                                : '💎 Book Session'
                               }
-                            }}
-                          >
-                            {isCurrentlyActive 
-                              ? '🎮 Continue Session' 
-                              : currentSession 
-                              ? '🔒 Currently Busy' 
-                              : '🔒 Book Private Session'
-                            }
-                          </button>
+                              
+                              {/* Tooltip for non-authenticated users */}
+                              {!isAuthenticated && (
+                                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
+                                  Create account • Get 100 free points • Book instantly
+                                </div>
+                              )}
+                            </button>
+                          </div>
                         </div>
                       )}
                     </div>
@@ -494,6 +625,23 @@ export const SimpleLandingPage: React.FC = () => {
                 </div>
               );
             })}
+              </div>
+            </div>
+
+            {/* Carousel Dots */}
+            <div className="flex justify-center mt-8 gap-2">
+              {Array.from({ length: Math.ceil(models.length / 2) }, (_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCarouselIndex(index * 2)}
+                  className={`w-3 h-3 rounded-full transition-all duration-200 ${
+                    Math.floor(carouselIndex / 2) === index 
+                      ? 'bg-white shadow-lg' 
+                      : 'bg-white/30 hover:bg-white/50'
+                  }`}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -680,6 +828,24 @@ export const SimpleLandingPage: React.FC = () => {
       <AuthModal 
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
+      />
+
+      {/* Booking Authentication Modal */}
+      <BookingAuthModal 
+        isOpen={showBookingAuthModal}
+        onClose={() => {
+          setShowBookingAuthModal(false);
+          setSelectedModelForBooking(null);
+        }}
+        onSuccess={() => {
+          setShowBookingAuthModal(false);
+          // After successful auth, proceed with booking
+          if (selectedModelForBooking) {
+            proceedWithBooking(selectedModelForBooking.modelName, selectedModelForBooking);
+          }
+          setSelectedModelForBooking(null);
+        }}
+        modelConfig={selectedModelForBooking}
       />
     </div>
   );

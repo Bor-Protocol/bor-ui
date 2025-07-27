@@ -1,5 +1,7 @@
 import { LiveStream } from './components/LiveStream';
 import { SimpleLandingPage } from './components/SimpleLandingPage';
+import { AgentsPage } from './components/AgentsPage';
+import { FreeAgentsPage } from './components/FreeAgentsPage';
 import { PrivateSession } from './components/PrivateSession';
 import { SessionGuard } from './components/SessionGuard';
 
@@ -34,6 +36,8 @@ export default function App() {
                 <Route path="/agent/:agentId/public" element={<InnerApp />} />
                 <Route path="/agent/:agentId/private" element={<InnerApp />} />
                 <Route path="/private-session/:agentId" element={<PrivateSession />} />
+                <Route path="/agents" element={<AgentsPage />} />
+                <Route path="/free-agents" element={<FreeAgentsPage />} />
                 <Route path="/:modelName" element={
                   <SessionGuard>
                     <InnerApp />
