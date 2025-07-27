@@ -9,6 +9,62 @@ import { PointsDisplay } from './PointsDisplay';
 import { useNavigate } from 'react-router-dom';
 import { useSessionBooking } from '../hooks/useSessionBooking';
 
+// Add custom CSS animations for bubbles
+if (typeof document !== 'undefined') {
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes float-slow {
+      0%, 100% { transform: translateY(0px) translateX(0px) rotate(0deg); }
+      25% { transform: translateY(-20px) translateX(10px) rotate(90deg); }
+      50% { transform: translateY(-40px) translateX(-5px) rotate(180deg); }
+      75% { transform: translateY(-20px) translateX(-15px) rotate(270deg); }
+    }
+    
+    @keyframes float-medium {
+      0%, 100% { transform: translateY(0px) translateX(0px) rotate(0deg); }
+      33% { transform: translateY(-15px) translateX(15px) rotate(120deg); }
+      66% { transform: translateY(-30px) translateX(-10px) rotate(240deg); }
+    }
+    
+    @keyframes float-fast {
+      0%, 100% { transform: translateY(0px) translateX(0px) rotate(0deg); }
+      50% { transform: translateY(-25px) translateX(8px) rotate(180deg); }
+    }
+    
+    @keyframes bubble-rise {
+      0% { transform: translateY(100vh) scale(0.5); opacity: 0; }
+      10% { opacity: 0.6; }
+      90% { opacity: 0.6; }
+      100% { transform: translateY(-20vh) scale(1.2); opacity: 0; }
+    }
+    
+    @keyframes glow-pulse {
+      0%, 100% { box-shadow: 0 0 20px currentColor; opacity: 0.6; }
+      50% { box-shadow: 0 0 40px currentColor; opacity: 0.9; }
+    }
+    
+    .animate-float-slow { animation: float-slow 8s ease-in-out infinite; }
+    .animate-float-medium { animation: float-medium 6s ease-in-out infinite; }
+    .animate-float-fast { animation: float-fast 4s ease-in-out infinite; }
+    .animate-bubble-rise { animation: bubble-rise 15s linear infinite; }
+    .animate-glow-pulse { animation: glow-pulse 3s ease-in-out infinite; }
+    
+    .delay-500 { animation-delay: 0.5s; }
+    .delay-1000 { animation-delay: 1s; }
+    .delay-1500 { animation-delay: 1.5s; }
+    .delay-2000 { animation-delay: 2s; }
+    .delay-2500 { animation-delay: 2.5s; }
+    .delay-3000 { animation-delay: 3s; }
+    .delay-3500 { animation-delay: 3.5s; }
+    .delay-4000 { animation-delay: 4s; }
+    .delay-5000 { animation-delay: 5s; }
+    .delay-6000 { animation-delay: 6s; }
+    .delay-7000 { animation-delay: 7s; }
+    .delay-8000 { animation-delay: 8s; }
+  `;
+  document.head.appendChild(style);
+}
+
 export const SimpleLandingPage: React.FC = () => {
   const { isAuthenticated, user, token, logout } = useAuth();
   const navigate = useNavigate();
@@ -19,6 +75,7 @@ export const SimpleLandingPage: React.FC = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [hoveredModel, setHoveredModel] = useState<string | null>(null);
   const [carouselIndex, setCarouselIndex] = useState(0);
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   
   // New session booking system
   const { 
@@ -179,6 +236,37 @@ export const SimpleLandingPage: React.FC = () => {
       {/* Optimized Background */}
       <div className="fixed inset-0 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 -z-10"></div>
       
+      {/* Animated Bubbles */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none -z-5">
+        {/* Large Floating Bubbles */}
+        <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-blue-500/10 rounded-full animate-float-slow"></div>
+        <div className="absolute top-3/4 right-1/4 w-24 h-24 bg-purple-500/10 rounded-full animate-float-medium"></div>
+        <div className="absolute top-1/2 left-1/3 w-20 h-20 bg-pink-500/10 rounded-full animate-float-fast"></div>
+        
+        {/* Medium Floating Bubbles */}
+        <div className="absolute top-1/3 right-1/3 w-16 h-16 bg-cyan-500/15 rounded-full animate-float-slow delay-1000"></div>
+        <div className="absolute bottom-1/4 left-1/2 w-14 h-14 bg-green-500/15 rounded-full animate-float-medium delay-2000"></div>
+        <div className="absolute top-2/3 right-1/2 w-18 h-18 bg-yellow-500/15 rounded-full animate-float-fast delay-1500"></div>
+        
+        {/* Small Floating Bubbles */}
+        <div className="absolute top-1/5 right-1/5 w-8 h-8 bg-indigo-500/20 rounded-full animate-float-fast delay-500"></div>
+        <div className="absolute bottom-1/3 right-2/3 w-10 h-10 bg-rose-500/20 rounded-full animate-float-medium delay-3000"></div>
+        <div className="absolute top-4/5 left-1/5 w-6 h-6 bg-teal-500/20 rounded-full animate-float-slow delay-2500"></div>
+        <div className="absolute top-1/6 left-2/3 w-12 h-12 bg-violet-500/15 rounded-full animate-float-medium delay-4000"></div>
+        
+        {/* Rising Bubbles */}
+        <div className="absolute left-1/6 w-6 h-6 bg-blue-400/30 rounded-full animate-bubble-rise delay-1000"></div>
+        <div className="absolute left-1/3 w-8 h-8 bg-purple-400/25 rounded-full animate-bubble-rise delay-3000"></div>
+        <div className="absolute left-1/2 w-4 h-4 bg-pink-400/35 rounded-full animate-bubble-rise delay-5000"></div>
+        <div className="absolute left-2/3 w-7 h-7 bg-cyan-400/30 rounded-full animate-bubble-rise delay-7000"></div>
+        <div className="absolute left-5/6 w-5 h-5 bg-green-400/30 rounded-full animate-bubble-rise delay-2000"></div>
+        
+        {/* Glowing Accent Bubbles */}
+        <div className="absolute top-1/2 right-1/6 w-4 h-4 bg-orange-500/25 rounded-full animate-glow-pulse delay-1000"></div>
+        <div className="absolute bottom-1/2 left-1/6 w-5 h-5 bg-emerald-500/25 rounded-full animate-glow-pulse delay-3500"></div>
+        <div className="absolute top-3/5 left-3/4 w-7 h-7 bg-sky-500/20 rounded-full animate-glow-pulse delay-2000"></div>
+      </div>
+      
       {/* Header */}
       <header className="relative z-50 bg-black/50 border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 py-4">
@@ -298,6 +386,13 @@ export const SimpleLandingPage: React.FC = () => {
         {/* Simplified Background Effects */}
         <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 to-purple-900/20"></div>
         
+        {/* Interactive Bubbles in Hero */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-1/4 right-1/4 w-40 h-40 bg-blue-400/5 rounded-full animate-float-slow"></div>
+          <div className="absolute bottom-1/3 left-1/3 w-28 h-28 bg-purple-400/8 rounded-full animate-float-medium delay-2000"></div>
+          <div className="absolute top-1/2 right-1/2 w-20 h-20 bg-pink-400/6 rounded-full animate-float-fast delay-1000"></div>
+        </div>
+        
         <div className="relative max-w-6xl mx-auto text-center">
           <div className="mb-8">
             <div className="inline-flex items-center px-4 py-2 bg-black/50 rounded-full border border-white/20 text-sm text-gray-300 mb-6">
@@ -405,11 +500,13 @@ export const SimpleLandingPage: React.FC = () => {
 
       {/* Video Showcase Section */}
       <section className="relative py-24 px-4 bg-slate-900">
-        {/* Simplified background elements */}
-        <div className="absolute inset-0">
-          <div className="absolute top-20 left-10 w-32 h-32 bg-pink-500/5 rounded-full"></div>
-          <div className="absolute top-40 right-20 w-24 h-24 bg-cyan-500/5 rounded-full"></div>
-          <div className="absolute bottom-20 left-1/3 w-20 h-20 bg-purple-500/5 rounded-full"></div>
+        {/* Enhanced floating bubble elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-20 left-10 w-32 h-32 bg-pink-500/8 rounded-full animate-float-slow delay-1000"></div>
+          <div className="absolute top-40 right-20 w-24 h-24 bg-cyan-500/10 rounded-full animate-float-medium delay-2500"></div>
+          <div className="absolute bottom-20 left-1/3 w-20 h-20 bg-purple-500/8 rounded-full animate-float-fast delay-500"></div>
+          <div className="absolute top-1/2 right-1/3 w-16 h-16 bg-yellow-500/6 rounded-full animate-float-medium delay-3000"></div>
+          <div className="absolute bottom-1/4 right-1/4 w-12 h-12 bg-green-500/8 rounded-full animate-float-fast delay-1500"></div>
         </div>
         
         <div className="relative max-w-7xl mx-auto">
@@ -474,6 +571,13 @@ export const SimpleLandingPage: React.FC = () => {
                   
                   {/* Video overlay with anime-inspired effects */}
                   <div className="absolute inset-0 bg-gradient-to-tr from-pink-500/5 via-transparent to-cyan-500/5 pointer-events-none"></div>
+                  
+                  {/* Video Bubbles */}
+                  <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                    <div className="absolute top-1/4 left-1/4 w-8 h-8 bg-white/10 rounded-full animate-float-fast delay-500"></div>
+                    <div className="absolute top-3/4 right-1/4 w-6 h-6 bg-white/8 rounded-full animate-float-medium delay-2000"></div>
+                    <div className="absolute bottom-1/3 right-1/3 w-4 h-4 bg-white/12 rounded-full animate-glow-pulse delay-1500"></div>
+                  </div>
                 </div>
                 
                 {/* Decorative elements */}
@@ -498,6 +602,13 @@ export const SimpleLandingPage: React.FC = () => {
 
       {/* Step-by-Step Guide Section */}
       <section className="relative py-24 px-4 bg-black">
+        {/* Step Guide Bubbles */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-1/4 left-1/5 w-22 h-22 bg-purple-400/6 rounded-full animate-float-slow delay-1000"></div>
+          <div className="absolute top-2/3 right-1/4 w-18 h-18 bg-blue-400/8 rounded-full animate-float-medium delay-2500"></div>
+          <div className="absolute bottom-1/3 left-2/3 w-14 h-14 bg-green-400/7 rounded-full animate-float-fast delay-4000"></div>
+          <div className="absolute top-1/2 right-1/5 w-10 h-10 bg-indigo-400/9 rounded-full animate-float-slow delay-500"></div>
+        </div>
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <div className="inline-flex items-center px-4 py-2 bg-black/50 rounded-full border border-white/20 text-sm text-gray-300 mb-6">
@@ -636,11 +747,13 @@ export const SimpleLandingPage: React.FC = () => {
 
       {/* Feedback & Collaboration Section */}
       <section className="relative py-24 px-4 bg-slate-900">
-        {/* Simplified floating elements */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-1/4 left-20 w-2 h-2 bg-pink-400 rounded-full opacity-30"></div>
-          <div className="absolute top-1/2 right-32 w-1 h-1 bg-cyan-400 rounded-full opacity-30"></div>
-          <div className="absolute bottom-1/3 left-1/4 w-1.5 h-1.5 bg-purple-400 rounded-full opacity-30"></div>
+        {/* Enhanced floating bubble elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-1/4 left-20 w-16 h-16 bg-pink-400/8 rounded-full animate-float-slow delay-2000"></div>
+          <div className="absolute top-1/2 right-32 w-12 h-12 bg-cyan-400/10 rounded-full animate-float-medium delay-3500"></div>
+          <div className="absolute bottom-1/3 left-1/4 w-14 h-14 bg-purple-400/6 rounded-full animate-float-fast delay-1000"></div>
+          <div className="absolute top-1/3 right-1/5 w-10 h-10 bg-emerald-400/8 rounded-full animate-float-slow delay-4000"></div>
+          <div className="absolute bottom-1/4 right-2/3 w-8 h-8 bg-orange-400/10 rounded-full animate-float-medium delay-500"></div>
         </div>
         
         <div className="relative max-w-7xl mx-auto">
@@ -705,7 +818,10 @@ export const SimpleLandingPage: React.FC = () => {
                 </div>
               </div>
               
-              <button className="w-full mt-6 py-3 bg-pink-600 text-white rounded-xl font-medium hover:bg-pink-700 transition-colors duration-200">
+              <button 
+                className="w-full mt-6 py-3 bg-pink-600 text-white rounded-xl font-medium hover:bg-pink-700 transition-colors duration-200"
+                onClick={() => setShowFeedbackModal(true)}
+              >
                 📝 Submit Feedback
               </button>
             </div>
@@ -756,7 +872,10 @@ export const SimpleLandingPage: React.FC = () => {
                 </div>
               </div>
               
-              <button className="w-full mt-6 py-3 bg-cyan-600 text-white rounded-xl font-medium hover:bg-cyan-700 transition-colors duration-200">
+              <button 
+                className="w-full mt-6 py-3 bg-cyan-600 text-white rounded-xl font-medium hover:bg-cyan-700 transition-colors duration-200"
+                onClick={() => window.open('https://discord.gg/bor-platform', '_blank')}
+              >
                 🌟 Join Community
               </button>
             </div>
@@ -786,6 +905,15 @@ export const SimpleLandingPage: React.FC = () => {
 
       {/* AI Agents Showcase */}
       <section id="agents-section" className="relative py-24 px-4 bg-gradient-to-b from-slate-900 to-black">
+        {/* Floating Bubbles for Agents Section */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-1/6 left-1/6 w-36 h-36 bg-blue-400/6 rounded-full animate-float-slow delay-1500"></div>
+          <div className="absolute top-2/3 right-1/5 w-28 h-28 bg-purple-400/8 rounded-full animate-float-medium delay-3000"></div>
+          <div className="absolute bottom-1/4 left-1/2 w-24 h-24 bg-cyan-400/7 rounded-full animate-float-fast delay-500"></div>
+          <div className="absolute top-1/3 right-1/3 w-18 h-18 bg-pink-400/9 rounded-full animate-float-slow delay-2500"></div>
+          <div className="absolute bottom-1/3 right-1/6 w-14 h-14 bg-green-400/8 rounded-full animate-float-medium delay-4000"></div>
+          <div className="absolute top-3/4 left-1/4 w-12 h-12 bg-yellow-400/10 rounded-full animate-float-fast delay-1000"></div>
+        </div>
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <div className="inline-flex items-center px-4 py-2 bg-white/10 rounded-full border border-white/20 text-sm text-gray-300 mb-6">
@@ -1027,6 +1155,12 @@ export const SimpleLandingPage: React.FC = () => {
       {/* Enhanced Dashboard for Authenticated Users */}
       {isAuthenticated && (
         <section id="dashboard-section" className="py-24 px-4 bg-gradient-to-b from-black to-slate-900">
+          {/* Dashboard Bubbles */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <div className="absolute top-1/5 right-1/4 w-26 h-26 bg-yellow-400/6 rounded-full animate-float-slow delay-2000"></div>
+            <div className="absolute bottom-1/4 left-1/3 w-20 h-20 bg-blue-400/8 rounded-full animate-float-medium delay-3500"></div>
+            <div className="absolute top-1/2 left-1/6 w-16 h-16 bg-green-400/7 rounded-full animate-float-fast delay-1500"></div>
+          </div>
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-16">
               <h3 className="text-4xl font-bold mb-4 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
@@ -1137,6 +1271,13 @@ export const SimpleLandingPage: React.FC = () => {
 
       {/* Professional Footer */}
       <footer className="relative py-16 px-4 bg-black border-t border-white/10">
+        {/* Footer Bubbles */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-1/4 left-1/5 w-20 h-20 bg-blue-400/5 rounded-full animate-float-slow delay-2000"></div>
+          <div className="absolute top-1/2 right-1/4 w-16 h-16 bg-purple-400/6 rounded-full animate-float-medium delay-4000"></div>
+          <div className="absolute bottom-1/4 left-1/2 w-12 h-12 bg-cyan-400/7 rounded-full animate-float-fast delay-1000"></div>
+          <div className="absolute top-2/3 right-1/3 w-8 h-8 bg-green-400/8 rounded-full animate-glow-pulse delay-3000"></div>
+        </div>
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
             {/* Brand */}
@@ -1225,6 +1366,122 @@ export const SimpleLandingPage: React.FC = () => {
         }}
         modelConfig={selectedModelForBooking}
       />
+
+      {/* Feedback Modal */}
+      {showFeedbackModal && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setShowFeedbackModal(false);
+            }
+          }}
+        >
+          <div className="bg-slate-900 rounded-2xl w-full max-w-md border border-white/20 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div className="relative p-6 border-b border-white/10">
+              <button
+                onClick={() => setShowFeedbackModal(false)}
+                className="absolute top-4 right-4 text-gray-400 hover:text-white text-xl font-bold w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors"
+                type="button"
+              >
+                ×
+              </button>
+              
+              <div className="text-center pr-8">
+                <div className="w-12 h-12 mx-auto mb-3 bg-pink-600 rounded-xl flex items-center justify-center text-xl">
+                  💭
+                </div>
+                <h2 className="text-xl font-bold text-white mb-1">
+                  Share Your Feedback
+                </h2>
+                <p className="text-sm text-gray-300">
+                  Help us improve by sharing your thoughts
+                </p>
+              </div>
+            </div>
+
+            <div className="p-6">
+              <form onSubmit={(e) => {
+                e.preventDefault();
+                // For now, we'll use mailto. In production, you'd want to use a proper API
+                const form = e.target as HTMLFormElement;
+                const type = form.feedbackType.value;
+                const message = form.message.value;
+                const email = form.email?.value || 'Not provided';
+                
+                const subject = `BOR Platform Feedback: ${type}`;
+                const body = `Type: ${type}\n\nMessage:\n${message}\n\nFrom: ${email}`;
+                
+                window.location.href = `mailto:feedback@bor-platform.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                setShowFeedbackModal(false);
+              }}>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-white text-sm font-medium mb-2">
+                      Feedback Type
+                    </label>
+                    <select 
+                      name="feedbackType"
+                      required
+                      className="w-full px-3 py-2 bg-black/30 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent text-white"
+                    >
+                      <option value="feature-request">Feature Request</option>
+                      <option value="bug-report">Bug Report</option>
+                      <option value="improvement">Improvement Suggestion</option>
+                      <option value="general">General Feedback</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-white text-sm font-medium mb-2">
+                      Your Message
+                    </label>
+                    <textarea 
+                      name="message"
+                      required
+                      rows={4}
+                      className="w-full px-3 py-2 bg-black/30 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent text-white placeholder-gray-400 resize-none"
+                      placeholder="Tell us what's on your mind..."
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-white text-sm font-medium mb-2">
+                      Email (Optional)
+                    </label>
+                    <input 
+                      type="email"
+                      name="email"
+                      className="w-full px-3 py-2 bg-black/30 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent text-white placeholder-gray-400"
+                      placeholder="your@email.com"
+                    />
+                  </div>
+                </div>
+
+                <div className="mt-6 flex gap-3">
+                  <button
+                    type="submit"
+                    className="flex-1 py-3 bg-pink-600 text-white rounded-lg font-medium hover:bg-pink-700 transition-colors duration-200"
+                  >
+                    Send Feedback
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowFeedbackModal(false)}
+                    className="flex-1 py-3 bg-gray-700 text-white rounded-lg font-medium hover:bg-gray-600 transition-colors duration-200"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+
+              <div className="mt-4 text-center text-xs text-gray-400">
+                Or reach us directly at feedback@bor-platform.com
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
