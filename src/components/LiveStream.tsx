@@ -5,6 +5,7 @@ import SceneWrapper from './SceneWrapper';
 import { useParams } from 'react-router-dom';
 import { getStreamConfigByIdentifier } from '../utils/constants';
 import { MessageInput } from './MessageInput';
+import { SessionTimer } from './SessionTimer';
 
 export function LiveStream() {
   const { modelName } = useParams<{ modelName?: string }>();
@@ -93,6 +94,9 @@ export function LiveStream() {
 
   return (
     <div className="flex flex-1 h-full w-full">
+      {/* Session Timer and Home Button */}
+      <SessionTimer />
+      
       {/* Main content area */}
       <div className="flex-1 flex-col min-w-0">
 

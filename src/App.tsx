@@ -1,6 +1,7 @@
 import { LiveStream } from './components/LiveStream';
 import { SimpleLandingPage } from './components/SimpleLandingPage';
 import { PrivateSession } from './components/PrivateSession';
+import { SessionGuard } from './components/SessionGuard';
 
 import { SceneProvider } from './contexts/ScenesContext';
 import { AuthProvider } from './contexts/AuthContext';
@@ -33,7 +34,11 @@ export default function App() {
                 <Route path="/agent/:agentId/public" element={<InnerApp />} />
                 <Route path="/agent/:agentId/private" element={<InnerApp />} />
                 <Route path="/private-session/:agentId" element={<PrivateSession />} />
-                <Route path="/:modelName" element={<InnerApp />} />
+                <Route path="/:modelName" element={
+                  <SessionGuard>
+                    <InnerApp />
+                  </SessionGuard>
+                } />
                 <Route path="/app" element={<InnerApp />} />
                 <Route path="/configure" element={<StreamConfigEditor />} />
                 <Route path="/docs" element={<DocsPage />} />
