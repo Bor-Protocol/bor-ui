@@ -65,7 +65,7 @@ const InnerApp = () => {
  // useInvisibleRecording();
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden overscroll-none dark:bg-dark">
+    <div className="flex flex-col h-screen overflow-hidden overscroll-none bg-slate-900" style={{ backgroundColor: '#0f172a' }}>
       <div className="flex flex-1 overflow-hidden">
         <div className="flex-1 min-w-0">
           <LiveStream />

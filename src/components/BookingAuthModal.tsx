@@ -92,7 +92,7 @@ export const BookingAuthModal: React.FC<BookingAuthModalProps> = ({
       className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4 animate-fadeIn"
       onClick={handleOverlayClick}
     >
-      <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl w-full max-w-md border border-white/20 shadow-2xl animate-slideUpAndScale max-h-[90vh] overflow-y-auto">
+      <div className="bg-slate-900 rounded-2xl w-full max-w-md border border-white/20 shadow-lg max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="relative p-6 border-b border-white/10">
           <button

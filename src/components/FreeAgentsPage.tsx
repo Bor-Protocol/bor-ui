@@ -75,9 +75,11 @@ export const FreeAgentsPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <div className="min-h-screen bg-slate-900" style={{ backgroundColor: '#0f172a' }}>
+      {/* Fixed background layer */}
+      <div className="fixed inset-0 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 -z-10"></div>
       {/* Header */}
-      <header className="relative z-50 bg-black/20 backdrop-blur-xl border-b border-white/10">
+      <header className="relative z-50 bg-slate-900/90 border-b border-white/10" style={{ backgroundColor: 'rgba(15, 23, 42, 0.9)' }}>
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <Link to="/" className="flex items-center space-x-4">
@@ -121,17 +123,17 @@ export const FreeAgentsPage: React.FC = () => {
           
           {/* Benefits Banner */}
           <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
-            <div className="bg-green-500/20 backdrop-blur-sm rounded-lg p-4 border border-green-500/30">
+            <div className="bg-green-900/30 rounded-lg p-4 border border-green-500/30">
               <div className="text-2xl mb-2">🌍</div>
               <h3 className="text-white font-medium">Completely Free</h3>
               <p className="text-green-200 text-sm">No hidden costs or limits</p>
             </div>
-            <div className="bg-blue-500/20 backdrop-blur-sm rounded-lg p-4 border border-blue-500/30">
+            <div className="bg-blue-900/30 rounded-lg p-4 border border-blue-500/30">
               <div className="text-2xl mb-2">⚡</div>
               <h3 className="text-white font-medium">Instant Access</h3>
               <p className="text-blue-200 text-sm">Start chatting immediately</p>
             </div>
-            <div className="bg-purple-500/20 backdrop-blur-sm rounded-lg p-4 border border-purple-500/30">
+            <div className="bg-purple-900/30 rounded-lg p-4 border border-purple-500/30">
               <div className="text-2xl mb-2">🔄</div>
               <h3 className="text-white font-medium">Unlimited Sessions</h3>
               <p className="text-purple-200 text-sm">Chat as long as you want</p>
@@ -188,21 +190,39 @@ export const FreeAgentsPage: React.FC = () => {
           {paginatedModels.map((model) => (
             <div 
               key={model.modelName} 
-              className="group relative bg-gradient-to-b from-green-500/10 to-green-600/5 backdrop-blur-sm rounded-3xl border border-green-500/20 overflow-hidden transition-all duration-500 hover:transform hover:scale-105 hover:border-green-400/40"
+              className="group relative bg-green-900/20 rounded-3xl border border-green-500/20 overflow-hidden transition-all duration-300 hover:border-green-400/40"
             >
               {/* Free Badge */}
               <div className="absolute top-4 right-4 z-10">
-                <div className="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold animate-pulse">
+                <div className="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold">
                   🌍 FREE
                 </div>
               </div>
 
               {/* Agent Avatar */}
               <div className="relative p-8 text-center">
-                <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center text-2xl">
-                  {model.displayName === 'Trump AI' ? '🇺🇸' : 
-                   model.displayName.charAt(0)}
-                </div>
+                {model.displayName === 'Trump AI' ? (
+                  <div className="relative w-48 h-48 mx-auto mb-6 group">
+                    <img 
+                      src="/avatar/trump-avatar.png" 
+                      alt="Trump AI Avatar"
+                      className="w-48 h-48 rounded-3xl object-cover shadow-lg transition-all duration-200 group-hover:scale-105"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.style.display = 'none';
+                        const fallback = target.nextElementSibling as HTMLElement;
+                        if (fallback) fallback.style.display = 'flex';
+                      }}
+                    />
+                    <div className="w-48 h-48 bg-gradient-to-br from-green-500 to-green-600 rounded-3xl flex items-center justify-center text-8xl transition-all duration-300 group-hover:scale-105" style={{ display: 'none' }}>
+                      🇺🇸
+                    </div>
+                  </div>
+                ) : (
+                  <div className="w-48 h-48 mx-auto mb-6 bg-green-600 rounded-3xl flex items-center justify-center text-8xl group shadow-lg transition-all duration-200 hover:scale-105">
+                    {model.displayName.charAt(0)}
+                  </div>
+                )}
                 
                 <h3 className="text-xl font-bold text-white mb-2">
                   {model.displayName}
@@ -230,7 +250,7 @@ export const FreeAgentsPage: React.FC = () => {
                   <div className="bg-black/20 rounded-lg p-3">
                     <div className="text-white font-medium">Status</div>
                     <div className="text-green-400 flex items-center gap-1">
-                      <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                      <div className="w-2 h-2 bg-green-400 rounded-full"></div>
                       Live
                     </div>
                   </div>
@@ -238,7 +258,7 @@ export const FreeAgentsPage: React.FC = () => {
 
                 {/* Action Button */}
                 <button 
-                  className="w-full py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl font-bold hover:from-green-600 hover:to-green-700 transition-all duration-200 transform hover:scale-105 shadow-lg"
+                  className="w-full py-3 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 transition-colors duration-200"
                   onClick={() => handleStartSession(model.modelName)}
                 >
                   🌍 Start Free Session
@@ -303,7 +323,7 @@ export const FreeAgentsPage: React.FC = () => {
         )}
 
         {/* Call to Action */}
-        <div className="mt-16 text-center bg-gradient-to-r from-green-500/20 to-blue-500/20 backdrop-blur-sm rounded-2xl p-8 border border-white/10">
+        <div className="mt-16 text-center bg-green-900/20 rounded-2xl p-8 border border-white/10">
           <h3 className="text-2xl font-bold text-white mb-4">Want More Powerful AI?</h3>
           <p className="text-gray-300 mb-6 max-w-2xl mx-auto">
             Upgrade to premium AI agents for private sessions, advanced capabilities, and personalized conversations.

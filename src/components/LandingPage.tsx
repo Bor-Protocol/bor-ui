@@ -181,7 +181,7 @@ export const LandingPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-slate-900" style={{ backgroundColor: '#0f172a' }}>
       {/* Header */}
       <header className="border-b">
         <div className="container mx-auto px-4 py-4">

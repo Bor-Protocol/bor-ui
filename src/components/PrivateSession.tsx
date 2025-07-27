@@ -190,7 +190,7 @@ export const PrivateSession: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center" style={{ backgroundColor: '#0f172a' }}>
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
           <p className="mt-4 text-gray-600">Loading session...</p>
@@ -201,8 +201,8 @@ export const PrivateSession: React.FC = () => {
 
   if (!session) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="bg-white p-8 rounded-lg border border-gray-200 text-center max-w-md">
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center" style={{ backgroundColor: '#0f172a' }}>
+        <div className="bg-slate-800 p-8 rounded-lg border border-white/20 text-center max-w-md">
           <div className="text-6xl mb-4">❌</div>
           <h2 className="text-2xl font-bold mb-4">No Active Session</h2>
           <p className="text-gray-600 mb-6">
@@ -221,8 +221,8 @@ export const PrivateSession: React.FC = () => {
 
   if (session.status === 'queued') {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="bg-white p-8 rounded-lg border border-gray-200 text-center max-w-md">
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center" style={{ backgroundColor: '#0f172a' }}>
+        <div className="bg-slate-800 p-8 rounded-lg border border-white/20 text-center max-w-md">
           <div className="text-6xl mb-4">⏰</div>
           <h2 className="text-2xl font-bold mb-4">You're in Queue</h2>
           
@@ -313,12 +313,14 @@ export const PrivateSession: React.FC = () => {
 
   // Active session
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-900 to-purple-900">
+    <div className="min-h-screen bg-slate-900" style={{ backgroundColor: '#0f172a' }}>
+      {/* Fixed background layer */}
+      <div className="fixed inset-0 bg-gradient-to-br from-blue-900 to-purple-900 -z-10"></div>
       {/* Session Header */}
       <div className="bg-black bg-opacity-50 text-white p-4">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+            <div className="w-3 h-3 bg-red-500 rounded-full"></div>
             <h1 className="text-xl font-bold">Private Session Active</h1>
           </div>
           
@@ -341,7 +343,7 @@ export const PrivateSession: React.FC = () => {
       {/* Main Content */}
       <div className="p-8">
         <div className="max-w-4xl mx-auto">
-          <div className="bg-white bg-opacity-10 backdrop-blur-sm rounded-lg p-6 text-white text-center">
+          <div className="bg-white/10 rounded-lg p-6 text-white text-center">
             <div className="text-6xl mb-4">🤖</div>
             <h2 className="text-3xl font-bold mb-4">
               Welcome to Your Private Session!

@@ -133,9 +133,11 @@ export const AgentsPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <div className="min-h-screen bg-slate-900" style={{ backgroundColor: '#0f172a' }}>
+      {/* Fixed background layer */}
+      <div className="fixed inset-0 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 -z-10"></div>
       {/* Header */}
-      <header className="relative z-50 bg-black/20 backdrop-blur-xl border-b border-white/10">
+      <header className="relative z-50 bg-slate-900/90 border-b border-white/10" style={{ backgroundColor: 'rgba(15, 23, 42, 0.9)' }}>
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <Link to="/" className="flex items-center space-x-4">
@@ -249,11 +251,11 @@ export const AgentsPage: React.FC = () => {
             return (
               <div 
                 key={model.modelName} 
-                className="group relative bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-sm rounded-3xl border border-white/20 overflow-hidden transition-all duration-500 hover:transform hover:scale-105 hover:border-white/40"
+                className="group relative bg-white/5 rounded-3xl border border-white/20 overflow-hidden transition-all duration-300 hover:border-white/40"
               >
                 {/* Category Badge */}
                 <div className="absolute top-4 left-4 z-10">
-                  <div className="bg-black/50 backdrop-blur-sm text-white px-2 py-1 rounded-full text-xs">
+                  <div className="bg-black/70 text-white px-2 py-1 rounded-full text-xs">
                     {categories.find(c => c.id === model.category)?.icon} {categories.find(c => c.id === model.category)?.name}
                   </div>
                 </div>
@@ -271,12 +273,46 @@ export const AgentsPage: React.FC = () => {
 
                 {/* Agent Avatar */}
                 <div className="relative p-8 text-center">
-                  <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-purple-500 to-blue-600 rounded-2xl flex items-center justify-center text-2xl">
-                    {model.displayName === 'Trump AI' ? '🇺🇸' : 
-                     model.displayName === 'Borp AI' ? '🤖' : 
-                     model.displayName === 'Agent Alpha' ? '⚡' : 
-                     model.displayName.charAt(0)}
-                  </div>
+                  {model.displayName === 'Trump AI' ? (
+                    <div className="relative w-48 h-48 mx-auto mb-6 group">
+                      <img 
+                        src="/avatar/trump-avatar.png" 
+                        alt="Trump AI Avatar"
+                        className="w-48 h-48 rounded-3xl object-cover shadow-lg transition-all duration-200 group-hover:scale-105"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                          const fallback = target.nextElementSibling as HTMLElement;
+                          if (fallback) fallback.style.display = 'flex';
+                        }}
+                      />
+                      <div className="w-48 h-48 bg-gradient-to-br from-purple-500 to-blue-600 rounded-3xl flex items-center justify-center text-8xl transition-all duration-300 group-hover:scale-105" style={{ display: 'none' }}>
+                        🇺🇸
+                      </div>
+                    </div>
+                  ) : model.displayName === 'Borp AI' ? (
+                    <div className="relative w-48 h-48 mx-auto mb-6 group">
+                      <img 
+                        src="/avatar/bor-avatar.png" 
+                        alt="Borp AI Avatar"
+                        className="w-48 h-48 rounded-3xl object-cover shadow-lg transition-all duration-200 group-hover:scale-105"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                          const fallback = target.nextElementSibling as HTMLElement;
+                          if (fallback) fallback.style.display = 'flex';
+                        }}
+                      />
+                      <div className="w-48 h-48 bg-gradient-to-br from-purple-500 to-blue-600 rounded-3xl flex items-center justify-center text-8xl transition-all duration-300 group-hover:scale-105" style={{ display: 'none' }}>
+                        🤖
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="w-48 h-48 mx-auto mb-6 bg-purple-600 rounded-3xl flex items-center justify-center text-8xl group shadow-lg transition-all duration-200 hover:scale-105">
+                      {model.displayName === 'Agent Alpha' ? '⚡' : 
+                       model.displayName.charAt(0)}
+                    </div>
+                  )}
                   
                   <h3 className="text-xl font-bold text-white mb-2">
                     {model.displayName}
@@ -311,7 +347,7 @@ export const AgentsPage: React.FC = () => {
 
                   {/* Action Button */}
                   <button 
-                    className="w-full py-3 bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-xl font-medium hover:from-purple-600 hover:to-blue-600 transition-all duration-200 transform hover:scale-105"
+                    className="w-full py-3 bg-purple-600 text-white rounded-xl font-medium hover:bg-purple-700 transition-colors duration-200"
                     onClick={() => handleModelBook(model.modelName)}
                   >
                     {isFree ? '🌍 Start Free Session' : '💎 Book Session'}

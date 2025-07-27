@@ -101,7 +101,7 @@ export function LiveStream() {
       
       {/* Preview Mode Banner */}
       {isPreview && (
-        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-[90] bg-gradient-to-r from-orange-500/90 to-red-500/90 backdrop-blur-sm text-white px-6 py-3 rounded-full border border-white/20 shadow-lg">
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-[90] bg-orange-600/90 text-white px-6 py-3 rounded-full border border-white/20 shadow-lg">
           <div className="flex items-center gap-2 text-sm font-medium">
             <span>👁️</span>
             <span>Preview Mode</span>
@@ -150,7 +150,7 @@ export function LiveStream() {
           <div className="fixed bottom-4 left-4 right-4 z-[70] md:right-[340px]">
             <div className="max-w-2xl mx-auto">
               {isPreview ? (
-                <div className="bg-gradient-to-r from-orange-500/20 to-red-500/20 backdrop-blur-sm rounded-lg p-4 border border-orange-500/30">
+                <div className="bg-orange-900/30 rounded-lg p-4 border border-orange-500/30">
                   <div className="text-center text-white">
                     <p className="text-sm font-medium mb-2">👁️ Preview Mode - Limited Access</p>
                     <p className="text-xs text-orange-200 mb-3">
@@ -167,7 +167,7 @@ export function LiveStream() {
               ) : (
                 <MessageInput 
                   placeholder={`Send a message to ${displayScenes[0]?.creator?.username || modelName}...`}
-                  className="bg-black/80 backdrop-blur-sm rounded-lg p-4 border border-gray-600"
+                  className="bg-black/90 rounded-lg p-4 border border-gray-600"
                 />
               )}
             </div>

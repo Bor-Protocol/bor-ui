@@ -61,8 +61,32 @@
   * {
     @apply border-border;
   }
+  html {
+    background-color: #0f172a !important; /* slate-900 */
+    min-height: 100vh;
+  }
   body {
     @apply bg-background text-foreground;
+    background-color: #0f172a !important; /* slate-900 - force dark background */
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+  }
+  #root {
+    background-color: #0f172a !important; /* slate-900 */
+    min-height: 100vh;
+  }
+  /* Prevent any white flashes during page transitions */
+  * {
+    box-sizing: border-box;
+  }
+  /* Force dark background on all possible elements */
+  .bg-background {
+    background-color: #0f172a !important;
+  }
+  /* Ensure all page containers have dark background */
+  [class*="min-h-screen"] {
+    background-color: #0f172a;
   }
 }
 

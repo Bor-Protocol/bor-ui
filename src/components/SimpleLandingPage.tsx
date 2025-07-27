@@ -232,7 +232,7 @@ export const SimpleLandingPage: React.FC = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-slate-900">
+    <div className="min-h-screen bg-slate-900" style={{ backgroundColor: '#0f172a' }}>
       {/* Optimized Background */}
       <div className="fixed inset-0 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 -z-10"></div>
       
@@ -268,7 +268,7 @@ export const SimpleLandingPage: React.FC = () => {
       </div>
       
       {/* Header */}
-      <header className="relative z-50 bg-black/50 border-b border-white/10">
+      <header className="relative z-50 bg-slate-900/90 border-b border-white/10" style={{ backgroundColor: 'rgba(15, 23, 42, 0.9)' }}>
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
@@ -418,10 +418,25 @@ export const SimpleLandingPage: React.FC = () => {
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16">
             <Link 
               to="/trump"
-              className="px-8 py-4 bg-red-600 text-white rounded-xl font-bold text-lg hover:bg-red-700 transition-colors duration-200"
+              className="group px-8 py-4 bg-red-600 text-white rounded-xl font-bold text-lg hover:bg-red-700 transition-all duration-300 overflow-hidden shadow-lg hover:shadow-xl"
             >
-              <div className="flex items-center gap-3">
-                🇺🇸 Try Trump FREE
+              <div className="flex items-center gap-4">
+                <div className="relative w-12 h-12">
+                  <img 
+                    src="/avatar/trump-avatar.png" 
+                    alt="Trump"
+                    className="w-12 h-12 rounded-xl object-cover group-hover:scale-110 transition-transform duration-300 shadow-md"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.onerror = null;
+                      target.style.display = 'none';
+                      const fallback = target.nextElementSibling as HTMLElement;
+                      if (fallback) fallback.style.display = 'block';
+                    }}
+                  />
+                  <span style={{ display: 'none' }}>🇺🇸</span>
+                </div>
+                Try Trump FREE
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
                 </svg>
@@ -987,17 +1002,53 @@ export const SimpleLandingPage: React.FC = () => {
                   {/* Avatar Section */}
                   <div className="relative p-4 text-center">
                     <div className="relative inline-block">
-                      <div className={`w-16 h-16 rounded-xl flex items-center justify-center text-2xl font-bold transition-all duration-200 ${
-                        isFree 
-                          ? 'bg-green-600 text-white' 
-                          : 'bg-blue-600 text-white'
-                      } ${isHovered ? 'scale-105' : ''}`}>
-                        {model.displayName === 'Trump AI' ? '🇺🇸' : 
-                         model.displayName === 'Borp AI' ? '🤖' : 
-                         model.displayName === 'Agent Alpha' ? '⚡' : 
-                         model.displayName.charAt(0)}
+                      {model.displayName === 'Trump AI' ? (
+                        <div className="relative">
+                          <img 
+                            src="/avatar/trump-avatar.png" 
+                            alt="Trump AI Avatar"
+                            className={`w-40 h-40 rounded-2xl object-cover transition-all duration-300 shadow-lg hover:shadow-2xl ${isHovered ? 'scale-110' : 'scale-100'}`}
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = 'none';
+                              const fallback = target.nextElementSibling as HTMLElement;
+                              if (fallback) fallback.style.display = 'flex';
+                            }}
+                          />
+                          <div className={`w-40 h-40 rounded-2xl flex items-center justify-center text-6xl font-bold transition-all duration-300 bg-green-600 text-white ${isHovered ? 'scale-110' : 'scale-100'}`} style={{ display: 'none' }}>
+                            🇺🇸
+                          </div>
+                        </div>
+                      ) : model.displayName === 'Borp AI' ? (
+                        <div className="relative">
+                          <img 
+                            src="/avatar/bor-avatar.png" 
+                            alt="Borp AI Avatar"
+                            className={`w-40 h-40 rounded-2xl object-cover transition-all duration-300 shadow-lg hover:shadow-2xl ${isHovered ? 'scale-110' : 'scale-100'}`}
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = 'none';
+                              const fallback = target.nextElementSibling as HTMLElement;
+                              if (fallback) fallback.style.display = 'flex';
+                            }}
+                          />
+                          <div className={`w-40 h-40 rounded-2xl flex items-center justify-center text-6xl font-bold transition-all duration-300 bg-blue-600 text-white ${isHovered ? 'scale-110' : 'scale-100'}`} style={{ display: 'none' }}>
+                            🤖
+                          </div>
+                        </div>
+                      ) : (
+                        <div className={`w-40 h-40 rounded-2xl flex items-center justify-center text-6xl font-bold transition-all duration-300 shadow-lg hover:shadow-2xl ${
+                          isFree 
+                            ? 'bg-green-600 text-white' 
+                            : 'bg-blue-600 text-white'
+                        } ${isHovered ? 'scale-110' : 'scale-100'}`}>
+                          {model.displayName === 'Agent Alpha' ? '⚡' : 
+                           model.displayName.charAt(0)}
+                        </div>
+                      )}
+                      <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-green-400 border-3 border-white rounded-full flex items-center justify-center">
+                        <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
                       </div>
-                      <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-400 border-2 border-white rounded-full"></div>
                     </div>
                     
                     <h3 className="text-lg font-bold text-white mt-3 mb-2">
@@ -1250,16 +1301,46 @@ export const SimpleLandingPage: React.FC = () => {
                   <div className="space-y-3">
                     <button
                       onClick={() => navigate('/trump')}
-                      className="w-full px-4 py-3 bg-red-600 text-white rounded-xl font-medium hover:bg-red-700 transition-colors duration-200"
+                      className="w-full px-4 py-3 bg-red-600 text-white rounded-xl font-medium hover:bg-red-700 transition-all duration-300 group shadow-lg hover:shadow-xl"
                     >
-                      🇺🇸 Trump (Free)
+                      <div className="flex items-center justify-center gap-3">
+                        <img 
+                          src="/avatar/trump-avatar.png" 
+                          alt="Trump"
+                          className="w-8 h-8 rounded-lg object-cover group-hover:scale-110 transition-transform duration-300"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.onerror = null;
+                            target.style.display = 'none';
+                            const fallback = target.nextElementSibling as HTMLElement;
+                            if (fallback) fallback.style.display = 'inline';
+                          }}
+                        />
+                        <span style={{ display: 'none' }}>🇺🇸</span>
+                        Trump (Free)
+                      </div>
                     </button>
                     <button
                       onClick={() => handleModelBook('borp')}
-                      className="w-full px-4 py-3 bg-purple-600 text-white rounded-xl font-medium hover:bg-purple-700 transition-colors duration-200"
+                      className="w-full px-4 py-3 bg-purple-600 text-white rounded-xl font-medium hover:bg-purple-700 transition-colors duration-200 group"
                       disabled={!!currentSession}
                     >
-                      🤖 Book Borp
+                      <div className="flex items-center justify-center gap-3">
+                        <img 
+                          src="/avatar/bor-avatar.png" 
+                          alt="Borp"
+                          className="w-8 h-8 rounded-lg object-cover group-hover:scale-110 transition-transform duration-300"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.onerror = null;
+                            target.style.display = 'none';
+                            const fallback = target.nextElementSibling as HTMLElement;
+                            if (fallback) fallback.style.display = 'inline';
+                          }}
+                        />
+                        <span style={{ display: 'none' }}>🤖</span>
+                        Book Borp
+                      </div>
                     </button>
                   </div>
                 </div>
