@@ -33,6 +33,9 @@ interface MessageEvent {
 export function ChatSection({  }: ChatSectionProps) {
   const { addComment } = useScene();
   const [, setIsConnected] = useState(false);
+  const [inputMessage, setInputMessage] = useState('');
+  const [username, setUsername] = useState('Guest');
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
   const clientIdRef = useRef(import.meta.env.VITE_TWITCH_CLIENT_ID);
 
@@ -110,6 +113,13 @@ useEffect(() => {
       window.removeEventListener('message', messageHandler);
     }
   };
+}, []);
+
+// Handle window resize
+useEffect(() => {
+  const handleResize = () => setIsMobile(window.innerWidth < 768);
+  window.addEventListener('resize', handleResize);
+  return () => window.removeEventListener('resize', handleResize);
 }, []);
 
 // for twitch
@@ -217,11 +227,112 @@ const client = new Client({
   
 
 
+  const handleSendMessage = () => {
+    if (inputMessage.trim()) {
+      const defaultAvatar = 'https://static-cdn.jtvnw.net/user-default-pictures-uv/13e5fa74-defa-11e9-809c-784f43822e80-profile_image-70x70.png';
+      addComment(inputMessage.trim(), defaultAvatar, username);
+      setInputMessage('');
+    }
+  };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  };
+
+  console.log('ChatSection is rendering!', { username, inputMessage, isMobile }); // Debug log
 
   return (
- <div>
-   {/* Test available via browser console: testTwitchMessage() */}
- </div>
+    <div style={{ 
+      background: 'rgba(17, 24, 39, 0.95)',
+      backdropFilter: 'blur(12px)',
+      borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+      borderLeft: '1px solid rgba(255, 255, 255, 0.1)',
+      padding: '16px',
+      height: 'auto'
+    }}>
+      <div style={{ marginBottom: '12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+          <div style={{
+            width: '32px',
+            height: '32px',
+            borderRadius: '50%',
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '14px',
+            fontWeight: 'bold',
+            color: 'white',
+            flexShrink: 0
+          }}>
+            {username.charAt(0).toUpperCase()}
+          </div>
+          <input
+            type="text"
+            placeholder="Your name"
+            value={username}
+            onChange={(e) => setUsername(e.target.value || 'Guest')}
+            style={{
+              flex: 1,
+              background: 'rgba(255, 255, 255, 0.05)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              borderRadius: '6px',
+              padding: '6px 10px',
+              fontSize: '13px',
+              color: 'rgba(255, 255, 255, 0.9)',
+              outline: 'none'
+            }}
+          />
+        </div>
+        
+        <textarea
+          placeholder="Send a message..."
+          value={inputMessage}
+          onChange={(e) => setInputMessage(e.target.value)}
+          onKeyDown={handleKeyDown}
+          style={{
+            width: '100%',
+            background: 'rgba(255, 255, 255, 0.05)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            borderRadius: '8px',
+            padding: '10px',
+            fontSize: '14px',
+            color: 'rgba(255, 255, 255, 0.95)',
+            outline: 'none',
+            resize: 'vertical',
+            minHeight: '60px',
+            maxHeight: '120px',
+            marginBottom: '10px',
+            fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+            boxSizing: 'border-box'
+          }}
+        />
+        
+        <button
+          onClick={handleSendMessage}
+          disabled={!inputMessage.trim()}
+          style={{
+            width: '100%',
+            background: inputMessage.trim() 
+              ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' 
+              : 'rgba(255, 255, 255, 0.1)',
+            border: 'none',
+            borderRadius: '8px',
+            padding: '10px',
+            color: 'white',
+            fontSize: '14px',
+            fontWeight: '500',
+            cursor: inputMessage.trim() ? 'pointer' : 'not-allowed',
+            transition: 'all 0.2s',
+            opacity: inputMessage.trim() ? 1 : 0.5
+          }}
+        >
+          Send Message
+        </button>
+      </div>
+    </div>
   );
 }

@@ -53,22 +53,15 @@ export function LiveStream() {
       </div>
 
       {/* Chat section is related to twitch and twitter received messages*/}
-     
-        <div
-          className={`
-           translate-x-0
-            fixed md:relative md:translate-x-0 
-            right-0 top-16 bottom-0 
-            w-full md:w-[320px] md:min-w-[320px]
-            z-40 
-            transition-transform duration-300 ease-in-out 
-            md:top-0
-            md:h-full
-            md:border-l md:border-gray-100 md:dark:border-gray-700
-          `}
-        >
-          <ChatSection />
-        </div>
+      <div style={{
+        position: 'fixed',
+        right: '0',
+        bottom: '0',
+        width: '320px',
+        zIndex: 9999
+      }}>
+        <ChatSection />
+      </div>
     </div>
   );
 }
