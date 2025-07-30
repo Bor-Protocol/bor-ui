@@ -100,13 +100,13 @@ export const NEW_STREAM_CONFIGS: NewStreamConfig[] = [
    title: "Agent Alpha Stream",
    agentId: "c9a175eb-deb5-06b1-886b-ef4f876a5be2", // Will be replaced with actual Alpha agent ID
    twitter: "@agent_alpha",
-   modelName: "Agent-Alpha",
+   modelName: "Naruto",
    identifier: "alpha",
    description: "Technical Operations Hub",
    color: "#0066FF",
    type: "stream",
    component: "ThreeScene",
-   creator: { avatar: "/images/alpha-avatar.webp", title: "System Coordinator", username: "Alpha" },
+   creator: { avatar: "/avatar/naruto-avatar.png", title: "System Coordinator", username: "Alpha" },
    bgm: BGM_URLS.BORP.DEFAULT,
    sceneConfigs: [
      {
@@ -115,8 +115,8 @@ export const NEW_STREAM_CONFIGS: NewStreamConfig[] = [
        "environmentURL": "tt.glb",
        "models": [
          {
-           "model": "testtrump.vrm",
-           "name": "Agent Alpha",
+           "model": "naruto.vrm",
+           "name": "Naruto",
            "agentId": "c9a175eb-deb5-06b1-886b-ef4f876a5be2",
            "description": "Agent Alpha - Technical Coordinator",
            "clothes": "professional",

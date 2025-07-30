@@ -2,11 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useSessionBooking } from '../hooks/useSessionBooking';
+import { useScene } from '../contexts/ScenesContext';
+import { FREE_MODEL_AGENT_ID } from '../utils/constants';
 
 export const SessionTimer: React.FC = () => {
   const navigate = useNavigate();
   const { currentSession: authSession } = useAuth();
   const { currentSession, refreshSession } = useSessionBooking();
+  const { currentAgentId } = useScene();
   const [remainingTime, setRemainingTime] = useState<number>(0);
 
   // Use session from either auth context or session booking
@@ -40,29 +43,32 @@ export const SessionTimer: React.FC = () => {
   }, [session, refreshSession]);
 
   // For free models or no active session, only show home button
-  const isFreeModel = !session || !session.endTime || session.type === 'public';
+  const isFreeModel = currentAgentId === FREE_MODEL_AGENT_ID || !session || !session.endTime || session.type === 'public';
   
   if (!session || session.status !== 'active') {
     return (
       <div className="fixed top-4 right-4 z-[100]">
         <button
           onClick={() => navigate('/')}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
+          className="group relative overflow-hidden flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white font-semibold hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-2xl"
         >
-          <svg 
-            className="w-4 h-4" 
-            fill="none" 
-            stroke="currentColor" 
-            viewBox="0 0 24 24"
-          >
-            <path 
-              strokeLinecap="round" 
-              strokeLinejoin="round" 
-              strokeWidth={2} 
-              d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" 
-            />
-          </svg>
-          Home
+          <span className="relative z-10 flex items-center gap-2">
+            <svg 
+              className="w-4 h-4" 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                strokeWidth={2} 
+                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" 
+              />
+            </svg>
+            🏠 Home
+          </span>
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
         </button>
       </div>
     );
@@ -83,80 +89,96 @@ export const SessionTimer: React.FC = () => {
       <div className="fixed top-4 right-4 z-[100]">
         <button
           onClick={() => navigate('/')}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors shadow-lg"
+          className="group relative overflow-hidden flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white font-semibold hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-2xl"
         >
-          <svg 
-            className="w-4 h-4" 
-            fill="none" 
-            stroke="currentColor" 
-            viewBox="0 0 24 24"
-          >
-            <path 
-              strokeLinecap="round" 
-              strokeLinejoin="round" 
-              strokeWidth={2} 
-              d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" 
-            />
-          </svg>
-          Home
+          <span className="relative z-10 flex items-center gap-2">
+            <svg 
+              className="w-4 h-4" 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                strokeWidth={2} 
+                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" 
+              />
+            </svg>
+            🏠 Home
+          </span>
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
         </button>
       </div>
     );
   }
 
   return (
-    <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-[100] flex items-center gap-4 bg-black/80 backdrop-blur-md rounded-lg px-6 py-3 border border-gray-700">
-      {/* Session Timer */}
-      <div className="flex items-center gap-3">
-        <div className="flex flex-col items-center">
-          <span className="text-xs text-gray-400">Session Time</span>
-          <span className={`text-2xl font-bold font-mono ${
-            isLowTime ? 'text-red-500 animate-pulse' : 'text-white'
-          }`}>
-            {formatTime(remainingTime)}
-          </span>
-        </div>
-        
-        {session.endTime && (
-          <div className="flex flex-col items-center border-l border-gray-600 pl-3">
-            <span className="text-xs text-gray-400">Ends at</span>
-            <span className="text-sm text-gray-300">
-              {new Date(session.endTime).toLocaleTimeString([], { 
-                hour: '2-digit', 
-                minute: '2-digit' 
-              })}
-            </span>
+    <div className="fixed top-4 right-4 z-[100] rounded-2xl border border-white/10 shadow-2xl backdrop-blur-md animate-slideUpAndScale">
+      <div className="bg-gradient-to-r from-slate-800/50 via-slate-700/50 to-slate-800/50 rounded-2xl p-1">
+        <div className="bg-slate-900/95 rounded-2xl px-6 py-4 flex items-center gap-4">
+          {/* Session Timer */}
+          <div className="flex items-center gap-4">
+            <div className="flex flex-col items-center">
+              <span className="text-xs text-slate-400 font-medium">⏱️ Session Time</span>
+              <span className={`text-2xl font-bold font-mono ${
+                isLowTime ? 'text-red-400 animate-pulse' : 'bg-gradient-to-r from-green-400 to-blue-400 bg-clip-text text-transparent'
+              }`}>
+                {formatTime(remainingTime)}
+              </span>
+            </div>
+            
+            {session.endTime && (
+              <div className="flex flex-col items-center border-l border-white/20 pl-4">
+                <span className="text-xs text-slate-400 font-medium">📅 Ends at</span>
+                <span className="text-sm text-white font-semibold">
+                  {new Date(session.endTime).toLocaleTimeString([], { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                  })}
+                </span>
+              </div>
+            )}
           </div>
-        )}
-      </div>
 
-      {/* Home Button */}
-      <button
-        onClick={() => navigate('/')}
-        className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
-      >
-        <svg 
-          className="w-4 h-4" 
-          fill="none" 
-          stroke="currentColor" 
-          viewBox="0 0 24 24"
-        >
-          <path 
-            strokeLinecap="round" 
-            strokeLinejoin="round" 
-            strokeWidth={2} 
-            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" 
-          />
-        </svg>
-        Home
-      </button>
+          {/* Home Button */}
+          <button
+            onClick={() => navigate('/')}
+            className="group relative overflow-hidden flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white font-semibold hover:scale-105 transition-all duration-300 shadow-lg"
+          >
+            <span className="relative z-10 flex items-center gap-2">
+              <svg 
+                className="w-4 h-4" 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  strokeWidth={2} 
+                  d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" 
+                />
+              </svg>
+              🏠 Home
+            </span>
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          </button>
 
-      {/* Low time warning */}
-      {isLowTime && remainingTime > 0 && (
-        <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-red-600 text-white text-xs px-3 py-1 rounded-md animate-bounce">
-          Session ending soon!
+          {/* Low time warning */}
+          {isLowTime && remainingTime > 0 && (
+            <div className="absolute -bottom-12 right-0 rounded-xl border border-red-500/30 shadow-2xl backdrop-blur-md animate-bounce">
+              <div className="bg-gradient-to-r from-red-500/20 via-orange-500/20 to-red-500/20 rounded-xl p-1">
+                <div className="bg-slate-900/95 rounded-xl px-4 py-2">
+                  <div className="text-red-400 text-xs font-semibold flex items-center gap-2">
+                    ⚠️ Session ending soon!
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 };

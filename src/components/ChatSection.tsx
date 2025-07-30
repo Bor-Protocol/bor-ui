@@ -175,8 +175,41 @@ const client = new Client({
 
 
   return (
- <div>
-   {/* Test available via browser console: testTwitchMessage() */}
- </div>
+    <div className="h-full bg-gradient-to-b from-slate-900/95 to-slate-800/95 backdrop-blur-md">
+      <div className="p-4 border-b border-white/10">
+        <div className="rounded-2xl border border-white/10 shadow-2xl backdrop-blur-md">
+          <div className="bg-gradient-to-r from-slate-800/50 via-slate-700/50 to-slate-800/50 rounded-2xl p-1">
+            <div className="bg-slate-900/95 rounded-2xl px-4 py-3">
+              <div className="flex items-center gap-3">
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                <h3 className="text-sm font-semibold bg-gradient-to-r from-white to-slate-200 bg-clip-text text-transparent">
+                  💬 Live Chat
+                </h3>
+                <span className="text-xs text-slate-400">Connected</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div className="flex-1 p-4">
+        <div className="text-center text-slate-400 text-sm">
+          <div className="rounded-2xl border border-white/10 shadow-2xl backdrop-blur-md">
+            <div className="bg-gradient-to-r from-slate-800/50 via-slate-700/50 to-slate-800/50 rounded-2xl p-1">
+              <div className="bg-slate-900/95 rounded-2xl p-6">
+                <div className="mb-3">🌊</div>
+                <p className="font-medium mb-1">Social Chat Features</p>
+                <p className="text-xs text-slate-500">
+                  Twitch and Twitter integration available
+                </p>
+                <div className="mt-4 text-xs text-slate-600">
+                  Test via console: <code className="bg-slate-800 px-1 rounded">testTwitchMessage()</code>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

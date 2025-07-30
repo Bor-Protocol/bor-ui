@@ -57,20 +57,20 @@ export function MessageInput({
 
   return (
     <div className={className}>
-      <form onSubmit={handleSubmit} className="flex gap-3">
-        <div className="flex-1 relative">
-          <input
-            type="text"
+      <form onSubmit={handleSubmit} className="space-y-3">
+        <div className="relative">
+          <textarea
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder={placeholder}
             disabled={isSubmitting}
-            className="w-full px-4 py-3 pr-16 bg-gray-900/90 border border-gray-500 rounded-xl text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 disabled:opacity-50 transition-all duration-200"
+            rows={3}
+            className="w-full px-4 py-3 bg-transparent border-none text-white placeholder-slate-400 focus:outline-none resize-none disabled:opacity-50 transition-all duration-200"
             maxLength={500}
           />
           {message.length > 400 && (
-            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs text-gray-400">
+            <div className="absolute right-3 bottom-3 text-xs text-slate-400">
               {message.length}/500
             </div>
           )}
@@ -78,16 +78,21 @@ export function MessageInput({
         <button
           type="submit"
           disabled={!message.trim() || isSubmitting}
-          className="px-6 py-3 bg-blue-600 hover:bg-blue-500 disabled:bg-gray-700 disabled:cursor-not-allowed text-white rounded-xl font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 shadow-lg hover:shadow-xl disabled:shadow-none min-w-[80px]"
+          className="group relative overflow-hidden w-full py-3 rounded-xl bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white font-semibold hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
         >
-          {isSubmitting ? (
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-              <span>Sending</span>
-            </div>
-          ) : (
-            'Send'
-          )}
+          <span className="relative z-10 flex items-center justify-center gap-2">
+            {isSubmitting ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <span>✨ Sending...</span>
+              </>
+            ) : (
+              <>
+                <span>🚀 Send Message</span>
+              </>
+            )}
+          </span>
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
         </button>
       </form>
     </div>

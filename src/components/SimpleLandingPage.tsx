@@ -76,6 +76,10 @@ export const SimpleLandingPage: React.FC = () => {
   const [hoveredModel, setHoveredModel] = useState<string | null>(null);
   const [carouselIndex, setCarouselIndex] = useState(0);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [showBookingConfirm, setShowBookingConfirm] = useState(false);
+  const [bookingData, setBookingData] = useState<any>(null);
+  const [showNotification, setShowNotification] = useState(false);
+  const [notificationData, setNotificationData] = useState<{ type: 'success' | 'error' | 'info', message: string }>({ type: 'info', message: '' });
   
   // New session booking system
   const { 
@@ -97,6 +101,13 @@ export const SimpleLandingPage: React.FC = () => {
   // Mock session stats for now - could be enhanced later
   const sessionStats: { totalSessions: number; totalPointsSpent: number } | null = null;
 
+  // Show modern notification
+  const showModernNotification = (type: 'success' | 'error' | 'info', message: string) => {
+    setNotificationData({ type, message });
+    setShowNotification(true);
+    setTimeout(() => setShowNotification(false), 5000);
+  };
+
   // Handle model booking with new system
   const handleModelBook = async (modelName: string) => {
     try {
@@ -108,7 +119,7 @@ export const SimpleLandingPage: React.FC = () => {
         const accessCheck = await checkAccess(modelName);
         
         if (!accessCheck.success) {
-          alert(accessCheck.error || 'Cannot access this model');
+          showModernNotification('error', accessCheck.error || 'Cannot access this model');
           return;
         }
 
@@ -147,7 +158,7 @@ export const SimpleLandingPage: React.FC = () => {
       await proceedWithBooking(modelName, model);
     } catch (error: any) {
       console.error('Error in handleModelBook:', error);
-      alert(error.message || 'Failed to book session');
+      showModernNotification('error', error.message || 'Failed to book session');
     }
   };
 
@@ -159,47 +170,55 @@ export const SimpleLandingPage: React.FC = () => {
       
       if (!accessCheck.success) {
         if (accessCheck.error === 'Insufficient points') {
-          alert(`You need ${accessCheck.required} points but only have ${accessCheck.current}`);
+          showModernNotification('error', `You need ${accessCheck.required} points but only have ${accessCheck.current}`);
           return;
         }
-        alert(accessCheck.error || 'Cannot access this model');
+        showModernNotification('error', accessCheck.error || 'Cannot access this model');
         return;
       }
 
-      // Show confirmation dialog
+      // Show modern confirmation dialog
       const config = accessCheck.modelConfig;
       const availability = accessCheck.availability;
       
-      let message = `Book private session with ${config.displayName}?\n\n`;
-      message += `Cost: ${config.pointsCost} points\n`;
-      message += `Duration: ${config.sessionDurationMinutes} minutes\n\n`;
-      
-      if (availability && availability.queueLength > 0) {
-        message += `⚠️ Currently busy!\n`;
-        message += `Queue: ${availability.queueLength} people\n`;
-        message += `Estimated wait: ${availability.estimatedWaitMinutes} minutes\n\n`;
-        message += `You will be added to the queue. Proceed?`;
-      } else {
-        message += `✅ Available now! Session will start immediately.`;
-      }
-
-      if (confirm(message)) {
-        const result = await bookSession(modelName);
-        
-        if (result.success && result.session) {
-          if (result.session.status === 'active') {
-            // Redirect to model page with session
-            navigate(result.session.redirectUrl || `/${modelName}`);
-          } else if (result.session.status === 'queued') {
-            alert(`Added to queue! Position #${result.session.queuePosition}. You'll be notified when it's your turn.`);
-          }
-        } else {
-          alert(result.error || 'Failed to book session');
-        }
-      }
+      setBookingData({
+        config,
+        availability,
+        modelName,
+        message: availability && availability.queueLength > 0 
+          ? `⚠️ Currently busy! Queue: ${availability.queueLength} people. Estimated wait: ${availability.estimatedWaitMinutes} minutes.`
+          : `✅ Available now! Session will start immediately.`
+      });
+      setShowBookingConfirm(true);
     } catch (error: any) {
       console.error('Error in proceedWithBooking:', error);
-      alert(error.message || 'Failed to proceed with booking');
+      showModernNotification('error', error.message || 'Failed to proceed with booking');
+    }
+  };
+
+  // Handle confirmed booking
+  const handleConfirmedBooking = async () => {
+    if (!bookingData) return;
+    
+    setShowBookingConfirm(false);
+    
+    try {
+      const result = await bookSession(bookingData.modelName);
+      
+      if (result.success && result.session) {
+        if (result.session.status === 'active') {
+          showModernNotification('success', `🎉 Session started! Redirecting to ${bookingData.config.displayName}...`);
+          setTimeout(() => {
+            navigate(result.session.redirectUrl || `/${bookingData.modelName}`);
+          }, 1500);
+        } else if (result.session.status === 'queued') {
+          showModernNotification('info', `Added to queue! Position #${result.session.queuePosition}. You'll be notified when it's your turn.`);
+        }
+      } else {
+        showModernNotification('error', result.error || 'Failed to book session');
+      }
+    } catch (error: any) {
+      showModernNotification('error', error.message || 'Failed to book session');
     }
   };
 
@@ -1036,14 +1055,30 @@ export const SimpleLandingPage: React.FC = () => {
                             🤖
                           </div>
                         </div>
+                      ) : model.displayName === 'Agent Alpha' ? (
+                        <div className="relative">
+                          <img 
+                            src="/avatar/naruto-avatar.png" 
+                            alt="Agent Alpha - Naruto"
+                            className={`w-40 h-40 rounded-2xl object-cover transition-all duration-300 shadow-lg hover:shadow-2xl ${isHovered ? 'scale-110' : 'scale-100'}`}
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = 'none';
+                              const fallback = target.nextElementSibling as HTMLElement;
+                              if (fallback) fallback.style.display = 'flex';
+                            }}
+                          />
+                          <div className={`w-40 h-40 rounded-2xl flex items-center justify-center text-6xl font-bold transition-all duration-300 bg-blue-600 text-white ${isHovered ? 'scale-110' : 'scale-100'}`} style={{ display: 'none' }}>
+                            ⚡
+                          </div>
+                        </div>
                       ) : (
                         <div className={`w-40 h-40 rounded-2xl flex items-center justify-center text-6xl font-bold transition-all duration-300 shadow-lg hover:shadow-2xl ${
                           isFree 
                             ? 'bg-green-600 text-white' 
                             : 'bg-blue-600 text-white'
                         } ${isHovered ? 'scale-110' : 'scale-100'}`}>
-                          {model.displayName === 'Agent Alpha' ? '⚡' : 
-                           model.displayName.charAt(0)}
+                          {model.displayName.charAt(0)}
                         </div>
                       )}
                       <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-green-400 border-3 border-white rounded-full flex items-center justify-center">
@@ -1558,6 +1593,101 @@ export const SimpleLandingPage: React.FC = () => {
 
               <div className="mt-4 text-center text-xs text-gray-400">
                 Or reach us directly at feedback@bor-platform.com
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modern Booking Confirmation Modal */}
+      {showBookingConfirm && bookingData && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4 animate-fadeIn">
+          <div className="rounded-2xl border border-white/10 shadow-2xl backdrop-blur-md animate-slideUpAndScale max-w-md w-full">
+            <div className="bg-gradient-to-r from-slate-800/50 via-slate-700/50 to-slate-800/50 rounded-2xl p-1">
+              <div className="bg-slate-900/95 rounded-2xl p-6">
+                <div className="text-center mb-6">
+                  <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center text-2xl">
+                    🤖
+                  </div>
+                  <h3 className="text-xl font-bold bg-gradient-to-r from-white to-slate-200 bg-clip-text text-transparent mb-2">
+                    Book Private Session
+                  </h3>
+                  <p className="text-slate-300 text-sm">
+                    {bookingData.config.displayName}
+                  </p>
+                </div>
+
+                <div className="space-y-4 mb-6">
+                  <div className="rounded-xl border border-white/10 p-4 bg-slate-800/50">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-slate-300">💰 Cost</span>
+                      <span className="text-white font-bold">{bookingData.config.pointsCost} points</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-slate-300">⏱️ Duration</span>
+                      <span className="text-white font-bold">{bookingData.config.sessionDurationMinutes} minutes</span>
+                    </div>
+                  </div>
+
+                  <div className="rounded-xl border border-blue-500/30 p-4 bg-blue-500/10">
+                    <p className="text-blue-200 text-sm font-medium">
+                      {bookingData.message}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setShowBookingConfirm(false)}
+                    className="flex-1 py-3 px-4 rounded-xl bg-slate-700 text-white font-medium hover:bg-slate-600 transition-colors duration-200"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleConfirmedBooking}
+                    className="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 text-white font-semibold hover:scale-105 transition-all duration-300 shadow-lg"
+                  >
+                    🚀 Book Now
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modern Notification */}
+      {showNotification && (
+        <div className="fixed top-20 right-4 z-[110] animate-slideUpAndScale">
+          <div className="rounded-2xl border border-white/10 shadow-2xl backdrop-blur-md max-w-sm">
+            <div className={`bg-gradient-to-r rounded-2xl p-1 ${
+              notificationData.type === 'success' ? 'from-green-500/20 via-emerald-500/20 to-green-500/20' :
+              notificationData.type === 'error' ? 'from-red-500/20 via-pink-500/20 to-red-500/20' :
+              'from-blue-500/20 via-purple-500/20 to-blue-500/20'
+            }`}>
+              <div className="bg-slate-900/95 rounded-2xl p-4">
+                <div className="flex items-start gap-3">
+                  <div className={`w-2 h-2 rounded-full mt-2 animate-pulse ${
+                    notificationData.type === 'success' ? 'bg-green-400' :
+                    notificationData.type === 'error' ? 'bg-red-400' :
+                    'bg-blue-400'
+                  }`}></div>
+                  <div className="flex-1">
+                    <p className={`text-sm font-medium ${
+                      notificationData.type === 'success' ? 'text-green-200' :
+                      notificationData.type === 'error' ? 'text-red-200' :
+                      'text-blue-200'
+                    }`}>
+                      {notificationData.message}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setShowNotification(false)}
+                    className="text-slate-400 hover:text-white transition-colors"
+                  >
+                    ×
+                  </button>
+                </div>
               </div>
             </div>
           </div>

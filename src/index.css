@@ -185,6 +185,29 @@
   display: none;
 }
 
+/* Custom scrollbar for chat messages */
+.chat-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.3) transparent;
+}
+
+.chat-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.chat-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chat-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.3);
+  border-radius: 2px;
+}
+
+.chat-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.5);
+}
+
 .wallet-adapter-button {
   background-color: #fe2c55;  /* TikTok-style red */
   color: white;

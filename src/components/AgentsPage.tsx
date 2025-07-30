@@ -307,10 +307,26 @@ export const AgentsPage: React.FC = () => {
                         🤖
                       </div>
                     </div>
+                  ) : model.displayName === 'Agent Alpha' ? (
+                    <div className="relative w-48 h-48 mx-auto mb-6 group">
+                      <img 
+                        src="/avatar/naruto-avatar.png" 
+                        alt="Agent Alpha - Naruto"
+                        className="w-48 h-48 rounded-3xl object-cover shadow-lg transition-all duration-200 group-hover:scale-105"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                          const fallback = target.nextElementSibling as HTMLElement;
+                          if (fallback) fallback.style.display = 'flex';
+                        }}
+                      />
+                      <div className="w-48 h-48 bg-gradient-to-br from-orange-500 to-blue-600 rounded-3xl flex items-center justify-center text-8xl transition-all duration-300 group-hover:scale-105" style={{ display: 'none' }}>
+                        ⚡
+                      </div>
+                    </div>
                   ) : (
                     <div className="w-48 h-48 mx-auto mb-6 bg-purple-600 rounded-3xl flex items-center justify-center text-8xl group shadow-lg transition-all duration-200 hover:scale-105">
-                      {model.displayName === 'Agent Alpha' ? '⚡' : 
-                       model.displayName.charAt(0)}
+                      {model.displayName.charAt(0)}
                     </div>
                   )}
                   
