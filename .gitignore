@@ -30,3 +30,4 @@ src/components/3d/stresstest.py
 
 # Allow example env
 !.env.example
+.vercel
