@@ -190,7 +190,7 @@ export function SceneProvider({ children }: { children: ReactNode }) {
       console.log("comment received for agent:", currentAgentId, data);
       setCommentCount(data.commentCount);
 
-      if (data.newComment.user === userId) return;
+      // Don't skip any messages - show all real-time updates
       const comment: Comment = {
         id: data.newComment.id.toString(),
         agentId: data.newComment.agentId,
@@ -204,7 +204,17 @@ export function SceneProvider({ children }: { children: ReactNode }) {
 
       };
 
-      setComments(prev => [...prev, comment].slice(-100));
+      setComments(prev => {
+        // Check if comment already exists to avoid duplicates
+        const exists = prev.some(c => c.id === comment.id);
+        if (exists) {
+          console.log('Comment already exists, skipping');
+          return prev;
+        }
+        const updated = [...prev, comment].slice(-100);
+        console.log('Comments updated:', updated.length, 'comments');
+        return updated;
+      });
     };
 
     // Remove any existing listeners before adding new ones

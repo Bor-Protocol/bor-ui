@@ -12,6 +12,7 @@ const truncateText = (text: string, maxLength: number): string => {
 
 export function LiveChat() {
   const { comments } = useScene();
+  console.log('LiveChat rendering with', comments.length, 'comments');
 
  
   return (
