@@ -15,9 +15,9 @@ export const useSocket = () => {
         reconnectionDelay: 1000,
         reconnection: true,
         reconnectionAttempts: 10,
-        transports: ['websocket'],
+        transports: ['polling', 'websocket'], // Enable HTTP polling fallback for Vercel
         agent: false,
-        upgrade: false,
+        upgrade: true, // Allow upgrade from polling to websocket if available
         rejectUnauthorized: false
       });
     }

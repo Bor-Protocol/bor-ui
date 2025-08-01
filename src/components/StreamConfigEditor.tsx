@@ -4,7 +4,7 @@ import { DEFAULT_STREAM_CONFIG } from '../utils/constants';
 import { LiveStream } from './LiveStream';
 import { useScene } from '../contexts/ScenesContext';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5173/';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5173';
 
 const DEFAULT_CONFIG: StreamConfigFormData = {
   streamInfo: {
