@@ -2,6 +2,60 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Mobile-specific optimizations */
+@media (max-width: 768px) {
+  /* TikTok-style mobile layout */
+  body {
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+  
+  /* Prevent zoom on input focus */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+  
+  /* Smooth touch interactions */
+  * {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+  
+  /* Allow text selection for inputs and text areas */
+  input, textarea {
+    -webkit-user-select: text;
+    -khtml-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+  }
+  
+  /* Better touch targets */
+  button {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Smooth scrolling */
+  * {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* TikTok-style rounded video containers */
+  .mobile-video {
+    border-radius: 16px;
+    overflow: hidden;
+  }
+}
+
 /* Gift button animations */
 .gift-button {
   transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);

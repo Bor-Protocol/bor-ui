@@ -7,6 +7,7 @@ import ThreeScene from './3d/ThreeScene';
 import { useScene } from '../contexts/ScenesContext';
 import { LiveChat } from './old/LiveChat';
 import AIResponseDisplay from './old/AIResponseDisplay';
+import { useChatVisibility } from '../contexts/ChatVisibilityContext';
 
 import { useSceneEngine } from '../contexts/SceneEngineContext';
 
@@ -151,15 +152,31 @@ const SceneWrapper: React.FC<SceneWrapperProps> = ({
     index
 }) => {
     const {activeScene} = useScene();
+    const { isMobile } = useChatVisibility();
+    
     return (
         <div className="h-full w-full snap-start snap-always flex flex-col">
             <div className="flex-1 relative">
-                {/* 3D Scene - Always render */}
+                {/* 3D Scene - Full screen */}
                 <div className="absolute inset-0">
                     <SceneContent scene={scene} isActive={activeScene === index} debugMode={false} orbitEnabled={false} />
                 </div>
-                        <LiveChat />
-                        <AIResponseDisplay />
+                
+                {/* Chat messages - positioned better for mobile */}
+                <div className={isMobile 
+                    ? "absolute bottom-20 left-2 right-2 max-w-sm" // Mobile: bottom-left, avoid input area
+                    : ""
+                }>
+                    <LiveChat />
+                </div>
+                
+                {/* AI Response - positioned better for mobile */}
+                <div className={isMobile 
+                    ? "absolute top-4 right-2" // Mobile: top-right corner
+                    : ""
+                }>
+                    <AIResponseDisplay />
+                </div>
             </div>
         </div>
     );

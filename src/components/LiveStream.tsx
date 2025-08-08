@@ -2,16 +2,22 @@ import { ChatSection } from './ChatSection';
 import { useRef } from 'react';
 import { useScene } from '../contexts/ScenesContext';
 import SceneWrapper from './SceneWrapper';
+import { useChatVisibility } from '../contexts/ChatVisibilityContext';
 //import { useParams } from 'react-router-dom';
 
 export function LiveStream() {
-
+  const { isChatInputVisible, setIsChatInputVisible, isMobile } = useChatVisibility();
+  
   const {
    // setCurrentSceneIndex,
    // setActiveScene,
     newScenes: scenes
   } = useScene();
   const containerRef = useRef<HTMLDivElement>(null);
+
+  const handleToggleChat = () => {
+    setIsChatInputVisible(!isChatInputVisible);
+  };
 
   return (
     <div className="flex flex-1 h-full w-full">
@@ -55,12 +61,19 @@ export function LiveStream() {
       {/* Chat section is related to twitch and twitter received messages*/}
       <div style={{
         position: 'fixed',
-        right: '0',
-        bottom: '0',
-        width: '320px',
-        zIndex: 9999
+        right: isMobile ? '0' : '0',
+        bottom: isMobile ? '0' : '0', // On mobile, position at very bottom
+        left: isMobile ? '0' : 'auto',
+        width: isMobile ? '100%' : '320px',
+        maxWidth: isMobile ? '100vw' : '320px',
+        zIndex: 9999,
+        // Add safe area support for mobile devices with notches
+        paddingBottom: isMobile ? 'env(safe-area-inset-bottom)' : '0'
       }}>
-        <ChatSection />
+        <ChatSection 
+          isVisible={isChatInputVisible}
+          onToggle={handleToggleChat}
+        />
       </div>
     </div>
   );

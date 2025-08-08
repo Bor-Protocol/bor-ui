@@ -1,6 +1,7 @@
 import { LiveStream } from './components/LiveStream';
 
 import { SceneProvider } from './contexts/ScenesContext';
+import { ChatVisibilityProvider } from './contexts/ChatVisibilityContext';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { DocsPage } from './components/DocsPage';
@@ -37,12 +38,14 @@ export default function App() {
 
 const InnerApp = () => {
   return (
-    <div className="flex flex-col h-screen overflow-hidden overscroll-none dark:bg-dark">
-      <div className="flex flex-1 overflow-hidden">
-        <div className="flex-1 min-w-0">
-          <LiveStream />
-        </div>
-      </div> 
-    </div>
+    <ChatVisibilityProvider>
+      <div className="flex flex-col h-screen overflow-hidden overscroll-none dark:bg-dark">
+        <div className="flex flex-1 overflow-hidden">
+          <div className="flex-1 min-w-0">
+            <LiveStream />
+          </div>
+        </div> 
+      </div>
+    </ChatVisibilityProvider>
   )
 }
