@@ -1,10 +1,10 @@
-import  { useEffect, useState } from 'react';
+import  { useEffect, useState, memo, useMemo, useCallback } from 'react';
 import { useSceneEngine } from '../../contexts/SceneEngineContext';
 import { AGENT_MAP } from '../../utils/constants';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useChatVisibility } from '../../contexts/ChatVisibilityContext';
 
-export default function AIResponseDisplay() {
+function AIResponseDisplayComponent() {
   const [isVisible, setIsVisible] = useState(false);
   const [isPersisted, setIsPersisted] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -396,3 +396,7 @@ export default function AIResponseDisplay() {
     </AnimatePresence>
   );
 }
+
+// Export memoized component
+const AIResponseDisplay = memo(AIResponseDisplayComponent);
+export default AIResponseDisplay;

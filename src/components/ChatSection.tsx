@@ -1,6 +1,6 @@
 import './WebSocketProvider';  // Import this first!
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo, memo } from 'react';
 import { useScene } from '../contexts/ScenesContext';
 import { Client, ChatUserstate } from 'tmi.js';
 
@@ -24,7 +24,7 @@ interface MessageEvent {
   };
 }
 
-export function ChatSection({ isVisible = true, onToggle }: ChatSectionProps) {
+function ChatSectionComponent({ isVisible = true, onToggle }: ChatSectionProps) {
   const { addComment } = useScene();
   const [, setIsConnected] = useState(false);
   const [inputMessage, setInputMessage] = useState('');
@@ -103,7 +103,7 @@ useEffect(() => {
   }, []);
 
 
-  const handleSendMessage = async () => {
+  const handleSendMessage = useCallback(async () => {
     if (inputMessage.trim() && username.trim()) {
       try {
         console.log('Sending message:', inputMessage.trim());
@@ -127,47 +127,50 @@ useEffect(() => {
         }, 500); // Hide after 500ms to show the message was sent
       }
     }
-  };
+  }, [inputMessage, username, addComment]);
 
-  const handleUsernameSubmit = () => {
+  const handleUsernameSubmit = useCallback(() => {
     if (username.trim()) {
       localStorage.setItem('chatUsername', username.trim());
       setIsUsernameSet(true);
     }
-  };
+  }, [username]);
 
-  const handleEditUsername = () => {
+  const handleEditUsername = useCallback(() => {
     setIsUsernameSet(false);
     setUsername('');
     localStorage.removeItem('chatUsername');
-  };
+  }, []);
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
     }
-  };
+  }, [handleSendMessage]);
 
   console.log('ChatSection is rendering!', { username, inputMessage, isMobile }); // Debug log
 
   // Always show the chat input (no floating button)
+  
+  // Memoize main container styles
+  const containerStyle = useMemo(() => ({
+    background: isMobile 
+      ? 'rgba(0, 0, 0, 0.8)'
+      : 'rgba(0, 0, 0, 0.9)',
+    border: isMobile ? 'none' : '3px solid #FFD700',
+    borderRadius: '0px',
+    boxShadow: isMobile ? 'none' : '0 0 20px rgba(255, 215, 0, 0.4), inset 0 0 15px rgba(0, 0, 0, 0.8)',
+    padding: isMobile ? '8px 12px 12px' : '12px',
+    height: 'auto',
+    maxHeight: isMobile ? '25vh' : 'auto',
+    position: 'relative' as const,
+    width: '100%',
+    fontFamily: 'monospace'
+  }), [isMobile]);
 
   return (
-    <div style={{ 
-      background: isMobile 
-        ? 'rgba(0, 0, 0, 0.8)'
-        : 'rgba(0, 0, 0, 0.9)',
-      border: isMobile ? 'none' : '3px solid #FFD700',
-      borderRadius: '0px',
-      boxShadow: isMobile ? 'none' : '0 0 20px rgba(255, 215, 0, 0.4), inset 0 0 15px rgba(0, 0, 0, 0.8)',
-      padding: isMobile ? '8px 12px 12px' : '12px',
-      height: 'auto',
-      maxHeight: isMobile ? '25vh' : 'auto',
-      position: 'relative',
-      width: '100%',
-      fontFamily: 'monospace'
-    }}>
+    <div style={containerStyle}>
 
 
 {isMobile ? (
@@ -480,3 +483,6 @@ useEffect(() => {
     </div>
   );
 }
+
+// Export memoized component
+export const ChatSection = memo(ChatSectionComponent);

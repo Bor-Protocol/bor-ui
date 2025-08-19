@@ -1,7 +1,7 @@
 import { Diamond } from 'lucide-react';
 import { useScene } from '../../contexts/ScenesContext';
 import { useChatVisibility } from '../../contexts/ChatVisibilityContext';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback, useMemo, memo } from 'react';
 
 const truncateText = (text: string, maxLength: number): string => {
   if (text.length > maxLength) {
@@ -10,7 +10,7 @@ const truncateText = (text: string, maxLength: number): string => {
   return text;
 };
 
-export function LiveChat() {
+function LiveChatComponent() {
   const { comments } = useScene();
   const { isChatInputVisible, isMobile } = useChatVisibility();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -21,7 +21,7 @@ export function LiveChat() {
   
   console.log('LiveChat rendering with', comments.length, 'comments');
 
-  const toggleMessageExpansion = (messageId: string) => {
+  const toggleMessageExpansion = useCallback((messageId: string) => {
     console.log('Toggling message expansion for:', messageId);
     setExpandedMessages(prev => {
       const newSet = new Set(prev);
@@ -32,7 +32,7 @@ export function LiveChat() {
       }
       return newSet;
     });
-  };
+  }, []);
 
   // Auto-scroll to bottom on mobile when new messages arrive
   useEffect(() => {
@@ -45,7 +45,7 @@ export function LiveChat() {
   const maxMessages = isMobile ? 50 : 50; // Show 50 messages on both mobile and desktop
   const messageMaxLength = isMobile ? 80 : 120;
 
-  const toggleChatHeight = () => {
+  const toggleChatHeight = useCallback(() => {
     if (isExpanded) {
       // Contract to default size
       setLiveChatHeight(120);
@@ -55,49 +55,52 @@ export function LiveChat() {
       setLiveChatHeight(300);
       setIsExpanded(true);
     }
-  };
+  }, [isExpanded]);
 
-  // Generate random color for new users
-  const getUserColor = (username: string) => {
+  // Memoize the color palette
+  const colorPalette = useMemo(() => [
+    '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FECA57',
+    '#FF9FF3', '#54A0FF', '#5F27CD', '#00D2D3', '#FF9F43',
+    '#10AC84', '#EE5A24', '#0ABDE3', '#C44569', '#F8B500'
+  ], []);
+
+  // Memoize getUserColor function
+  const getUserColor = useCallback((username: string) => {
     if (userColors.has(username)) {
       return userColors.get(username)!;
     }
     
-    const colors = [
-      '#FF6B6B', // Red
-      '#4ECDC4', // Teal
-      '#45B7D1', // Blue
-      '#96CEB4', // Green
-      '#FECA57', // Yellow
-      '#FF9FF3', // Pink
-      '#54A0FF', // Light Blue
-      '#5F27CD', // Purple
-      '#00D2D3', // Cyan
-      '#FF9F43', // Orange
-      '#10AC84', // Emerald
-      '#EE5A24', // Dark Orange
-      '#0ABDE3', // Light Blue
-      '#C44569', // Dark Pink
-      '#F8B500'  // Amber
-    ];
-    
-    const randomColor = colors[Math.floor(Math.random() * colors.length)];
+    const randomColor = colorPalette[Math.floor(Math.random() * colorPalette.length)];
     setUserColors(prev => new Map(prev).set(username, randomColor));
     return randomColor;
-  };
+  }, [userColors, colorPalette]);
+  // Memoize main container styles
+  const containerStyle = useMemo(() => ({
+    background: isMobile 
+      ? 'linear-gradient(180deg, rgba(0, 0, 0, 0.0) 0%, rgba(0, 0, 0, 0.9) 100%)'
+      : 'rgba(0, 0, 0, 0.9)',
+    border: isMobile ? 'none' : '3px solid #FFD700',
+    borderRadius: '0px',
+    padding: isMobile ? '4px' : '6px',
+    boxShadow: isMobile ? 'none' : '0 0 20px rgba(255, 215, 0, 0.4), inset 0 0 15px rgba(0, 0, 0, 0.8)',
+    pointerEvents: 'none' as const,
+    position: 'relative' as const
+  }), [isMobile]);
+
+  // Memoize scroll container styles
+  const scrollContainerStyle = useMemo(() => ({
+    height: isMobile ? `${liveChatHeight}px` : '400px',
+    overflowY: 'auto' as const,
+    overflowX: 'hidden' as const,
+    scrollbarWidth: 'none' as const,
+    msOverflowStyle: 'none' as const,
+    display: 'flex',
+    flexDirection: 'column' as const,
+    gap: '1px'
+  }), [isMobile, liveChatHeight]);
  
   return (
-    <div style={{
-      background: isMobile 
-        ? 'linear-gradient(180deg, rgba(0, 0, 0, 0.0) 0%, rgba(0, 0, 0, 0.9) 100%)'
-        : 'rgba(0, 0, 0, 0.9)',
-      border: isMobile ? 'none' : '3px solid #FFD700',
-      borderRadius: '0px',
-      padding: isMobile ? '4px' : '6px',
-      boxShadow: isMobile ? 'none' : '0 0 20px rgba(255, 215, 0, 0.4), inset 0 0 15px rgba(0, 0, 0, 0.8)',
-      pointerEvents: 'none',
-      position: 'relative'
-    }}>
+    <div style={containerStyle}>
       {/* Mobile height toggle button */}
       {isMobile && (
         <div style={{
@@ -153,16 +156,7 @@ export function LiveChat() {
       
       <div 
         ref={scrollContainerRef}
-        style={{
-          height: isMobile ? `${liveChatHeight}px` : '400px',
-          overflowY: 'auto',
-          overflowX: 'hidden',
-          scrollbarWidth: 'none',
-          msOverflowStyle: 'none',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '1px'
-        }}>
+        style={scrollContainerStyle}>
         {comments
           .map((comment) => (
             <div
@@ -243,3 +237,6 @@ export function LiveChat() {
     </div>
   );
 }
+
+// Export memoized component
+export const LiveChat = memo(LiveChatComponent);
