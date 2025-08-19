@@ -18,4 +18,19 @@ export default defineConfig({
     // Add minimal global polyfills for WebSocket libraries if needed
     global: 'globalThis',
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'three-core': ['three'],
+          'three-fiber': ['@react-three/fiber'],
+          'three-drei': ['@react-three/drei'],
+          'three-vrm': ['@pixiv/three-vrm'],
+          'vendor': ['react', 'react-dom'],
+          'ui-libs': ['lucide-react', 'framer-motion'],
+        },
+      },
+    },
+    chunkSizeWarningLimit: 1000,
+  },
 });

@@ -9,9 +9,10 @@ import {
   Group,
   AnimationAction,
   LoopOnce,
-  LoopRepeat
+  LoopRepeat,
+  MeshStandardMaterial,
+  FrontSide
 } from 'three';
-import * as THREE from 'three';
 import { loadMixamoAnimation } from '../old/loadMixamoAnimation';
 import { useScene } from '../../contexts/ScenesContext.js';
 // import Note from '../Note';
@@ -488,7 +489,7 @@ export function ThreeScene({ debugMode, forceMaterialConversion = true }: { debu
                     
                     // Force convert ALL materials to MeshStandardMaterial for light response
                     if (!material.isMeshStandardMaterial) {
-                      const newMaterial = new THREE.MeshStandardMaterial({
+                      const newMaterial = new MeshStandardMaterial({
                         color: originalColor || 0xffffff,
                         map: originalMap,
                         normalMap: originalNormalMap,
@@ -508,7 +509,7 @@ export function ThreeScene({ debugMode, forceMaterialConversion = true }: { debu
                       }
                       
                       // Preserve side settings
-                      newMaterial.side = material.side || THREE.FrontSide;
+                      newMaterial.side = material.side || FrontSide;
                       
                       // Dispose old material before replacing
                       material.dispose();

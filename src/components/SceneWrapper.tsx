@@ -1,9 +1,11 @@
-import React, { Suspense, useRef, useState, useEffect } from 'react';
+import React, { Suspense, useRef, useState, useEffect, lazy } from 'react';
 
 
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
-import ThreeScene from './3d/ThreeScene';
+
+// Lazy load ThreeScene to reduce initial bundle size
+const ThreeScene = lazy(() => import('./3d/ThreeScene'));
 import { useScene } from '../contexts/ScenesContext';
 import { LiveChat } from './old/LiveChat';
 import AIResponseDisplay from './old/AIResponseDisplay';

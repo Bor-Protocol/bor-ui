@@ -1,4 +1,10 @@
-import * as THREE from 'three';
+import {
+	AnimationClip,
+	Quaternion,
+	Vector3,
+	QuaternionKeyframeTrack,
+	VectorKeyframeTrack
+} from 'three';
 import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
 import { mixamoVRMRigMap } from './mixamoVRMRigMap.js';
 
@@ -7,21 +13,21 @@ import { mixamoVRMRigMap } from './mixamoVRMRigMap.js';
  *
  * @param {string} url A url of mixamo animation data
  * @param {VRM} vrm A target VRM
- * @returns {Promise<THREE.AnimationClip>} The converted AnimationClip
+ * @returns {Promise<AnimationClip>} The converted AnimationClip
  */
 export function loadMixamoAnimation( url, vrm ) {
 
 	const loader = new FBXLoader(); // A loader which loads FBX
 	return loader.loadAsync( url ).then( ( asset ) => {
 
-		const clip = THREE.AnimationClip.findByName( asset.animations, 'mixamo.com' ); // extract the AnimationClip
+		const clip = AnimationClip.findByName( asset.animations, 'mixamo.com' ); // extract the AnimationClip
 
 		const tracks = []; // KeyframeTracks compatible with VRM will be added here
 
-		const restRotationInverse = new THREE.Quaternion();
-		const parentRestWorldRotation = new THREE.Quaternion();
-		const _quatA = new THREE.Quaternion();
-		const _vec3 = new THREE.Vector3();
+		const restRotationInverse = new Quaternion();
+		const parentRestWorldRotation = new Quaternion();
+		const _quatA = new Quaternion();
+		const _vec3 = new Vector3();
 
 		// Adjust with reference to hips height.
 		const motionHipsHeight = asset.getObjectByName( 'mixamorigHips' ).position.y;
@@ -47,7 +53,7 @@ export function loadMixamoAnimation( url, vrm ) {
 				mixamoRigNode.getWorldQuaternion( restRotationInverse ).invert();
 				mixamoRigNode.parent.getWorldQuaternion( parentRestWorldRotation );
 
-				if ( track instanceof THREE.QuaternionKeyframeTrack ) {
+				if ( track instanceof QuaternionKeyframeTrack ) {
 
 					// Retarget rotation of mixamoRig to NormalizedBone.
 					for ( let i = 0; i < track.values.length; i += 4 ) {
@@ -72,17 +78,17 @@ export function loadMixamoAnimation( url, vrm ) {
 					}
 
 					tracks.push(
-						new THREE.QuaternionKeyframeTrack(
+						new QuaternionKeyframeTrack(
 							`${vrmNodeName}.${propertyName}`,
 							track.times,
 							track.values.map( ( v, i ) => ( vrm.meta?.metaVersion === '0' && i % 2 === 0 ? - v : v ) ),
 						),
 					);
 
-				} else if ( track instanceof THREE.VectorKeyframeTrack ) {
+				} else if ( track instanceof VectorKeyframeTrack ) {
 
 					const value = track.values.map( ( v, i ) => ( vrm.meta?.metaVersion === '0' && i % 3 !== 1 ? - v : v ) * hipsPositionScale );
-					tracks.push( new THREE.VectorKeyframeTrack( `${vrmNodeName}.${propertyName}`, track.times, value ) );
+					tracks.push( new VectorKeyframeTrack( `${vrmNodeName}.${propertyName}`, track.times, value ) );
 
 				}
 
@@ -90,7 +96,7 @@ export function loadMixamoAnimation( url, vrm ) {
 
 		} );
 
-		return new THREE.AnimationClip( 'vrmAnimation', clip.duration, tracks );
+		return new AnimationClip( 'vrmAnimation', clip.duration, tracks );
 
 	} );
 
