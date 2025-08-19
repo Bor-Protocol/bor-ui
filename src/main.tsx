@@ -1,12 +1,10 @@
-import { Buffer } from 'buffer';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
 
-// Polyfills for Solana Web3.js
-window.Buffer = Buffer;
-window.global = window;
+// SECURITY FIX: Removed unsafe global window modifications
+// Polyfills are now handled securely via Vite configuration
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

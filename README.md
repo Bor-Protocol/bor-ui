@@ -77,10 +77,28 @@ We welcome contributions to improve Bor_ui. Please follow these steps:
 This project is licensed under the MIT License. See the LICENSE file for details.
 
 
-In order to use the twitch chat, you need to create a twitch account and get the access token and clientId
-from https://twitchtokengenerator.com/ select bot chat token
+## Chat Configuration
 
-In order to use twitter chat you need to install the extension.
-to activate only twitch use VITE_TWITCH_ENABLED=true
-to activate only twitter use VITE_TWITCH_ENABLED=true
-to activate both use VITE_TWITCH_ENABLED=true and VITE_TWITCH_ENABLED=true
+The application now uses WebSocket-based real-time chat functionality. External chat integrations (Twitch, Twitter) have been removed from the frontend for security reasons.
+
+### Security Configuration
+
+For production deployments:
+- External API integrations should be implemented on the backend
+- API credentials must never be exposed in client-side code
+- Use environment variables only for non-sensitive configuration
+
+#### PostMessage Security
+
+The application includes secure postMessage handling with origin validation:
+
+```bash
+# Set allowed origins for cross-origin messages (comma-separated)
+VITE_ALLOWED_MESSAGE_ORIGINS=https://yourdomain.com,https://www.yourdomain.com
+```
+
+**Security Features:**
+- Origin validation prevents unauthorized cross-origin attacks
+- Input sanitization prevents XSS injection
+- Payload validation ensures data integrity
+- Length limits prevent DoS attacks

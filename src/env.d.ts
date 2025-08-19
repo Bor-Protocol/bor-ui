@@ -1,12 +1,10 @@
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
-    readonly VITE_TWITCH_BOT_USERNAME: string
-    readonly VITE_TWITCH_ACCESS_TOKEN: string
-    readonly VITE_TWITCH_CHANNEL: string
-    readonly VITE_TWITCH_CLIENT_ID: string
-    readonly VITE_TWITCH_ENABLED: string
+    // SECURITY FIX: Removed Twitch API credential definitions
+    // API credentials should never be exposed in frontend code
     readonly VITE_TWITTER_ENABLED: string
+    readonly VITE_ALLOWED_MESSAGE_ORIGINS: string
 }
 
 interface ImportMeta {

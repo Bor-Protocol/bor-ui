@@ -2,7 +2,7 @@ import './WebSocketProvider';  // Import this first!
 
 import { useState, useEffect, useRef, useCallback, useMemo, memo } from 'react';
 import { useScene } from '../contexts/ScenesContext';
-import { Client, ChatUserstate } from 'tmi.js';
+// Removed unused tmi.js imports
 
 interface ChatSectionProps {
   onClose?: () => void;
@@ -17,11 +17,13 @@ interface ChatMessage {
   avatar: string;
 }
 
-interface MessageEvent {
+// Enhanced MessageEvent interface for better type safety
+interface SecureMessageEvent extends MessageEvent {
   data: {
-      type: string;
-      payload: ChatMessage;
+    type: string;
+    payload: ChatMessage;
   };
+  origin: string;
 }
 
 function ChatSectionComponent({ isVisible = true, onToggle }: ChatSectionProps) {
@@ -39,55 +41,69 @@ function ChatSectionComponent({ isVisible = true, onToggle }: ChatSectionProps) 
   });
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
-  const clientIdRef = useRef(import.meta.env.VITE_TWITCH_CLIENT_ID);
+  // SECURITY FIX: Removed Twitch API credentials and unused fetchUserAvatar function
+  // Avatar fetching should be handled by backend services to protect API credentials
 
- // Function to fetch user avatar from twitch
- const fetchUserAvatar = async (userId: string): Promise<string | null> => {
-  try {
-      const response = await fetch(`https://api.twitch.tv/helix/users?id=${userId}`, {
-          headers: {
-              'Authorization': `Bearer ${import.meta.env.VITE_TWITCH_ACCESS_TOKEN}`,
-              'Client-Id': clientIdRef.current
-          }
-      });
-      const data = await response.json();
-      return data.data[0]?.profile_image_url;
-  } catch (error) {
-      console.error('Error fetching avatar:', error);
-      return null;
-  }
-};
-
-// for twitter
+// SECURITY FIX: Secure postMessage handler with origin validation
 useEffect(() => {
+  // Get allowed origins from environment variables
+  const allowedOrigins = import.meta.env.VITE_ALLOWED_MESSAGE_ORIGINS?.split(',').map(origin => origin.trim()) || [];
+  
+  // Add current origin as fallback for development
+  if (allowedOrigins.length === 0) {
+    allowedOrigins.push(window.location.origin);
+  }
 
   const messageHandler = (event: MessageEvent) => {
-      console.log('Received message:', event.data); // Debug log
+    // SECURITY: Validate message origin
+    if (!allowedOrigins.includes(event.origin)) {
+      console.warn('Rejected message from unauthorized origin:', event.origin);
+      return;
+    }
 
-      if (event.data?.type === 'NEW_CHAT_DATA' && event.data?.payload) {
-          const payload = event.data.payload;
-          
-          // Verify the payload has the expected structure
-          if (payload.username && payload.chatContent && payload.timestamp) {
-              const newMessage: ChatMessage = {
-                  username: payload.username,
-                  chatContent: payload.chatContent,
-                  timestamp: payload.timestamp,
-                  avatar: payload.avatar
-              };
-              
-              console.log('Processed message:', newMessage); // Debug log
-              addComment(newMessage.chatContent, false, newMessage.username, newMessage.avatar);
-          } else {
-              console.warn('Incomplete message payload:', payload);
-          }
+    // SECURITY: Validate event structure
+    if (!event.data || typeof event.data !== 'object') {
+      console.warn('Invalid message format received');
+      return;
+    }
+
+    console.log('Received message from authorized origin:', event.origin, event.data);
+
+    if (event.data?.type === 'NEW_CHAT_DATA' && event.data?.payload) {
+      const payload = event.data.payload;
+      
+      // SECURITY: Strict payload validation with type checking
+      if (
+        payload &&
+        typeof payload === 'object' &&
+        typeof payload.username === 'string' &&
+        typeof payload.chatContent === 'string' &&
+        typeof payload.timestamp === 'string' &&
+        payload.username.length > 0 &&
+        payload.username.length <= 50 && // Limit username length
+        payload.chatContent.length > 0 &&
+        payload.chatContent.length <= 500 // Limit message length
+      ) {
+        // SECURITY: Sanitize inputs (basic XSS prevention)
+        const sanitizedMessage: ChatMessage = {
+          username: payload.username.replace(/[<>"'&]/g, ''), // Remove potential HTML chars
+          chatContent: payload.chatContent.replace(/[<>]/g, ''), // Remove HTML tags
+          timestamp: payload.timestamp,
+          avatar: typeof payload.avatar === 'string' ? payload.avatar : ''
+        };
+        
+        console.log('Processed secure message:', sanitizedMessage);
+        addComment(sanitizedMessage.chatContent, false, sanitizedMessage.username, sanitizedMessage.avatar);
+      } else {
+        console.warn('Invalid or unsafe message payload:', payload);
       }
+    }
   };
 
   window.addEventListener('message', messageHandler);
 
   return () => {
-      window.removeEventListener('message', messageHandler);
+    window.removeEventListener('message', messageHandler);
   };
 }, [addComment]);
 
