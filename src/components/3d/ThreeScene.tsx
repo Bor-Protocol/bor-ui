@@ -118,7 +118,7 @@ export function ThreeScene({ debugMode, forceMaterialConversion = true }: { debu
   const mixerRefs = useRef<(AnimationMixer | undefined)[]>([]); 
   const actionsRefs = useRef<{ [key: string]: AnimationAction }[]>([]);
 
-  const clockRef = useRef(new Clock());
+  const clockRef = useRef<Clock>();
   const currentActionRef = useRef<string | null>(null);
   const nextAnimationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -267,23 +267,76 @@ export function ThreeScene({ debugMode, forceMaterialConversion = true }: { debu
   }, [animation, animationFile, models, playAnimation]);
 
 
-  // Add a cleanup function to clear models
+  // Add a cleanup function to clear models with proper disposal
   const cleanupModels = useCallback(() => {
-    // Clear all models
-    modelRefs.current.forEach(model => {
+    // Dispose of Three.js objects properly
+    modelRefs.current.forEach((model, index) => {
       if (model) {
+        // Traverse and dispose of all geometries and materials
+        model.traverse((object: any) => {
+          if (object.isMesh) {
+            // Dispose geometry
+            if (object.geometry) {
+              object.geometry.dispose();
+            }
+            
+            // Dispose materials (handle both single material and material arrays)
+            if (object.material) {
+              const materials = Array.isArray(object.material) ? object.material : [object.material];
+              materials.forEach((material: any) => {
+                // Dispose textures
+                if (material.map) material.map.dispose();
+                if (material.normalMap) material.normalMap.dispose();
+                if (material.roughnessMap) material.roughnessMap.dispose();
+                if (material.metalnessMap) material.metalnessMap.dispose();
+                if (material.aoMap) material.aoMap.dispose();
+                if (material.emissiveMap) material.emissiveMap.dispose();
+                
+                // Dispose material
+                material.dispose();
+              });
+            }
+          }
+        });
+        
+        // Clear the model
         model.clear();
       }
+      
+      // Stop and dispose animation mixers
+      if (mixerRefs.current[index]) {
+        mixerRefs.current[index]!.stopAllAction();
+        // Note: AnimationMixer doesn't have a dispose method, but stopping actions releases resources
+      }
     });
+    
+    // Clear all references
     modelRefs.current = [];
     vrmRefs.current = [];
     mixerRefs.current = [];
     actionsRefs.current = [];
+    
+    // Clear animation timeouts
+    if (nextAnimationTimeoutRef.current) {
+      clearTimeout(nextAnimationTimeoutRef.current);
+      nextAnimationTimeoutRef.current = null;
+    }
   }, []);
 
   // Add loading state
   const [, setModelsLoaded] = useState<boolean[]>([]);
   const [, setAllModelsLoaded] = useState(false);
+  
+  // Create GLTFLoader singleton
+  const loaderRef = useRef<GLTFLoader>();
+  if (!loaderRef.current) {
+    loaderRef.current = new GLTFLoader();
+    loaderRef.current.register((parser) => {
+      return new VRMLoaderPlugin(parser, {
+        autoUpdateHumanBones: true
+      });
+    });
+  }
 
   // Modify the model loading effect
   useEffect(() => {
@@ -310,13 +363,8 @@ export function ThreeScene({ debugMode, forceMaterialConversion = true }: { debu
       }
     });
 
-    // Load new models
-    const loader = new GLTFLoader();
-    loader.register((parser) => {
-      return new VRMLoaderPlugin(parser, {
-        autoUpdateHumanBones: true
-      });
-    });
+    // Use singleton loader
+    const loader = loaderRef.current;
 
     // Load each model in parallel
     const loadPromises = models.map((modelConfig, index) => {
@@ -436,9 +484,26 @@ export function ThreeScene({ debugMode, forceMaterialConversion = true }: { debu
     };
   }, [models, cleanupModels]); // Add models to dependency array to reload when they change
 
+  // Component unmount cleanup
+  useEffect(() => {
+    return () => {
+      cleanupModels();
+      
+      // Close audio context on unmount
+      if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
+        audioContextRef.current.close();
+      }
+    };
+  }, []); // Only run on unmount
+
+  // Initialize clock singleton
+  if (!clockRef.current) {
+    clockRef.current = new Clock();
+  }
+
   // Update animation frame
   useFrame(() => {
-    const clock = clockRef.current;
+    const clock = clockRef.current!;
     const delta = clock.getDelta();
 
     // Update mixers
@@ -587,20 +652,22 @@ export function ThreeScene({ debugMode, forceMaterialConversion = true }: { debu
 
 
   useEffect(() => {
-    // Initialize audio context
-    audioContextRef.current = new AudioContext();
-    analyserRef.current = audioContextRef.current.createAnalyser();
-    analyserRef.current.fftSize = 2048;
-    
-    const bufferLength = analyserRef.current.frequencyBinCount;
-    dataArrayRef.current = new Float32Array(bufferLength);
+    // Initialize audio context (singleton pattern)
+    if (!audioContextRef.current || audioContextRef.current.state === 'closed') {
+      audioContextRef.current = new AudioContext();
+      analyserRef.current = audioContextRef.current.createAnalyser();
+      analyserRef.current.fftSize = 2048;
+      
+      const bufferLength = analyserRef.current.frequencyBinCount;
+      dataArrayRef.current = new Float32Array(bufferLength);
+    }
 
     return () => {
-      if (audioContextRef.current) {
+      if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
         audioContextRef.current.close();
       }
     };
-  }, []);
+  }, []); // Empty dependency array - only run once
 
 
 
