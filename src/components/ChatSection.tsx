@@ -24,14 +24,6 @@ interface MessageEvent {
   };
 }
 
-
-
-
-
-
-
-
-
 export function ChatSection({ isVisible = true, onToggle }: ChatSectionProps) {
   const { addComment } = useScene();
   const [, setIsConnected] = useState(false);
@@ -65,21 +57,8 @@ export function ChatSection({ isVisible = true, onToggle }: ChatSectionProps) {
       return null;
   }
 };
-/*to be removed 
-  useEffect(() => {
-    (window as any).addChatMessage = (message: string) => addComment(message, true);
-    return () => {
-      delete (window as any).addChatMessage;
-    };
-  }, [addComment]);
 
-*/
- 
-
- 
-
-
- // for twitter
+// for twitter
 useEffect(() => {
 
   const messageHandler = (event: MessageEvent) => {
@@ -98,155 +77,53 @@ useEffect(() => {
               };
               
               console.log('Processed message:', newMessage); // Debug log
-              const trimmedMessage = newMessage.chatContent.trim();
-            
-              // Validate message
-             // const validation = validateMessage(trimmedMessage);
-            
-
-              // Sanitize message before sending
-             // const sanitizedMessage = sanitizeMessage(trimmedMessage);
-              addComment(trimmedMessage,newMessage.avatar,newMessage.username);
-                 // Trigger animation on number change
-       
+              addComment(newMessage.chatContent, false, newMessage.username, newMessage.avatar);
+          } else {
+              console.warn('Incomplete message payload:', payload);
           }
       }
   };
-  const VITE_TWITTER_ENABLED =  import.meta.env.VITE_TWITTER_ENABLED;
-  console.log('VITE_TWITTER_ENABLED',VITE_TWITTER_ENABLED);
-  if (VITE_TWITTER_ENABLED === 'true') {
-    window.addEventListener('message', messageHandler);
-  }
+
+  window.addEventListener('message', messageHandler);
 
   return () => {
-    if (VITE_TWITTER_ENABLED === 'true') {
       window.removeEventListener('message', messageHandler);
-    }
   };
-}, []);
-
-// Handle window resize
-useEffect(() => {
-  const handleResize = () => setIsMobile(window.innerWidth < 768);
-  window.addEventListener('resize', handleResize);
-  return () => window.removeEventListener('resize', handleResize);
-}, []);
-
-// for twitch
-useEffect(() => {
- 
-  
+}, [addComment]);
 
 
- // Function to handle messages
- const handleMessage = async (_channel: string, userstate: ChatUserstate, message: string, self: boolean) => {
-  if (self) return; // Ignore messages from the bot
+  // Update mobile state on window resize
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
 
-  // Fetch avatar for the user
-  const avatar = await fetchUserAvatar(userstate['user-id'] || '');
-
-  // Verify the payload has the expected structure
-  const newMessage: ChatMessage = {
-    username:  userstate['display-name'] || 'Unknown',
-    chatContent: message,
-    timestamp: new Date().toISOString(),
-    avatar: avatar || 'https://static-cdn.jtvnw.net/user-default-pictures-uv/13e5fa74-defa-11e9-809c-784f43822e80-profile_image-70x70.png' // Default Twitch avatar
-  };
-
-  const trimmedMessage = newMessage.chatContent.trim();
-      
-  // Validate message
- // const validation = validateMessage(trimmedMessage);
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
 
-  // Sanitize message before sending
- // const sanitizedMessage = sanitizeMessage(trimmedMessage);
-  addComment(trimmedMessage,newMessage.avatar,newMessage.username);
-     // Trigger animation on number change
-
-
-
-
-};
-
-// Expose test function to browser console
-if (typeof window !== 'undefined') {
-  (window as any).testTwitchMessage = async () => {
-    console.log('🧪 Testing Twitch message from console...');
-    
-    const mockUserstate = {
-      'user-id': '123456789',
-      'display-name': 'TestUser'
-    } as ChatUserstate;
-    
-    await handleMessage('#testchannel', mockUserstate, 'testing', false);
-    console.log('✅ Test message sent from console!');
-  };
-}
-
-// Handle connection
-const handleConnect = () => {
-setIsConnected(true);
-console.log('Connected to Twitch chat!');
-};
-
-// Handle disconnection
-const handleDisconnect = () => {
-setIsConnected(false);
-console.log('Disconnected from Twitch chat!');
-};
-const TWITCH_ENABLED =  import.meta.env.VITE_TWITCH_ENABLED;
-console.log('TWITCH_ENABLED',TWITCH_ENABLED);
-if (TWITCH_ENABLED === 'true') {
-// Create a new client instance
-const client = new Client({
-  options: { debug: true },
-  connection: {
-      secure: true,
-      reconnect: true
-  },
-  identity: {
-      username: import.meta.env.VITE_TWITCH_BOT_USERNAME,
-      password: import.meta.env.VITE_TWITCH_ACCESS_TOKEN
-  },
-  channels: [import.meta.env.VITE_TWITCH_CHANNEL]
-});
-
-   // Add event listeners
-   client.on('message', handleMessage);
-   client.on('connected', handleConnect);
-   client.on('disconnected', handleDisconnect);
-
-   // Connect to Twitch
-   client.connect().catch(console.error);
-    
-
-   // Cleanup function
-   return () => {
-  
-       client.removeListener('message', handleMessage);
-       client.removeListener('connected', handleConnect);
-       client.removeListener('disconnected', handleDisconnect);
-       client.disconnect();
-    }
-   };
-}, []);
-
-
-
-  
-
-
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (inputMessage.trim() && username.trim()) {
-      // Use empty string instead of null for avatar - we'll generate it based on username
-      addComment(inputMessage.trim(), '', username);
-      setInputMessage('');
-      
-      // Auto-hide input on mobile after sending message
-      if (isMobile && onToggle) {
+      try {
+        console.log('Sending message:', inputMessage.trim());
+        
+        // Add the message locally
+        addComment(inputMessage.trim(), false, username.trim());
+        
+        // Clear input and show sending state
+        const sentMessage = inputMessage.trim();
+        setInputMessage('');
+
+      } catch (error) {
+        console.error('Error sending message:', error);
+        
+        // Restore the message on error
+        setInputMessage(inputMessage);
+        
+        // Show error message briefly
         setTimeout(() => {
-          onToggle();
+          // Could add error handling UI here
         }, 500); // Hide after 500ms to show the message was sent
       }
     }
@@ -274,127 +151,37 @@ const client = new Client({
 
   console.log('ChatSection is rendering!', { username, inputMessage, isMobile }); // Debug log
 
-  // If not visible on mobile, show only a floating toggle button
-  if (!isVisible && isMobile) {
-    return (
-      <div style={{
-        position: 'fixed',
-        bottom: '20px',
-        right: '20px',
-        zIndex: 10000
-      }}>
-        <button
-          onClick={onToggle}
-          style={{
-            width: '56px',
-            height: '56px',
-            borderRadius: '50%',
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            border: 'none',
-            color: 'white',
-            fontSize: '24px',
-            cursor: 'pointer',
-            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            touchAction: 'manipulation',
-            WebkitTapHighlightColor: 'transparent'
-          }}
-        >
-          💬
-        </button>
-      </div>
-    );
-  }
+  // Always show the chat input (no floating button)
 
   return (
     <div style={{ 
-      background: isMobile ? 'rgba(0, 0, 0, 0.85)' : 'rgba(17, 24, 39, 0.95)',
-      backdropFilter: 'blur(12px)',
-      borderTop: '1px solid rgba(255, 255, 255, 0.1)',
-      borderLeft: isMobile ? 'none' : '1px solid rgba(255, 255, 255, 0.1)',
-      borderRadius: isMobile ? '20px 20px 0 0' : '0',
-      padding: isMobile ? '8px 12px 12px' : '16px',
+      background: isMobile 
+        ? 'rgba(0, 0, 0, 0.8)'
+        : 'rgba(0, 0, 0, 0.9)',
+      border: isMobile ? 'none' : '3px solid #FFD700',
+      borderRadius: '0px',
+      boxShadow: isMobile ? 'none' : '0 0 20px rgba(255, 215, 0, 0.4), inset 0 0 15px rgba(0, 0, 0, 0.8)',
+      padding: isMobile ? '8px 12px 12px' : '12px',
       height: 'auto',
-      // Mobile optimizations - smaller and more compact
       maxHeight: isMobile ? '25vh' : 'auto',
       position: 'relative',
       width: '100%',
-      // Animation for mobile
-      transform: isMobile && !isVisible ? 'translateY(100%)' : 'translateY(0)',
-      transition: 'transform 0.3s ease-in-out'
+      fontFamily: 'monospace'
     }}>
-      {/* Mobile header with toggle and handle bar */}
-      {isMobile && (
-        <>
-          <div style={{
-            position: 'absolute',
-            top: '6px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            width: '32px',
-            height: '3px',
-            backgroundColor: 'rgba(255, 255, 255, 0.4)',
-            borderRadius: '2px'
-          }} />
-          
-          {/* Hide button for mobile - more subtle */}
-          <button
-            onClick={onToggle}
-            style={{
-              position: 'absolute',
-              top: '8px',
-              right: '12px',
-              background: 'rgba(255, 255, 255, 0.15)',
-              border: 'none',
-              borderRadius: '16px',
-              padding: '6px 10px',
-              color: 'rgba(255, 255, 255, 0.8)',
-              fontSize: '11px',
-              cursor: 'pointer',
-              touchAction: 'manipulation',
-              WebkitTapHighlightColor: 'transparent'
-            }}
-          >
-            ✕
-          </button>
-        </>
-      )}
 
-      <div style={{ marginBottom: '12px' }}>
-        {/* Username input - ultra compact for mobile */}
-        <div style={{ 
-          display: 'flex', 
-          alignItems: 'center', 
-          gap: isMobile ? '6px' : '8px', 
-          marginBottom: isMobile ? '6px' : '12px',
-          flexWrap: 'nowrap'
-        }}>
-          <div style={{
-            width: isMobile ? '24px' : '32px',
-            height: isMobile ? '24px' : '32px',
-            borderRadius: '50%',
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: isMobile ? '11px' : '14px',
-            fontWeight: 'bold',
-            color: 'white',
-            flexShrink: 0
-          }}>
-            {(username || 'G').charAt(0).toUpperCase()}
-          </div>
+
+{isMobile ? (
+        /* Mobile layout: username above, input form below */
+        <div style={{ marginBottom: '8px' }}>
+          {/* Username section above */}
           {!isUsernameSet ? (
-            <>
+            <div style={{ marginBottom: '6px' }}>
               <input
                 type="text"
-                placeholder="Enter your name"
+                placeholder="ENTER USERNAME"
                 value={username}
                 onChange={(e) => {
                   const value = e.target.value;
-                  // Limit username to 15 characters
                   const limitedValue = value.length > 15 ? value.substring(0, 15) : value;
                   setUsername(limitedValue);
                 }}
@@ -406,140 +193,290 @@ const client = new Client({
                 }}
                 maxLength={15}
                 style={{
-                  width: isMobile ? '120px' : 'auto',
-                  flex: isMobile ? 'none' : 1,
-                  background: 'rgba(255, 255, 255, 0.08)',
-                  border: '1px solid rgba(255, 255, 255, 0.15)',
-                  borderRadius: isMobile ? '12px' : '6px',
-                  padding: isMobile ? '2px 10px' : '6px 10px',
-                  fontSize: isMobile ? '12px' : '14px',
-                  color: 'rgba(255, 255, 255, 0.9)',
+                  width: '100%',
+                  background: 'rgba(0, 0, 0, 0.8)',
+                  border: '1px solid #FFD700',
+                  borderRadius: '0px',
+                  padding: '6px 8px',
+                  fontSize: '10px',
+                  color: '#FFD700',
                   outline: 'none',
-                  height: isMobile ? '24px' : 'auto',
-                  lineHeight: isMobile ? '20px' : 'normal'
+                  fontFamily: 'monospace',
+                  fontWeight: 'bold',
+                  textTransform: 'uppercase',
+                  marginBottom: '4px'
                 }}
               />
               <button
                 onClick={handleUsernameSubmit}
                 disabled={!username.trim()}
                 style={{
-                  padding: isMobile ? '2px 8px' : '6px 12px',
-                  background: username.trim() ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : 'rgba(255, 255, 255, 0.15)',
-                  border: 'none',
-                  borderRadius: isMobile ? '12px' : '6px',
-                  color: 'white',
-                  fontSize: isMobile ? '11px' : '12px',
+                  width: '100%',
+                  padding: '6px 8px',
+                  background: username.trim() ? 'rgba(255, 215, 0, 0.9)' : 'rgba(255, 215, 0, 0.3)',
+                  border: '1px solid #FFD700',
+                  borderRadius: '0px',
+                  color: username.trim() ? '#000' : '#666',
+                  fontSize: '9px',
                   cursor: username.trim() ? 'pointer' : 'not-allowed',
-                  opacity: username.trim() ? 1 : 0.5,
-                  height: isMobile ? '24px' : 'auto'
+                  fontFamily: 'monospace',
+                  fontWeight: 'bold',
+                  textTransform: 'uppercase'
                 }}
               >
-                Set
+                SET USERNAME
               </button>
-            </>
+            </div>
           ) : (
-            <>
-              <div style={{
+            <div style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '4px',
+              marginBottom: '4px'
+            }}>
+              <span style={{
+                color: '#FFD700',
+                fontSize: '12px',
+                fontWeight: 'bold',
+                fontFamily: 'monospace',
+                textTransform: 'uppercase',
+                letterSpacing: '0.3px',
+                textShadow: '0 0 4px rgba(255, 215, 0, 0.6)'
+              }}>
+                USER: {username}
+              </span>
+              <button
+                onClick={handleEditUsername}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: '#FFD700',
+                  fontSize: '14px',
+                  cursor: 'pointer',
+                  padding: '0',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '18px',
+                  height: '18px'
+                }}
+                title="Edit username"
+              >
+                ✏️
+              </button>
+            </div>
+          )}
+
+          {/* Input form below */}
+          <div style={{ display: 'flex', gap: '4px', alignItems: 'stretch' }}>
+            <textarea
+              placeholder="TALK TO HIKARI..."
+              value={inputMessage}
+              onChange={(e) => setInputMessage(e.target.value)}
+              onKeyDown={handleKeyDown}
+              style={{
+                flex: 1,
+                background: 'rgba(0, 0, 0, 0.8)',
+                border: '1px solid #FFD700',
+                borderRadius: '0px',
+                padding: '10px',
+                fontSize: '11px',
+                color: 'rgba(255, 255, 255, 0.9)',
+                outline: 'none',
+                resize: 'none',
+                height: '44px',
+                fontFamily: 'monospace',
+                lineHeight: '1.2',
+                boxSizing: 'border-box',
+                display: 'flex',
+                alignItems: 'center'
+              }}
+            />
+            <button
+              onClick={handleSendMessage}
+              disabled={!inputMessage.trim() || !username.trim()}
+              style={{
+                padding: '0px 12px',
+                background: (inputMessage.trim() && username.trim()) ? 'rgba(255, 215, 0, 0.9)' : 'rgba(255, 215, 0, 0.3)',
+                border: '1px solid #FFD700',
+                borderRadius: '0px',
+                color: (inputMessage.trim() && username.trim()) ? '#000' : '#666',
+                fontSize: '12px',
+                cursor: (inputMessage.trim() && username.trim()) ? 'pointer' : 'not-allowed',
+                fontFamily: 'monospace',
+                fontWeight: 'bold',
+                textTransform: 'uppercase',
+                height: '44px',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '8px',
-                flex: 1
-              }}>
-                <span style={{
-                  color: 'rgba(255, 255, 255, 0.9)',
-                  fontSize: isMobile ? '12px' : '14px',
-                  fontWeight: '500'
-                }}>
-                  {username}
-                </span>
-                <button
-                  onClick={handleEditUsername}
-                  style={{
-                    padding: '2px 6px',
-                    background: 'rgba(255, 255, 255, 0.1)',
-                    border: '1px solid rgba(255, 255, 255, 0.2)',
-                    borderRadius: '4px',
-                    color: 'rgba(255, 255, 255, 0.7)',
-                    fontSize: '11px',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s',
-                    ':hover': {
-                      background: 'rgba(255, 255, 255, 0.2)',
-                      color: 'rgba(255, 255, 255, 0.9)'
+                justifyContent: 'center',
+                boxSizing: 'border-box'
+              }}
+            >
+              SEND
+            </button>
+          </div>
+        </div>
+      ) : (
+        /* Desktop layout: original layout */
+        <div style={{ marginBottom: '8px' }}>
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '8px', 
+            marginBottom: '8px',
+            flexWrap: 'nowrap'
+          }}>
+            {!isUsernameSet ? (
+              <>
+                <input
+                  type="text"
+                  placeholder="ENTER USERNAME"
+                  value={username}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    const limitedValue = value.length > 15 ? value.substring(0, 15) : value;
+                    setUsername(limitedValue);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && username.trim()) {
+                      e.preventDefault();
+                      handleUsernameSubmit();
                     }
                   }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
-                    e.currentTarget.style.color = 'rgba(255, 255, 255, 0.9)';
+                  maxLength={15}
+                  style={{
+                    flex: 1,
+                    background: 'rgba(0, 0, 0, 0.8)',
+                    border: '2px solid #FFD700',
+                    borderRadius: '0px',
+                    padding: '6px 10px',
+                    fontSize: '12px',
+                    color: '#FFD700',
+                    outline: 'none',
+                    fontFamily: 'monospace',
+                    fontWeight: 'bold',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px'
                   }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
-                    e.currentTarget.style.color = 'rgba(255, 255, 255, 0.7)';
+                />
+                <button
+                  onClick={handleUsernameSubmit}
+                  disabled={!username.trim()}
+                  style={{
+                    padding: '6px 12px',
+                    background: username.trim() ? 'rgba(255, 215, 0, 0.9)' : 'rgba(255, 215, 0, 0.3)',
+                    border: '2px solid #FFD700',
+                    borderRadius: '0px',
+                    color: username.trim() ? '#000' : '#666',
+                    fontSize: '11px',
+                    cursor: username.trim() ? 'pointer' : 'not-allowed',
+                    fontFamily: 'monospace',
+                    fontWeight: 'bold',
+                    textTransform: 'uppercase'
                   }}
                 >
-                  Edit
+                  SET
                 </button>
-              </div>
-            </>
-          )}
-        </div>
-        
-        {/* Message input - single line for mobile, compact design */}
-        <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-end' }}>
-          <textarea
-            placeholder="Type a message..."
-            value={inputMessage}
-            onChange={(e) => setInputMessage(e.target.value)}
-            onKeyDown={handleKeyDown}
-            style={{
-              flex: 1,
-              background: 'rgba(255, 255, 255, 0.08)',
-              border: '1px solid rgba(255, 255, 255, 0.15)',
-              borderRadius: '20px',
-              padding: isMobile ? '10px 16px' : '10px',
-              fontSize: '14px',
-              color: 'rgba(255, 255, 255, 0.95)',
-              outline: 'none',
-              resize: 'none',
-              minHeight: isMobile ? '40px' : '60px',
-              maxHeight: isMobile ? '120px' : '120px',
-              fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-              boxSizing: 'border-box',
-              touchAction: 'manipulation',
-              WebkitTapHighlightColor: 'transparent'
-            }}
-          />
+              </>
+            ) : (
+              <>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  flex: 1
+                }}>
+                  <span style={{
+                    color: '#FFD700',
+                    fontSize: '12px',
+                    fontWeight: 'bold',
+                    fontFamily: 'monospace',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px',
+                    textShadow: '0 0 4px rgba(255, 215, 0, 0.6)'
+                  }}>
+                    USER: {username}
+                  </span>
+                  <button
+                    onClick={handleEditUsername}
+                    style={{
+                      padding: '1px 2px',
+                      background: 'rgba(0, 0, 0, 0.8)',
+                      border: '1px solid #FFD700',
+                      borderRadius: '0px',
+                      color: '#FFD700',
+                      fontSize: '8px',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s',
+                      fontFamily: 'monospace',
+                      fontWeight: 'bold',
+                      textTransform: 'uppercase',
+                      minWidth: '18px'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = 'rgba(255, 215, 0, 0.2)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = 'rgba(0, 0, 0, 0.8)';
+                    }}
+                  >
+                    EDIT
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
           
-          {/* Send button - compact circular button for mobile */}
-          <button
-            onClick={handleSendMessage}
-            disabled={!inputMessage.trim()}
-            style={{
-              width: isMobile ? '40px' : '60px',
-              height: isMobile ? '40px' : '40px',
-              background: inputMessage.trim() 
-                ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' 
-                : 'rgba(255, 255, 255, 0.15)',
-              border: 'none',
-              borderRadius: '20px',
-              color: 'white',
-              fontSize: isMobile ? '16px' : '14px',
-              fontWeight: 'bold',
-              cursor: inputMessage.trim() ? 'pointer' : 'not-allowed',
-              transition: 'all 0.2s',
-              opacity: inputMessage.trim() ? 1 : 0.5,
-              touchAction: 'manipulation',
-              WebkitTapHighlightColor: 'transparent',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0
-            }}
-          >
-            {isMobile ? '→' : 'Send'}
-          </button>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-end' }}>
+            <textarea
+              placeholder="TALK TO HIKARI..."
+              value={inputMessage}
+              onChange={(e) => setInputMessage(e.target.value)}
+              onKeyDown={handleKeyDown}
+              style={{
+                flex: 1,
+                background: 'rgba(0, 0, 0, 0.8)',
+                border: '2px solid #FFD700',
+                borderRadius: '0px',
+                padding: '10px 14px',
+                fontSize: '12px',
+                color: 'rgba(255, 255, 255, 0.9)',
+                outline: 'none',
+                resize: 'none',
+                minHeight: '40px',
+                maxHeight: '80px',
+                fontFamily: 'monospace',
+                lineHeight: '1.4'
+              }}
+              rows={2}
+            />
+            <button
+              onClick={handleSendMessage}
+              disabled={!inputMessage.trim() || !username.trim()}
+              style={{
+                padding: '10px 16px',
+                background: (inputMessage.trim() && username.trim()) ? 'rgba(255, 215, 0, 0.9)' : 'rgba(255, 215, 0, 0.3)',
+                border: '2px solid #FFD700',
+                borderRadius: '0px',
+                color: (inputMessage.trim() && username.trim()) ? '#000' : '#666',
+                fontSize: '11px',
+                cursor: (inputMessage.trim() && username.trim()) ? 'pointer' : 'not-allowed',
+                fontFamily: 'monospace',
+                fontWeight: 'bold',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px',
+                minHeight: '40px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              SEND
+            </button>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

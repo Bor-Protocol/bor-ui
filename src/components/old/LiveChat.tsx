@@ -15,6 +15,9 @@ export function LiveChat() {
   const { isChatInputVisible, isMobile } = useChatVisibility();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [expandedMessages, setExpandedMessages] = useState<Set<string>>(new Set());
+  const [liveChatHeight, setLiveChatHeight] = useState(120); // Default small size
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [userColors, setUserColors] = useState<Map<string, string>>(new Map());
   
   console.log('LiveChat rendering with', comments.length, 'comments');
 
@@ -39,129 +42,200 @@ export function LiveChat() {
   }, [comments.length, isMobile]);
 
   // Calculate how many messages to show based on screen size and input visibility
-  const maxMessages = isMobile ? 4 : 7; // Show 4 recent messages on mobile, 7 on desktop
-  const messageMaxLength = isMobile ? 60 : 100; // Slightly longer messages on mobile
+  const maxMessages = isMobile ? 50 : 50; // Show 50 messages on both mobile and desktop
+  const messageMaxLength = isMobile ? 80 : 120;
+
+  const toggleChatHeight = () => {
+    if (isExpanded) {
+      // Contract to default size
+      setLiveChatHeight(120);
+      setIsExpanded(false);
+    } else {
+      // Expand to larger size
+      setLiveChatHeight(300);
+      setIsExpanded(true);
+    }
+  };
+
+  // Generate random color for new users
+  const getUserColor = (username: string) => {
+    if (userColors.has(username)) {
+      return userColors.get(username)!;
+    }
+    
+    const colors = [
+      '#FF6B6B', // Red
+      '#4ECDC4', // Teal
+      '#45B7D1', // Blue
+      '#96CEB4', // Green
+      '#FECA57', // Yellow
+      '#FF9FF3', // Pink
+      '#54A0FF', // Light Blue
+      '#5F27CD', // Purple
+      '#00D2D3', // Cyan
+      '#FF9F43', // Orange
+      '#10AC84', // Emerald
+      '#EE5A24', // Dark Orange
+      '#0ABDE3', // Light Blue
+      '#C44569', // Dark Pink
+      '#F8B500'  // Amber
+    ];
+    
+    const randomColor = colors[Math.floor(Math.random() * colors.length)];
+    setUserColors(prev => new Map(prev).set(username, randomColor));
+    return randomColor;
+  };
  
   return (
-    <div className={`z-[0] pointer-events-none
-      ${isMobile 
-        ? '' // No positioning on mobile - controlled by parent
-        : 'absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent' // Keep desktop background
-      }`}>
+    <div style={{
+      background: isMobile 
+        ? 'linear-gradient(180deg, rgba(0, 0, 0, 0.0) 0%, rgba(0, 0, 0, 0.9) 100%)'
+        : 'rgba(0, 0, 0, 0.9)',
+      border: isMobile ? 'none' : '3px solid #FFD700',
+      borderRadius: '0px',
+      padding: isMobile ? '4px' : '6px',
+      boxShadow: isMobile ? 'none' : '0 0 20px rgba(255, 215, 0, 0.4), inset 0 0 15px rgba(0, 0, 0, 0.8)',
+      pointerEvents: 'none',
+      position: 'relative'
+    }}>
+      {/* Mobile height toggle button */}
+      {isMobile && (
+        <div style={{
+          position: 'absolute',
+          top: '2px',
+          right: '2px',
+          zIndex: 1
+        }}>
+          <button
+            onClick={toggleChatHeight}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              borderRadius: '0px',
+              color: '#333333',
+              fontSize: '20px',
+              fontWeight: 'bold',
+              width: '28px',
+              height: '24px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              pointerEvents: 'auto',
+              fontFamily: 'monospace'
+            }}
+          >
+            {isExpanded ? '−' : '+'}
+          </button>
+        </div>
+      )}
+      
+      {/* Gaming header bar - only on desktop */}
+      {!isMobile && (
+        <div style={{
+          borderBottom: '2px solid #FFD700',
+          marginBottom: '4px',
+          padding: '2px 6px',
+          background: 'linear-gradient(90deg, rgba(255, 215, 0, 0.2) 0%, transparent 100%)'
+        }}>
+          <span style={{
+            color: '#FFD700',
+            fontSize: '10px',
+            fontWeight: 'bold',
+            textTransform: 'uppercase',
+            letterSpacing: '1px',
+            textShadow: '0 0 4px rgba(255, 215, 0, 0.6)'
+          }}>
+            LIVE CHAT
+          </span>
+        </div>
+      )}
+      
       <div 
         ref={scrollContainerRef}
-        className={isMobile 
-          ? "h-40 overflow-y-auto scrollbar-hide space-y-2 flex flex-col pb-2" // Mobile: taller container (160px) with padding
-          : "mb-4 overflow-hidden space-y-0.5" // Desktop: unchanged
-        }>
-        {(isMobile ? comments : comments.slice(Math.max(comments.length - maxMessages, 0)))
+        style={{
+          height: isMobile ? `${liveChatHeight}px` : '400px',
+          overflowY: 'auto',
+          overflowX: 'hidden',
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '1px'
+        }}>
+        {comments
           .map((comment) => (
             <div
               key={comment.id}
-              className={`group flex items-start transition-all duration-300 ease-out animate-slide-up
-                ${isMobile 
-                  ? 'space-x-2 pointer-events-auto' // TikTok-style: minimal styling
-                  : 'space-x-3 p-1 rounded-lg pointer-events-auto'
-                }`}
+              style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                padding: isMobile ? '2px 4px' : '2px 6px',
+                borderLeft: '2px solid #FFD700',
+                background: 'linear-gradient(90deg, rgba(255, 215, 0, 0.1) 0%, transparent 70%)',
+                pointerEvents: 'auto',
+                animation: 'slideUp 0.3s ease-out',
+                opacity: 1,
+                cursor: isMobile ? 'pointer' : 'default'
+              }}
+              onClick={isMobile ? (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                toggleMessageExpansion(comment.id);
+              } : undefined}
             >
-              <div className="relative flex-shrink-0">
-                {comment.avatar ? (
-                  <img 
-                    src={comment.avatar} 
-                    alt="User Avatar" 
-                    className={`rounded-full transition-all
-                      ${isMobile 
-                        ? 'w-8 h-8 ring-1 ring-white/30' // Smaller, subtle ring on mobile
-                        : 'w-8 h-8 ring-2 ring-white-500/50 group-hover:ring-white-500'
-                      }`}
-                  />
-                ) : (
-                  // Generate avatar from first letter of username
-                  <div 
-                    className={`rounded-full transition-all flex items-center justify-center
-                      ${isMobile 
-                        ? 'w-8 h-8 ring-1 ring-white/30' // Smaller, subtle ring on mobile
-                        : 'w-8 h-8 ring-2 ring-white-500/50 group-hover:ring-white-500'
-                      }`}
-                    style={{
-                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                      fontSize: isMobile ? '12px' : '14px',
-                      fontWeight: 'bold',
-                      color: 'white'
-                    }}
-                  >
-                    {(comment.handle || 'G').charAt(0).toUpperCase()}
-                  </div>
-                )}
-              </div>
-              
-              <div className={`flex-1 min-w-0 ${isMobile ? 'max-w-none' : 'max-w-sm'}`}>
-                {isMobile ? (
-                  // Mobile: clickable expandable message bubbles
-                  <div 
-                    className="bg-black/60 backdrop-blur-sm rounded-2xl px-3 py-2 max-w-[280px] min-w-[120px] flex-shrink-0 cursor-pointer hover:bg-black/70 transition-all duration-200 select-none pointer-events-auto"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      toggleMessageExpansion(comment.id);
-                    }}
-                    style={{ WebkitTapHighlightColor: 'transparent' }}
-                    title="Click to expand message"
-                  >
-                    <div className="flex flex-col space-y-1">
-                      <span className="font-semibold text-white text-xs truncate max-w-[100px]">
-                        {comment.handle.length > 8 ? comment.handle.substring(0, 8) + '...' : comment.handle}
-                      </span>
-                      <div className="text-white/90 text-xs leading-relaxed break-words">
-                        {comment.message.includes('diamonds') ? (
-                          <div className="flex items-start space-x-1">
-                            <Diamond className="w-3 h-3 text-yellow-400 flex-shrink-0 mt-0.5" />
-                            <span className="text-yellow-100">
-                              {expandedMessages.has(comment.id) 
-                                ? comment.message 
-                                : truncateText(comment.message, messageMaxLength)
-                              }
-                            </span>
-                          </div>
-                        ) : (
-                          <span className="whitespace-pre-wrap">
-                            {expandedMessages.has(comment.id) 
-                              ? comment.message 
-                              : truncateText(comment.message, messageMaxLength)
-                            }
-                          </span>
-                        )}
-                        {!expandedMessages.has(comment.id) && comment.message.length > messageMaxLength && (
-                          <span className="text-white/40 text-xs"> ...click to expand</span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  // Desktop: keep existing style
-                  <>
-                    <div className="flex items-center space-x-2">
-                      <span className="font-bold text-sm text-white/80">
-                        {comment.handle}
-                      </span>
-                    </div>
-                    
-                    <div className="mt-0.5">
-                      {comment.message.includes('diamonds') ? (
-                        <div className="flex items-center space-x-2 bg-yellow-500/10 px-3 py-1.5 rounded-full inline-block">
-                          <Diamond className="w-4 h-4 text-yellow-400 flex-shrink-0" />
-                          <span className="text-yellow-100 text-sm break-words">
-                            {truncateText(comment.message, messageMaxLength)}
-                          </span>
-                        </div>
-                      ) : (
-                        <span className="leading-tight text-white/70 break-words text-[14px]">
-                          {truncateText(comment.message, messageMaxLength)}
-                        </span>
-                      )}
-                    </div>
-                  </>
-                )}
+              <div style={{ 
+                display: 'flex', 
+                flexDirection: 'row', 
+                gap: '6px', 
+                alignItems: 'baseline',
+                width: '100%'
+              }}>
+                <span style={{
+                  fontWeight: 'bold',
+                  color: getUserColor(comment.handle),
+                  fontSize: isMobile ? '14px' : '11px',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px',
+                  textShadow: `0 0 3px ${getUserColor(comment.handle)}80`,
+                  flexShrink: 0,
+                  fontFamily: 'monospace'
+                }}>
+                  {comment.handle.length > 12 ? comment.handle.substring(0, 12) : comment.handle}:
+                </span>
+                <span style={{
+                  color: comment.message.includes('diamonds') ? '#FEF3C7' : 'rgba(255, 255, 255, 0.85)',
+                  fontSize: isMobile ? '14px' : '11px',
+                  lineHeight: '1.2',
+                  fontFamily: 'monospace',
+                  flex: 1
+                }}>
+                  {comment.message.includes('diamonds') && (
+                    <Diamond style={{ 
+                      width: '10px', 
+                      height: '10px', 
+                      color: '#FFD700', 
+                      display: 'inline', 
+                      verticalAlign: 'text-bottom', 
+                      marginRight: '2px' 
+                    }} />
+                  )}
+                  {isMobile ? (
+                    expandedMessages.has(comment.id) 
+                      ? comment.message 
+                      : truncateText(comment.message, messageMaxLength)
+                  ) : (
+                    truncateText(comment.message, messageMaxLength)
+                  )}
+                  {isMobile && !expandedMessages.has(comment.id) && comment.message.length > messageMaxLength && (
+                    <span style={{ 
+                      color: '#FFD700', 
+                      fontSize: '9px', 
+                      opacity: 0.6,
+                      marginLeft: '2px'
+                    }}>[+]</span>
+                  )}
+                </span>
               </div>
             </div>
           ))}

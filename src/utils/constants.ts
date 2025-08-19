@@ -31,20 +31,20 @@ export const NEW_STREAM_CONFIGS: NewStreamConfig[] = [
        "environmentURL": "tt.glb",
        "models": [
          {
-           "model": "tromp.vrm",
+           "model": "5280075755292304359.vrm",
            "name": "Bor",
            "agentId": "795df77f-1620-07db-bd9a-0e2dfefef248",
            "description": "Bor",
            "clothes": "casual",
            "defaultAnimation": "idlet",
            "modelPosition": [
-             1.51,
-             -0.4999999999999999,
+             2.11,
+             -0.3999999999999999,
              -7.650000000000005
            ],
            "modelRotation": [
              0,
-             7.799999999999988,
+             7.999999999999988,
              0
            ],
            "modelScale": [

@@ -138,10 +138,37 @@ function SceneContent({  isActive, }: {
             {isLoading ? (
                 <SceneLoader />
             ) : (
-                <Canvas>
-                    <ThreeScene key={currentScene.id} debugMode={false} />
-                    {false && <OrbitControls />}
-                </Canvas>
+                <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+                    {/* Animated heaven background */}
+                    <iframe
+                        src="/heaven-scene.html"
+                        style={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            width: '100%',
+                            height: '100%',
+                            border: 'none',
+                            zIndex: 1,
+                            pointerEvents: 'none'
+                        }}
+                        title="Heaven Scene Background"
+                    />
+                    {/* 3D Canvas on top */}
+                    <Canvas style={{ 
+                        position: 'absolute', 
+                        top: 0, 
+                        left: 0, 
+                        width: '100%', 
+                        height: '100%', 
+                        zIndex: 2,
+                        background: 'transparent',
+                        pointerEvents: 'none' // Allow clicks to pass through to chat elements
+                    }}>
+                        <ThreeScene key={currentScene.id} debugMode={true} forceMaterialConversion={false} />
+                        {false && <OrbitControls />}
+                    </Canvas>
+                </div>
             )}
         </Suspense>
     );
@@ -162,11 +189,15 @@ const SceneWrapper: React.FC<SceneWrapperProps> = ({
                     <SceneContent scene={scene} isActive={activeScene === index} debugMode={false} orbitEnabled={false} />
                 </div>
                 
+
                 {/* Chat messages - positioned better for mobile */}
                 <div className={isMobile 
-                    ? "absolute bottom-20 left-2 right-2 max-w-sm" // Mobile: bottom-left, avoid input area
-                    : ""
-                }>
+                    ? "absolute bottom-32 left-2 right-2 max-w-sm" // Mobile: higher to avoid ChatSection collision
+                    : "absolute left-2 w-80" // Desktop: positioned above ChatSection
+                } style={{ 
+                    zIndex: 10001,
+                    bottom: isMobile ? undefined : 'calc(12rem - 50px)' // bottom-48 (12rem) minus 50px
+                }}>
                     <LiveChat />
                 </div>
                 
@@ -174,7 +205,7 @@ const SceneWrapper: React.FC<SceneWrapperProps> = ({
                 <div className={isMobile 
                     ? "absolute top-4 right-2" // Mobile: top-right corner
                     : ""
-                }>
+                } style={{ zIndex: 10002 }}>
                     <AIResponseDisplay />
                 </div>
             </div>

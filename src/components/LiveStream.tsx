@@ -61,12 +61,12 @@ export function LiveStream() {
       {/* Chat section is related to twitch and twitter received messages*/}
       <div style={{
         position: 'fixed',
-        right: isMobile ? '0' : '0',
-        bottom: isMobile ? '0' : '0', // On mobile, position at very bottom
-        left: isMobile ? '0' : 'auto',
+        left: isMobile ? '0' : '10px',
+        bottom: isMobile ? '0' : '10px', // Position at bottom on desktop
+        right: isMobile ? '0' : 'auto',
         width: isMobile ? '100%' : '320px',
         maxWidth: isMobile ? '100vw' : '320px',
-        zIndex: 9999,
+        zIndex: 10000, // Above the background layers
         // Add safe area support for mobile devices with notches
         paddingBottom: isMobile ? 'env(safe-area-inset-bottom)' : '0'
       }}>

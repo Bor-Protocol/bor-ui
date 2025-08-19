@@ -69,145 +69,326 @@ export default function AIResponseDisplay() {
           }
         >
           {isMobile ? (
-            // Mobile: interactive expandable response
-            <div className={`bg-black/50 backdrop-blur-sm rounded-2xl px-3 py-2 border border-white/20 shadow-lg transition-all duration-200 ${
-              isExpanded ? 'max-w-[300px]' : 'max-w-[240px]'
-            }`}>
-              {/* Header with controls */}
-              <div className="flex items-center justify-between mb-1">
-                <div className="flex items-center gap-2">
-                  <div className="w-5 h-5 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center flex-shrink-0">
-                    <span className="text-white text-xs font-bold">
-                      {AGENT_MAP[agentId]?.name?.[0] || 'A'}
-                    </span>
-                  </div>
-                  <span className="text-white text-xs font-semibold">
-                    {AGENT_MAP[agentId]?.name || 'Bor'}
+            // Mobile: gaming style compact
+            <div style={{
+              background: 'rgba(0, 0, 0, 0.9)',
+              border: '3px solid #FFD700',
+              borderRadius: '0px',
+              boxShadow: '0 0 20px rgba(255, 215, 0, 0.4), inset 0 0 15px rgba(0, 0, 0, 0.8)',
+              padding: '8px 12px',
+              maxWidth: isExpanded ? '300px' : '240px',
+              transition: 'all 0.2s ease',
+              fontFamily: 'monospace'
+            }}>
+              {/* Gaming header */}
+              <div style={{
+                borderBottom: '2px solid #FFD700',
+                marginBottom: '6px',
+                padding: '2px 4px',
+                background: 'linear-gradient(90deg, rgba(255, 215, 0, 0.2) 0%, transparent 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span style={{
+                    color: '#FFD700',
+                    fontSize: '9px',
+                    fontWeight: 'bold',
+                    textTransform: 'uppercase',
+                    letterSpacing: '1px',
+                    textShadow: '0 0 4px rgba(255, 215, 0, 0.6)'
+                  }}>
+                    AI: {AGENT_MAP[agentId]?.name || 'BOR'}
                   </span>
                 </div>
                 
-                {/* Control buttons */}
-                <div className="flex items-center gap-1">
+                {/* Gaming control buttons */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <button
                     onClick={handlePersistToggle}
-                    className="w-4 h-4 flex items-center justify-center rounded text-white/60 hover:text-white/90 text-xs"
-                    title={isPersisted ? "Unpin" : "Pin"}
+                    style={{
+                      background: 'rgba(0, 0, 0, 0.8)',
+                      border: '1px solid #FFD700',
+                      borderRadius: '0px',
+                      padding: '2px 4px',
+                      color: '#FFD700',
+                      fontSize: '8px',
+                      cursor: 'pointer',
+                      fontFamily: 'monospace',
+                      fontWeight: 'bold'
+                    }}
+                    title={isPersisted ? "UNPIN" : "PIN"}
                   >
-                    {isPersisted ? '📌' : '📍'}
+                    {isPersisted ? 'PIN' : 'PIN'}
                   </button>
                   <button
                     onClick={handleHide}
-                    className="w-4 h-4 flex items-center justify-center rounded text-white/60 hover:text-white/90 text-xs"
-                    title="Hide"
+                    style={{
+                      background: 'rgba(0, 0, 0, 0.8)',
+                      border: '1px solid #FFD700',
+                      borderRadius: '0px',
+                      padding: '2px 4px',
+                      color: '#FFD700',
+                      fontSize: '8px',
+                      cursor: 'pointer',
+                      fontFamily: 'monospace',
+                      fontWeight: 'bold'
+                    }}
+                    title="CLOSE"
                   >
-                    ✕
+                    X
                   </button>
                 </div>
               </div>
 
-              {/* Original message - clickable to expand */}
+              {/* Original message - gaming style */}
               {replyTo && replyToMessage && (
                 <div 
-                  className="text-white/70 text-xs mt-0.5 leading-tight overflow-hidden cursor-pointer hover:text-white/90 transition-colors select-none"
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    console.log('Original message clicked, isExpanded:', isExpanded);
                     handleExpandToggle();
                   }}
-                  style={{ WebkitTapHighlightColor: 'transparent' }}
-                  title="Click to expand"
+                  style={{
+                    color: 'rgba(255, 255, 255, 0.7)',
+                    fontSize: '10px',
+                    marginTop: '4px',
+                    lineHeight: '1.2',
+                    overflow: 'hidden',
+                    cursor: 'pointer',
+                    WebkitTapHighlightColor: 'transparent',
+                    fontFamily: 'monospace',
+                    padding: '4px',
+                    borderLeft: '2px solid #FFD700',
+                    background: 'linear-gradient(90deg, rgba(255, 215, 0, 0.1) 0%, transparent 50%)'
+                  }}
+                  title="TAP TO EXPAND"
                 >
-                  <div className={isExpanded 
-                    ? "whitespace-pre-wrap break-words" 
-                    : "whitespace-nowrap overflow-hidden text-ellipsis"
-                  }>
-                    "{replyToMessage}"
+                  <div style={{
+                    whiteSpace: isExpanded ? 'pre-wrap' : 'nowrap',
+                    overflow: isExpanded ? 'visible' : 'hidden',
+                    textOverflow: isExpanded ? 'clip' : 'ellipsis',
+                    wordBreak: isExpanded ? 'break-word' : 'normal'
+                  }}>
+{"> "}{replyToMessage}
                   </div>
                   {!isExpanded && replyToMessage && replyToMessage.length > 30 && (
-                    <span className="text-white/40 text-xs"> ...click to expand</span>
+                    <span style={{ color: '#FFD700', fontSize: '9px', opacity: 0.6 }}> [...]</span>
                   )}
                 </div>
               )}
               
-              {/* AI Response - clickable to expand */}
-              <div className="mt-2 pt-2 border-t border-white/10">
+              {/* AI Response - gaming style */}
+              <div style={{ marginTop: '6px' }}>
                 <p 
-                  className="text-white text-xs leading-tight overflow-hidden cursor-pointer hover:text-white/90 transition-colors select-none"
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    console.log('AI response clicked, isExpanded:', isExpanded);
                     handleExpandToggle();
                   }}
-                  style={{ 
+                  style={{
+                    color: 'rgba(255, 255, 255, 0.9)',
+                    fontSize: '10px',
+                    lineHeight: '1.3',
+                    overflow: 'hidden',
+                    cursor: 'pointer',
                     WebkitTapHighlightColor: 'transparent',
-                    ...(isExpanded ? { whiteSpace: 'pre-wrap', wordBreak: 'break-word' } : {
-                      display: '-webkit-box',
-                      WebkitLineClamp: 2,
-                      WebkitBoxOrient: 'vertical'
-                    })
+                    fontFamily: 'monospace',
+                    whiteSpace: isExpanded ? 'pre-wrap' : 'normal',
+                    wordBreak: isExpanded ? 'break-word' : 'normal',
+                    display: isExpanded ? 'block' : '-webkit-box',
+                    WebkitLineClamp: isExpanded ? 'none' : 2,
+                    WebkitBoxOrient: isExpanded ? 'horizontal' : 'vertical'
                   }}
-                  title="Click to expand"
+                  title="TAP TO EXPAND"
                 >
                   {text}
                 </p>
                 {!isExpanded && text.length > 80 && (
-                  <span className="text-white/40 text-xs">...click to read more</span>
+                  <span style={{ color: '#FFD700', fontSize: '9px', opacity: 0.6 }}>[TAP FOR MORE]</span>
                 )}
               </div>
               
-              {/* Persist indicator */}
+              {/* Persist indicator - gaming style */}
               {isPersisted && (
-                <div className="mt-1 text-white/50 text-xs text-center">
-                  📌 Pinned
+                <div style={{
+                  marginTop: '4px',
+                  color: '#FFD700',
+                  fontSize: '9px',
+                  textAlign: 'center',
+                  fontFamily: 'monospace',
+                  fontWeight: 'bold',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px'
+                }}>
+                  [PINNED]
                 </div>
               )}
             </div>
           ) : (
-            // Desktop: keep original large layout
-            <div className="bg-black/20 rounded-2xl">
-              {/* Agent Header */}
-              <div className="p-4 border-b border-white/10">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-black/25 flex items-center justify-center">
-                    <span className="text-white font-medium">
+            // Desktop: gaming style large layout
+            <div style={{
+              background: 'rgba(0, 0, 0, 0.9)',
+              border: '3px solid #FFD700',
+              borderRadius: '0px',
+              boxShadow: '0 0 20px rgba(255, 215, 0, 0.4), inset 0 0 15px rgba(0, 0, 0, 0.8)',
+              fontFamily: 'monospace'
+            }}>
+              {/* Gaming Agent Header */}
+              <div style={{
+                padding: '12px 16px',
+                borderBottom: '2px solid #FFD700',
+                background: 'linear-gradient(90deg, rgba(255, 215, 0, 0.2) 0%, transparent 100%)'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '0px',
+                    background: 'rgba(0, 0, 0, 0.8)',
+                    border: '2px solid #FFD700',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    <span style={{
+                      color: '#FFD700',
+                      fontWeight: 'bold',
+                      fontSize: '14px',
+                      textShadow: '0 0 4px rgba(255, 215, 0, 0.6)'
+                    }}>
                       {AGENT_MAP[agentId]?.name?.[0] || 'A'}
                     </span>
                   </div>
                   <div>
-                    <h3 className="font-medium text-white">
-                      {AGENT_MAP[agentId]?.name || 'Bor'}
+                    <h3 style={{
+                      fontWeight: 'bold',
+                      color: '#FFD700',
+                      fontSize: '14px',
+                      textTransform: 'uppercase',
+                      letterSpacing: '1px',
+                      textShadow: '0 0 4px rgba(255, 215, 0, 0.6)',
+                      margin: 0
+                    }}>
+                      AI AGENT: {AGENT_MAP[agentId]?.name || 'BOR'}
                     </h3>
+                  </div>
+                  {/* Desktop controls */}
+                  <div style={{ marginLeft: 'auto', display: 'flex', gap: '8px' }}>
+                    <button
+                      onClick={handlePersistToggle}
+                      style={{
+                        background: 'rgba(0, 0, 0, 0.8)',
+                        border: '2px solid #FFD700',
+                        borderRadius: '0px',
+                        padding: '4px 8px',
+                        color: '#FFD700',
+                        fontSize: '10px',
+                        cursor: 'pointer',
+                        fontFamily: 'monospace',
+                        fontWeight: 'bold',
+                        textTransform: 'uppercase'
+                      }}
+                    >
+                      {isPersisted ? 'UNPIN' : 'PIN'}
+                    </button>
+                    <button
+                      onClick={handleHide}
+                      style={{
+                        background: 'rgba(0, 0, 0, 0.8)',
+                        border: '2px solid #FFD700',
+                        borderRadius: '0px',
+                        padding: '4px 8px',
+                        color: '#FFD700',
+                        fontSize: '10px',
+                        cursor: 'pointer',
+                        fontFamily: 'monospace',
+                        fontWeight: 'bold',
+                        textTransform: 'uppercase'
+                      }}
+                    >
+                      CLOSE
+                    </button>
                   </div>
                 </div>
               </div>
 
-              {/* Reply Context */}
+              {/* Reply Context - gaming style */}
               {replyTo && (
-                <div className="px-4 py-2 bg-black/25">
-                  <div className="flex items-center gap-2">
-                    <img src={replyToPfp} alt={replyToHandle} className="w-5 h-5 rounded-full" />
-                    <span className="text-sm text-white">
-                      Replying to {replyToHandle}
+                <div style={{
+                  padding: '8px 16px',
+                  background: 'rgba(0, 0, 0, 0.6)',
+                  borderBottom: '1px solid #FFD700'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <img 
+                      src={replyToPfp} 
+                      alt={replyToHandle} 
+                      style={{
+                        width: '20px',
+                        height: '20px',
+                        borderRadius: '0px',
+                        border: '1px solid #FFD700'
+                      }}
+                    />
+                    <span style={{
+                      fontSize: '11px',
+                      color: '#FFD700',
+                      fontFamily: 'monospace',
+                      fontWeight: 'bold',
+                      textTransform: 'uppercase'
+                    }}>
+                      REPLY TO: {replyToHandle}
                     </span>
                   </div>
                   {replyToMessage && (
-                    <p className="mt-1 text-sm text-white/90 italic">
-                      "{replyToMessage}"
+                    <p style={{
+                      marginTop: '4px',
+                      fontSize: '11px',
+                      color: 'rgba(255, 255, 255, 0.8)',
+                      fontFamily: 'monospace',
+                      fontStyle: 'italic',
+                      padding: '4px',
+                      borderLeft: '2px solid #FFD700',
+                      background: 'linear-gradient(90deg, rgba(255, 215, 0, 0.1) 0%, transparent 50%)'
+                    }}>
+  {"> "}{replyToMessage}
                     </p>
                   )}
                 </div>
               )}
 
-              {/* Main Content */}
-              <div className="p-4">
-                <div className="prose prose-sm max-w-none">
-                  <p className="text-white leading-relaxed font-normal">
-                    {text}
-                  </p>
-                </div>
+              {/* Main Content - gaming style */}
+              <div style={{ padding: '16px' }}>
+                <p style={{
+                  color: 'rgba(255, 255, 255, 0.9)',
+                  lineHeight: '1.5',
+                  fontFamily: 'monospace',
+                  fontSize: '12px',
+                  margin: 0
+                }}>
+                  {text}
+                </p>
               </div>
+
+              {/* Persist indicator */}
+              {isPersisted && (
+                <div style={{
+                  padding: '8px',
+                  borderTop: '1px solid #FFD700',
+                  background: 'linear-gradient(90deg, rgba(255, 215, 0, 0.1) 0%, transparent 100%)',
+                  color: '#FFD700',
+                  fontSize: '10px',
+                  textAlign: 'center',
+                  fontFamily: 'monospace',
+                  fontWeight: 'bold',
+                  textTransform: 'uppercase',
+                  letterSpacing: '1px'
+                }}>
+                  [RESPONSE PINNED]
+                </div>
+              )}
             </div>
           )}
         </motion.div>

@@ -11,6 +11,7 @@ import {
   LoopOnce,
   LoopRepeat
 } from 'three';
+import * as THREE from 'three';
 import { loadMixamoAnimation } from '../old/loadMixamoAnimation';
 import { useScene } from '../../contexts/ScenesContext.js';
 // import Note from '../Note';
@@ -108,30 +109,10 @@ export const IPFS_BASE_URL = 'https://bafybeibgfj5zr3wtmbl6hgx5kuc4suiledti3ozkh
 
 
 
-// Make CafeEnvironment a proper React component
-const CafeEnvironment: React.FC<{ environmentUrl: string, config: SceneConfig }> = ({ environmentUrl: _environmentUrl, config }) => {
-  // console.log("CAFE_ENVIRONMENT", _environmentUrl)
-  const environmentUrl = getEnvironmentUrl(_environmentUrl)
-  const { scene } = useGLTF(environmentUrl);
-
-  if (!scene) {
-    console.error('Cafe scene is missing');
-    return null;
-  }
-
-  return (
-    <primitive
-      object={scene}
-      scale={config.environmentScale}
-      position={config.environmentPosition}
-      rotation={config.environmentRotation}
-    />
-  );
-};
 
 
 
-export function ThreeScene({ debugMode }: { debugMode: boolean }) {
+export function ThreeScene({ debugMode, forceMaterialConversion = true }: { debugMode: boolean, forceMaterialConversion?: boolean }) {
   const modelRefs = useRef<(Group | undefined)[]>([]);
   const vrmRefs = useRef<any[]>([]);
   const mixerRefs = useRef<(AnimationMixer | undefined)[]>([]); 
@@ -350,6 +331,59 @@ export function ThreeScene({ debugMode }: { debugMode: boolean }) {
 
             vrm.scene.traverse((obj: any) => {
               obj.frustumCulled = false;
+              
+              // Enable shadows and update materials to respond to lights
+              if (obj.isMesh) {
+                obj.castShadow = true;
+                obj.receiveShadow = true;
+                
+                // Convert VRM materials to standard materials that respond to lights (optional)
+                if (obj.material && forceMaterialConversion) {
+                  // Handle material arrays
+                  const materials = Array.isArray(obj.material) ? obj.material : [obj.material];
+                  
+                  materials.forEach((material, matIndex) => {
+                    // Store original material properties
+                    const originalColor = material.color ? material.color.clone() : null;
+                    const originalMap = material.map || null;
+                    const originalNormalMap = material.normalMap || null;
+                    const originalRoughnessMap = material.roughnessMap || null;
+                    const originalMetalnessMap = material.metalnessMap || null;
+                    
+                    // Force convert ALL materials to MeshStandardMaterial for light response
+                    if (!material.isMeshStandardMaterial) {
+                      const newMaterial = new THREE.MeshStandardMaterial({
+                        color: originalColor || 0xffffff,
+                        map: originalMap,
+                        normalMap: originalNormalMap,
+                        roughnessMap: originalRoughnessMap,
+                        metalnessMap: originalMetalnessMap,
+                        roughness: 0.6,
+                        metalness: 0.1,
+                        emissive: 0x000000,
+                        emissiveIntensity: 0
+                      });
+                      
+                      // Preserve transparency
+                      if (material.transparent) {
+                        newMaterial.transparent = true;
+                        newMaterial.opacity = material.opacity || 1.0;
+                        newMaterial.alphaTest = material.alphaTest || 0;
+                      }
+                      
+                      // Preserve side settings
+                      newMaterial.side = material.side || THREE.FrontSide;
+                      
+                      // Update the material
+                      if (Array.isArray(obj.material)) {
+                        obj.material[matIndex] = newMaterial;
+                      } else {
+                        obj.material = newMaterial;
+                      }
+                    }
+                  });
+                }
+              }
             });
 
             VRMUtils.rotateVRM0(vrm);
@@ -581,7 +615,6 @@ export function ThreeScene({ debugMode }: { debugMode: boolean }) {
         position={cameraPosition}
         rotation={[cameraPitch, cameraRotation, 0]}
       />
-      <CafeEnvironment environmentUrl={environmentUrl} config={sceneConfig} />
       {modelConfigs
         // Add filter to prevent duplicate agentIds
         .filter((model, index, self) => 
@@ -604,33 +637,46 @@ export function ThreeScene({ debugMode }: { debugMode: boolean }) {
           );
         })}
 
-      <ambientLight intensity={0.7} />
+      {/* Simple lighting for white background */}
+      <ambientLight intensity={1.2} color="#ffffff" />
+      
+      {/* Main directional light */}
       <directionalLight
-        position={[5, 5, 5]}  
+        position={[5, 10, 5]}
+        intensity={1.5}
+        color="#ffffff"
+        castShadow={false}
+      />
+      
+      {/* Side accent light (as requested) */}
+      <directionalLight
+        position={[-3, 5, 2]}
+        intensity={1.0}
+        color="#ffcc66"
+      />
+      
+      {/* Red side light from the left */}
+      <directionalLight
+        position={[-5, 2, 1]}
         intensity={1.2}
-        castShadow
-        shadow-mapSize={[2048, 2048]}
+        color="#ff3333"
+        castShadow={false}
       />
-      <directionalLight position={[-5, 5, -5]} intensity={0.8} />
+      
+      {/* Debug helpers to visualize lights */}
+      {debugMode && (
+        <>
+          <mesh position={[-2, 1.5, 1]}>
+            <sphereGeometry args={[0.1, 16, 16]} />
+            <meshBasicMaterial color="#ffcc66" />
+          </mesh>
+          <mesh position={[-2.5, 1.2, 0.5]}>
+            <sphereGeometry args={[0.1, 16, 16]} />
+            <meshBasicMaterial color="#ffa500" />
+          </mesh>
+        </>
+      )}
 
-      <Environment
-        preset="sunset"
-        background={false}
-        blur={0.8}
-      />
-
-      <mesh
-        rotation-x={-Math.PI / 2}
-        position-y={-1}
-        receiveShadow
-      >
-        <planeGeometry args={[50, 50]} />
-        <meshStandardMaterial
-          color="#232323"
-          roughness={0.8}
-          metalness={0.2}
-        />
-      </mesh>
     </>
   );
 }
