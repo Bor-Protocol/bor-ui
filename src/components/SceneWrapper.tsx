@@ -1,4 +1,4 @@
-import React, { Suspense, useRef, useState, useEffect, lazy } from 'react';
+import React, { Suspense, useRef, useState, useEffect, lazy, memo } from 'react';
 
 
 import { Canvas } from '@react-three/fiber';
@@ -36,7 +36,7 @@ interface OrbitingBallProps {
     delay: boolean;
 }
 
-export function OrbitingBall({ color, delay }: OrbitingBallProps) {
+export const OrbitingBall = memo(function OrbitingBall({ color, delay }: OrbitingBallProps) {
     return (
         <div
             className={`absolute left-1/2 top-1/2 -ml-1.5 -mt-1.5 ${delay ? 'animate-orbit-delayed' : 'animate-orbit'
@@ -45,9 +45,9 @@ export function OrbitingBall({ color, delay }: OrbitingBallProps) {
             <div className={`w-3 h-3 ${color} rounded-full shadow-lg`} />
         </div>
     );
-}
+});
 
-export function OrbitingBall2({ color: _color, delay }: OrbitingBallProps) {
+export const OrbitingBall2 = memo(function OrbitingBall2({ color: _color, delay }: OrbitingBallProps) {
     return (
         <div
             className={`absolute left-1/2 top-1/2 -ml-1.5 -mt-1.5 ${delay ? 'animate-orbit-delayed' : 'animate-orbit'
@@ -57,9 +57,9 @@ export function OrbitingBall2({ color: _color, delay }: OrbitingBallProps) {
             <img src={`/bow2.svg`} alt="Orbiting Ball" className="w-6 h-6" />
         </div>
     );
-}
+});
 
-export function SceneLoader() {
+export const SceneLoader = memo(function SceneLoader() {
     return (
         <div className="absolute inset-0 flex items-center justify-center">
             <div className="relative w-24 h-24">
@@ -73,12 +73,12 @@ export function SceneLoader() {
             </div>
         </div>
     );
-}
+});
 
 
 
 
-function SceneContent({  isActive, }: {
+const SceneContent = memo(function SceneContent({ scene, isActive, debugMode, orbitEnabled }: {
     scene: any,
     isActive: boolean,
     debugMode: boolean,
@@ -174,7 +174,7 @@ function SceneContent({  isActive, }: {
             )}
         </Suspense>
     );
-}
+});
 
 const SceneWrapper: React.FC<SceneWrapperProps> = ({
     scene,
@@ -215,4 +215,4 @@ const SceneWrapper: React.FC<SceneWrapperProps> = ({
     );
 };
 
-export default SceneWrapper;
+export default memo(SceneWrapper);

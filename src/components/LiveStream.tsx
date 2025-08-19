@@ -1,11 +1,11 @@
 import { ChatSection } from './ChatSection';
-import { useRef } from 'react';
+import { useRef, memo, useCallback, useMemo } from 'react';
 import { useScene } from '../contexts/ScenesContext';
 import SceneWrapper from './SceneWrapper';
 import { useChatVisibility } from '../contexts/ChatVisibilityContext';
 //import { useParams } from 'react-router-dom';
 
-export function LiveStream() {
+function LiveStreamComponent() {
   const { isChatInputVisible, setIsChatInputVisible, isMobile } = useChatVisibility();
   
   const {
@@ -15,9 +15,21 @@ export function LiveStream() {
   } = useScene();
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const handleToggleChat = () => {
+  const handleToggleChat = useCallback(() => {
     setIsChatInputVisible(!isChatInputVisible);
-  };
+  }, [isChatInputVisible, setIsChatInputVisible]);
+
+  const scenesWithProps = useMemo(() => 
+    scenes.map((scene, index) => ({
+      ...scene,
+      id: scene.id.toString(),
+      creator: {
+        ...scene.creator,
+        name: scene.creator.title,
+        description: scene.creator.title,
+      },
+      index
+    })), [scenes]);
 
   return (
     <div className="flex flex-1 h-full w-full">
@@ -32,24 +44,16 @@ export function LiveStream() {
           `}
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
-          {scenes.map((scene, index) => (
+          {scenesWithProps.map((scene) => (
             <div
-              key={scene.id || `scene-${index}`}
-              data-index={index}
-              data-scene-index={index}
+              key={scene.id || `scene-${scene.index}`}
+              data-index={scene.index}
+              data-scene-index={scene.index}
               className="h-full w-full snap-start snap-always flex flex-col"
             >
               <SceneWrapper
-                scene={{
-                  ...scene,
-                  id: scene.id.toString(),
-                  creator: {
-                    ...scene.creator,
-                    name: scene.creator.title,
-                    description: scene.creator.title,
-                  }
-                }}
-                index={index}
+                scene={scene}
+                index={scene.index}
               />
             </div>
           ))}
@@ -78,6 +82,8 @@ export function LiveStream() {
     </div>
   );
 }
+
+export const LiveStream = memo(LiveStreamComponent);
 
 
 

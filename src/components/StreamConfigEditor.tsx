@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { StreamConfigFormData } from '../types/configTypes';
 import { DEFAULT_STREAM_CONFIG } from '../utils/constants';
 import { LiveStream } from './LiveStream';
@@ -62,7 +62,7 @@ const dragHandleStyles = {
   touchAction: 'none',
 } as const;
 
-export const StreamConfigEditor: React.FC = () => {
+const StreamConfigEditorComponent: React.FC = () => {
   const { updateScene, newScenes: scenes } = useScene();
   
   // Log initial scenes
@@ -539,4 +539,6 @@ export const StreamConfigEditor: React.FC = () => {
       )}
     </div>
   );
-}; 
+};
+
+export const StreamConfigEditor = memo(StreamConfigEditorComponent); 

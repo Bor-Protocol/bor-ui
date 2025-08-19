@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, memo } from 'react';
 
 interface LinkProps {
   icon: ReactNode;
@@ -6,7 +6,7 @@ interface LinkProps {
   active?: boolean;
 }
 
-export function Link({ icon, text, active }: LinkProps) {
+const LinkComponent = ({ icon, text, active }: LinkProps) => {
   return (
     <a
       href="#"
@@ -18,4 +18,6 @@ export function Link({ icon, text, active }: LinkProps) {
       <span className="font-medium">{text}</span>
     </a>
   );
-}
+};
+
+export const Link = memo(LinkComponent);

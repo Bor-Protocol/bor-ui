@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback, useState, useMemo } from 'react';
+import { useEffect, useRef, useCallback, useState, useMemo, memo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { PerspectiveCamera, Environment, useGLTF } from '@react-three/drei';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
@@ -113,7 +113,7 @@ export const IPFS_BASE_URL = 'https://bafybeibgfj5zr3wtmbl6hgx5kuc4suiledti3ozkh
 
 
 
-export function ThreeScene({ debugMode, forceMaterialConversion = true }: { debugMode: boolean, forceMaterialConversion?: boolean }) {
+function ThreeSceneComponent({ debugMode, forceMaterialConversion = true }: { debugMode: boolean, forceMaterialConversion?: boolean }) {
   const modelRefs = useRef<(Group | undefined)[]>([]);
   const vrmRefs = useRef<any[]>([]);
   const mixerRefs = useRef<(AnimationMixer | undefined)[]>([]); 
@@ -850,4 +850,4 @@ export function ThreeScene({ debugMode, forceMaterialConversion = true }: { debu
   );
 }
 
-export default ThreeScene;
+export default memo(ThreeSceneComponent);

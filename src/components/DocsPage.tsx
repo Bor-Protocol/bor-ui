@@ -1,7 +1,8 @@
 import { ArrowRight, Sparkles, Clock } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { memo } from 'react';
 
-export const DocsPage = () => {
+const DocsPageComponent = () => {
   return (
     <div className="min-h-screen bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100">
       <Link 
@@ -86,4 +87,6 @@ export const DocsPage = () => {
       </div>
     </div>
   );
-}; 
+};
+
+export const DocsPage = memo(DocsPageComponent); 
