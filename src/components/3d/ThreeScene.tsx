@@ -269,6 +269,7 @@ export function ThreeScene({ debugMode, forceMaterialConversion = true }: { debu
 
   // Add a cleanup function to clear models with proper disposal
   const cleanupModels = useCallback(() => {
+    console.log('🧹 Starting comprehensive memory cleanup...');
     // Dispose of Three.js objects properly
     modelRefs.current.forEach((model, index) => {
       if (model) {
@@ -278,35 +279,104 @@ export function ThreeScene({ debugMode, forceMaterialConversion = true }: { debu
             // Dispose geometry
             if (object.geometry) {
               object.geometry.dispose();
+              object.geometry = null;
             }
             
             // Dispose materials (handle both single material and material arrays)
             if (object.material) {
               const materials = Array.isArray(object.material) ? object.material : [object.material];
               materials.forEach((material: any) => {
-                // Dispose textures
-                if (material.map) material.map.dispose();
-                if (material.normalMap) material.normalMap.dispose();
-                if (material.roughnessMap) material.roughnessMap.dispose();
-                if (material.metalnessMap) material.metalnessMap.dispose();
-                if (material.aoMap) material.aoMap.dispose();
-                if (material.emissiveMap) material.emissiveMap.dispose();
+                // Dispose all possible textures
+                const texturesToDispose = [
+                  'map', 'normalMap', 'roughnessMap', 'metalnessMap', 'aoMap', 'emissiveMap',
+                  'bumpMap', 'displacementMap', 'lightMap', 'envMap', 'specularMap',
+                  'alphaMap', 'gradientMap', 'clearcoatMap', 'clearcoatNormalMap',
+                  'clearcoatRoughnessMap', 'transmissionMap', 'thicknessMap',
+                  'sheenColorMap', 'sheenRoughnessMap', 'specularIntensityMap',
+                  'specularColorMap', 'iridescenceMap', 'iridescenceThicknessMap'
+                ];
+                
+                texturesToDispose.forEach(textureProperty => {
+                  if (material[textureProperty]) {
+                    material[textureProperty].dispose();
+                    material[textureProperty] = null;
+                  }
+                });
                 
                 // Dispose material
                 material.dispose();
               });
+              
+              // Clear material reference
+              object.material = null;
             }
+          }
+          
+          // Dispose additional object properties
+          if (object.skeleton) {
+            object.skeleton.dispose();
+          }
+          
+          if (object.morphTargetInfluences) {
+            object.morphTargetInfluences = null;
+          }
+          
+          if (object.userData) {
+            object.userData = {};
           }
         });
         
-        // Clear the model
+        // Remove from parent and clear the model
+        if (model.parent) {
+          model.parent.remove(model);
+        }
         model.clear();
+        
+        // Dispose of any remaining children
+        while (model.children.length > 0) {
+          const child = model.children[0];
+          model.remove(child);
+          if (child.dispose) {
+            child.dispose();
+          }
+        }
       }
       
       // Stop and dispose animation mixers
       if (mixerRefs.current[index]) {
-        mixerRefs.current[index]!.stopAllAction();
-        // Note: AnimationMixer doesn't have a dispose method, but stopping actions releases resources
+        const mixer = mixerRefs.current[index]!;
+        mixer.stopAllAction();
+        
+        // Uncache all clips to free memory
+        mixer.uncacheRoot(mixer.getRoot());
+        
+        // Remove all event listeners
+        mixer.removeEventListener('finished', () => {});
+        mixer.removeEventListener('loop', () => {});
+        
+        // Clear actions
+        if (actionsRefs.current[index]) {
+          Object.values(actionsRefs.current[index]).forEach(action => {
+            if (action) {
+              action.stop();
+            }
+          });
+        }
+      }
+    });
+    
+    // Dispose VRM instances
+    vrmRefs.current.forEach((vrm) => {
+      if (vrm) {
+        if (vrm.expressionManager) {
+          vrm.expressionManager.destroy();
+        }
+        if (vrm.humanoid && typeof vrm.humanoid.dispose === 'function') {
+          vrm.humanoid.dispose();
+        }
+        if (vrm.springBoneManager && typeof vrm.springBoneManager.dispose === 'function') {
+          vrm.springBoneManager.dispose();
+        }
       }
     });
     
@@ -321,6 +391,23 @@ export function ThreeScene({ debugMode, forceMaterialConversion = true }: { debu
       clearTimeout(nextAnimationTimeoutRef.current);
       nextAnimationTimeoutRef.current = null;
     }
+    
+    // Dispose audio context and related objects
+    if (analyserRef.current) {
+      analyserRef.current.disconnect();
+      analyserRef.current = null;
+    }
+    
+    if (dataArrayRef.current) {
+      dataArrayRef.current = null;
+    }
+    
+    if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
+      audioContextRef.current.close();
+      audioContextRef.current = null;
+    }
+    
+    console.log('✅ Memory cleanup completed successfully');
   }, []);
 
   // Add loading state
@@ -365,6 +452,7 @@ export function ThreeScene({ debugMode, forceMaterialConversion = true }: { debu
 
     // Use singleton loader
     const loader = loaderRef.current;
+    if (!loader) return;
 
     // Load each model in parallel
     const loadPromises = models.map((modelConfig, index) => {
@@ -390,7 +478,7 @@ export function ThreeScene({ debugMode, forceMaterialConversion = true }: { debu
                   // Handle material arrays
                   const materials = Array.isArray(obj.material) ? obj.material : [obj.material];
                   
-                  materials.forEach((material, matIndex) => {
+                  materials.forEach((material: any, matIndex: number) => {
                     // Store original material properties
                     const originalColor = material.color ? material.color.clone() : null;
                     const originalMap = material.map || null;
@@ -421,6 +509,9 @@ export function ThreeScene({ debugMode, forceMaterialConversion = true }: { debu
                       
                       // Preserve side settings
                       newMaterial.side = material.side || THREE.FrontSide;
+                      
+                      // Dispose old material before replacing
+                      material.dispose();
                       
                       // Update the material
                       if (Array.isArray(obj.material)) {
@@ -481,6 +572,11 @@ export function ThreeScene({ debugMode, forceMaterialConversion = true }: { debu
 
     return () => {
       cleanupModels();
+      
+      // Dispose GLTFLoader
+      if (loaderRef.current) {
+        loaderRef.current = undefined;
+      }
     };
   }, [models, cleanupModels]); // Add models to dependency array to reload when they change
 
@@ -489,9 +585,14 @@ export function ThreeScene({ debugMode, forceMaterialConversion = true }: { debu
     return () => {
       cleanupModels();
       
-      // Close audio context on unmount
-      if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
-        audioContextRef.current.close();
+      // Dispose GLTFLoader
+      if (loaderRef.current) {
+        loaderRef.current = undefined;
+      }
+      
+      // Dispose clock
+      if (clockRef.current) {
+        clockRef.current = undefined;
       }
     };
   }, []); // Only run on unmount
