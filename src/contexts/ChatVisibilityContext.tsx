@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useMemo, useCallback } from 'react';
 
 interface ChatVisibilityContextType {
   isChatInputVisible: boolean;
@@ -14,9 +14,14 @@ interface ChatVisibilityProviderProps {
 
 export function ChatVisibilityProvider({ children }: ChatVisibilityProviderProps) {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-  const [isChatInputVisible, setIsChatInputVisible] = useState(false);
+  const [isChatInputVisible, setIsChatInputVisibleState] = useState(false);
 
-  // Handle window resize
+  // Memoize the setter to maintain reference stability
+  const setIsChatInputVisible = useCallback((visible: boolean) => {
+    setIsChatInputVisibleState(visible);
+  }, []);
+
+  // Handle window resize with memoized handler
   useEffect(() => {
     const handleResize = () => {
       const mobile = window.innerWidth < 768;
@@ -28,19 +33,22 @@ export function ChatVisibilityProvider({ children }: ChatVisibilityProviderProps
     };
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  }, [setIsChatInputVisible]);
 
   // Initialize chat visibility based on screen size
   useEffect(() => {
     setIsChatInputVisible(!isMobile); // Hidden on mobile by default, visible on desktop
   }, [isMobile]);
 
+  // Memoize context value to prevent unnecessary re-renders
+  const value = useMemo(() => ({
+    isChatInputVisible,
+    setIsChatInputVisible,
+    isMobile
+  }), [isChatInputVisible, setIsChatInputVisible, isMobile]);
+
   return (
-    <ChatVisibilityContext.Provider value={{
-      isChatInputVisible,
-      setIsChatInputVisible,
-      isMobile
-    }}>
+    <ChatVisibilityContext.Provider value={value}>
       {children}
     </ChatVisibilityContext.Provider>
   );

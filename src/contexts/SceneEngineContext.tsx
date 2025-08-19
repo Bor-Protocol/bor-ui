@@ -1,5 +1,5 @@
 import { useSocket } from '../hooks/useSocket';
-import { createContext, useContext, ReactNode, useState, useEffect, useCallback, useRef } from 'react';
+import { createContext, useContext, ReactNode, useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useScene } from './ScenesContext';
 import { ANIMATION_MAP, getAnimationUrl, getMessageTimeout } from '../utils/constants';
 
@@ -459,7 +459,8 @@ export function SceneEngineProvider({ children }: SceneEngineProviderProps) {
     }
   }, [currentAgentId]);
 
-  const value: SceneEngineContextType = {
+  // Memoize context value to prevent unnecessary re-renders
+  const value: SceneEngineContextType = useMemo(() => ({
     currentResponse,
     audioRef,
     animation,
@@ -469,7 +470,16 @@ export function SceneEngineProvider({ children }: SceneEngineProviderProps) {
     playBackgroundMusic,
     stopBackgroundMusic,
     audioData,
-  };
+  }), [
+    currentResponse,
+    animation,
+    animationFile,
+    handleAnimation,
+    playBackgroundMusic,
+    stopBackgroundMusic,
+    audioData,
+    // audioRef and bgmRef are stable refs, no need to include them
+  ]);
 
 
   return (

@@ -322,51 +322,63 @@ export function SceneProvider({ children }: { children: ReactNode }) {
     ));
   };
 
+  // Memoize context value to prevent unnecessary re-renders
+  const value = useMemo(() => ({
+    currentAgentId,
+    nextAgentId,
+    prevAgentId,
+    
+    scenes: newScenes,
+    setCurrentAgentId,
+    updateSceneStats,
+    newScenes,
+
+    // Comments
+    comments,
+    commentCount,
+    setCommentCount,
+    addComment,
+    setComments,
+
+    // Scene Context
+    currentSceneIndex,
+    nextSceneIndex,
+    prevSceneIndex,
+    activeScene,
+    setCurrentSceneIndex,
+    setActiveScene,
+
+    sceneConfigIndex,
+    setSceneConfigIndex,
+    swapSceneConfig,
+    cycleSceneConfig,
+    swapSceneConfigByClothes,
+    availableSceneConfigs,
+    availableClothes,
+    updateScene,
+  }), [
+    currentAgentId,
+    nextAgentId,
+    prevAgentId,
+    newScenes,
+    comments,
+    commentCount,
+    addComment,
+    currentSceneIndex,
+    nextSceneIndex,
+    prevSceneIndex,
+    activeScene,
+    sceneConfigIndex,
+    swapSceneConfig,
+    cycleSceneConfig,
+    swapSceneConfigByClothes,
+    availableSceneConfigs,
+    availableClothes,
+    updateScene
+  ]);
+
   return (
-    <SceneContext.Provider
-      value={{
-        currentAgentId,
-        nextAgentId,
-        prevAgentId,
-        
-        scenes: newScenes,
-        setCurrentAgentId,
-        updateSceneStats,
-        newScenes,
-
-        // Comments
-        comments,
-        commentCount,
-        setCommentCount,
-        addComment,
-        setComments,
-
-        
-
-        // Scene Context
-        currentSceneIndex,
-        nextSceneIndex,
-        prevSceneIndex,
-        activeScene,
-        setCurrentSceneIndex,
-        setActiveScene,
-
-        // New properties
-       // isLoading,
-       // error,
-        //refreshScenes,
-
-
-        sceneConfigIndex,
-        setSceneConfigIndex,
-        swapSceneConfig,
-        cycleSceneConfig,
-        swapSceneConfigByClothes,
-        availableSceneConfigs,
-        availableClothes,
-        updateScene,
-      }}
-    >
+    <SceneContext.Provider value={value}>
       {children}
     </SceneContext.Provider>
   );
