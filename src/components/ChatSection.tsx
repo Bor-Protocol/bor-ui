@@ -121,14 +121,30 @@ useEffect(() => {
 
   const handleSendMessage = useCallback(async () => {
     if (inputMessage.trim() && username.trim()) {
+      const message = inputMessage.trim();
+      
+      // Check for links (URLs)
+      const urlPattern = /(?:https?:\/\/|www\.|ftp:\/\/|mailto:|tel:)/i;
+      if (urlPattern.test(message)) {
+        // Don't send if it contains a link
+        console.log('Message rejected: contains URL');
+        return;
+      }
+      
+      // Check message length
+      if (message.length > 300) {
+        // Don't send if over 300 characters
+        console.log('Message rejected: over 300 characters');
+        return;
+      }
+      
       try {
-        console.log('Sending message:', inputMessage.trim());
+        console.log('Sending message:', message);
         
         // Add the message locally
-        addComment(inputMessage.trim(), false, username.trim());
+        addComment(message, false, username.trim());
         
         // Clear input and show sending state
-        const sentMessage = inputMessage.trim();
         setInputMessage('');
 
       } catch (error) {
