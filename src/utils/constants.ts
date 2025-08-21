@@ -39,12 +39,12 @@ export const NEW_STREAM_CONFIGS: NewStreamConfig[] = [
            "defaultAnimation": "idlet",
            "modelPosition": [
              2.01,
-             -0.1499999999999999,
-             -7.650000000000005
+             -0.1599999999999999,
+             -7.730000000000005
            ],
            "modelRotation": [
              0,
-             7.999999999999988,
+             7.899999999999988,
              0
            ],
            "modelScale": [
