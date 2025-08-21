@@ -294,12 +294,15 @@ export function SceneEngineProvider({ children }: SceneEngineProviderProps) {
   }, []);
     // Process Message //
     const handleProcessMessage = useCallback((messageResponse: AIResponse) => {
+      console.log("handleAIResponse abdo with audio");
       console.log('processMessage started:', messageResponse);
       setCurrentResponse(messageResponse);
   
       if (messageResponse.audioUrl) {
+        console.log("handleAIResponse abdo with audioUrl");
         handleAudioResponse(messageResponse.audioUrl);
       } else {
+        console.log("handleAIResponse abdo without audioUrl");
         const timeout = getMessageTimeout(messageResponse.text);
         setTimeout(() => {
           setCurrentResponse(null);
@@ -318,9 +321,12 @@ export function SceneEngineProvider({ children }: SceneEngineProviderProps) {
   const handleAIResponse = useCallback((response: AIResponse) => {
     // Instead of checking currentResponse state, check if audio is currently playing
     if (audioRef.current && !audioRef.current.ended || !!currentResponse) {
+      console.log("handleAIResponse abdo with audio");
       // console.log('handleAIResponse: Audio playing, queueing new response');
       setMessageQueue(prev => [...prev, response]);
     } else {
+      //pass from here
+      console.log("handleAIResponse abdo without audio");
       // console.log('handleAIResponse: No audio playing, showing new response immediately');
       handleProcessMessage(response);
     }
