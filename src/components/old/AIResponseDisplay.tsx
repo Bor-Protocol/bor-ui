@@ -18,8 +18,19 @@ function AIResponseDisplayComponent() {
     setIsVisible(true);
     setIsExpanded(false); // Reset expansion on new message
     
-    // Only set timer if not already persisted
-    if (!isPersisted) {
+    // Wait for audio to finish before hiding
+    if (!isPersisted && audioRef?.current) {
+      const checkAudioEnded = () => {
+        setIsVisible(false);
+      };
+      
+      audioRef.current.addEventListener('ended', checkAudioEnded);
+      
+      return () => {
+        audioRef.current?.removeEventListener('ended', checkAudioEnded);
+      };
+    } else if (!isPersisted) {
+      // Fallback timer if no audio
       const hideTimer = setTimeout(() => {
         setIsVisible(false);
       }, 5000);
@@ -28,7 +39,7 @@ function AIResponseDisplayComponent() {
         clearTimeout(hideTimer);
       };
     }
-  }, [currentResponse?.text]); // Remove isPersisted from dependencies to avoid re-running
+  }, [currentResponse?.text, audioRef]); // Add audioRef to dependencies
 
   const handlePersistToggle = () => {
     setIsPersisted(!isPersisted);
@@ -80,67 +91,6 @@ function AIResponseDisplayComponent() {
               transition: 'all 0.2s ease',
               fontFamily: 'monospace'
             }}>
-              {/* Gaming header */}
-              <div style={{
-                borderBottom: '2px solid #FFD700',
-                marginBottom: '6px',
-                padding: '2px 4px',
-                background: 'linear-gradient(90deg, rgba(255, 215, 0, 0.2) 0%, transparent 100%)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span style={{
-                    color: '#FFD700',
-                    fontSize: '9px',
-                    fontWeight: 'bold',
-                    textTransform: 'uppercase',
-                    letterSpacing: '1px',
-                    textShadow: '0 0 4px rgba(255, 215, 0, 0.6)'
-                  }}>
-                    AI: {AGENT_MAP[agentId]?.name || 'BOR'}
-                  </span>
-                </div>
-                
-                {/* Gaming control buttons */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <button
-                    onClick={handlePersistToggle}
-                    style={{
-                      background: 'rgba(0, 0, 0, 0.8)',
-                      border: '1px solid #FFD700',
-                      borderRadius: '0px',
-                      padding: '2px 4px',
-                      color: '#FFD700',
-                      fontSize: '8px',
-                      cursor: 'pointer',
-                      fontFamily: 'monospace',
-                      fontWeight: 'bold'
-                    }}
-                    title={isPersisted ? "UNPIN" : "PIN"}
-                  >
-                    {isPersisted ? 'PIN' : 'PIN'}
-                  </button>
-                  <button
-                    onClick={handleHide}
-                    style={{
-                      background: 'rgba(0, 0, 0, 0.8)',
-                      border: '1px solid #FFD700',
-                      borderRadius: '0px',
-                      padding: '2px 4px',
-                      color: '#FFD700',
-                      fontSize: '8px',
-                      cursor: 'pointer',
-                      fontFamily: 'monospace',
-                      fontWeight: 'bold'
-                    }}
-                    title="CLOSE"
-                  >
-                    X
-                  </button>
-                </div>
-              </div>
 
               {/* Original message - gaming style */}
               {replyTo && replyToMessage && (
@@ -235,84 +185,6 @@ function AIResponseDisplayComponent() {
               boxShadow: '0 0 20px rgba(255, 215, 0, 0.4), inset 0 0 15px rgba(0, 0, 0, 0.8)',
               fontFamily: 'monospace'
             }}>
-              {/* Gaming Agent Header */}
-              <div style={{
-                padding: '12px 16px',
-                borderBottom: '2px solid #FFD700',
-                background: 'linear-gradient(90deg, rgba(255, 215, 0, 0.2) 0%, transparent 100%)'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <div style={{
-                    width: '32px',
-                    height: '32px',
-                    borderRadius: '0px',
-                    background: 'rgba(0, 0, 0, 0.8)',
-                    border: '2px solid #FFD700',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}>
-                    <span style={{
-                      color: '#FFD700',
-                      fontWeight: 'bold',
-                      fontSize: '14px',
-                      textShadow: '0 0 4px rgba(255, 215, 0, 0.6)'
-                    }}>
-                      {AGENT_MAP[agentId]?.name?.[0] || 'A'}
-                    </span>
-                  </div>
-                  <div>
-                    <h3 style={{
-                      fontWeight: 'bold',
-                      color: '#FFD700',
-                      fontSize: '14px',
-                      textTransform: 'uppercase',
-                      letterSpacing: '1px',
-                      textShadow: '0 0 4px rgba(255, 215, 0, 0.6)',
-                      margin: 0
-                    }}>
-                      AI AGENT: {AGENT_MAP[agentId]?.name || 'BOR'}
-                    </h3>
-                  </div>
-                  {/* Desktop controls */}
-                  <div style={{ marginLeft: 'auto', display: 'flex', gap: '8px' }}>
-                    <button
-                      onClick={handlePersistToggle}
-                      style={{
-                        background: 'rgba(0, 0, 0, 0.8)',
-                        border: '2px solid #FFD700',
-                        borderRadius: '0px',
-                        padding: '4px 8px',
-                        color: '#FFD700',
-                        fontSize: '10px',
-                        cursor: 'pointer',
-                        fontFamily: 'monospace',
-                        fontWeight: 'bold',
-                        textTransform: 'uppercase'
-                      }}
-                    >
-                      {isPersisted ? 'UNPIN' : 'PIN'}
-                    </button>
-                    <button
-                      onClick={handleHide}
-                      style={{
-                        background: 'rgba(0, 0, 0, 0.8)',
-                        border: '2px solid #FFD700',
-                        borderRadius: '0px',
-                        padding: '4px 8px',
-                        color: '#FFD700',
-                        fontSize: '10px',
-                        cursor: 'pointer',
-                        fontFamily: 'monospace',
-                        fontWeight: 'bold',
-                        textTransform: 'uppercase'
-                      }}
-                    >
-                      CLOSE
-                    </button>
-                  </div>
-                </div>
-              </div>
 
               {/* Reply Context - gaming style */}
               {replyTo && (
@@ -322,16 +194,28 @@ function AIResponseDisplayComponent() {
                   borderBottom: '1px solid #FFD700'
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <img 
-                      src={replyToPfp} 
-                      alt={replyToHandle} 
+                    <div 
                       style={{
                         width: '20px',
                         height: '20px',
                         borderRadius: '0px',
-                        border: '1px solid #FFD700'
+                        border: '1px solid #FFD700',
+                        background: 'rgba(0, 0, 0, 0.8)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
                       }}
-                    />
+                    >
+                      <span style={{
+                        color: '#FFD700',
+                        fontSize: '10px',
+                        fontWeight: 'bold',
+                        textTransform: 'uppercase',
+                        textShadow: '0 0 4px rgba(255, 215, 0, 0.6)'
+                      }}>
+                        {replyToHandle?.[0]?.toUpperCase() || '?'}
+                      </span>
+                    </div>
                     <span style={{
                       fontSize: '11px',
                       color: '#FFD700',
