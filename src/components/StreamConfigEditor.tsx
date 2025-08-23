@@ -1,6 +1,6 @@
 import React, { memo } from 'react';
 import { StreamConfigFormData } from '../types/configTypes';
-import { DEFAULT_STREAM_CONFIG } from '../utils/constants';
+import { DEFAULT_STREAM_CONFIG, DEFAULT_AGENT_ID } from '../utils/constants';
 import { LiveStream } from './LiveStream';
 import { useScene } from '../contexts/ScenesContext';
 
@@ -38,7 +38,7 @@ const DEFAULT_CONFIG: StreamConfigFormData = {
     character: {
       model: "tromp.vrm",
       name: "Bor",
-      agentId: "795df77f-1620-07db-bd9a-0e2dfefef248",
+      agentId: DEFAULT_AGENT_ID,
       description: "Bor",
       position: [1.51, -0.4999999999999999, -7.650000000000005],
       rotation: [0, 7.799999999999988, 0],
@@ -110,7 +110,7 @@ const StreamConfigEditorComponent: React.FC = () => {
           ...scenes[0].sceneConfigs[0].models[0],
           model: "tromp.vrm",
           name: "Bor",
-          agentId: "795df77f-1620-07db-bd9a-0e2dfefef248",
+          agentId: DEFAULT_AGENT_ID,
           description: "Bor",
           clothes: "casual",
           defaultAnimation: "idlet",
@@ -164,7 +164,7 @@ const StreamConfigEditorComponent: React.FC = () => {
         models: [{
           model: "tromp.vrm",
           name: "Bor",
-          agentId: "795df77f-1620-07db-bd9a-0e2dfefef248",
+          agentId: DEFAULT_AGENT_ID,
           description: "Bor",
           clothes: "casual",
           defaultAnimation: "idlet",

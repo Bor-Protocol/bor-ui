@@ -1,7 +1,9 @@
+import { DEFAULT_AGENT_ID } from '../utils/constants';
+
 export const NEW_STREAM_CONFIGS = {
   "id": 0,
   "title": "Trump stream",
-  "agentId": "795df77f-1620-07db-bd9a-0e2dfefef248",
+  "agentId": DEFAULT_AGENT_ID,
   "twitter": "@bor_live",
   "modelName": "Trump",
   "identifier": "Trump",
@@ -24,7 +26,7 @@ export const NEW_STREAM_CONFIGS = {
         {
           "model": "tromp.vrm",
           "name": "Bor",
-          "agentId": "795df77f-1620-07db-bd9a-0e2dfefef248",
+          "agentId": DEFAULT_AGENT_ID,
           "description": "Bor",
           "clothes": "casual",
           "defaultAnimation": "idlet",

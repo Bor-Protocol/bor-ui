@@ -1,5 +1,8 @@
 //Configuration Constants
 
+// Default Agent ID - centralized configuration
+export const DEFAULT_AGENT_ID = "795df77f-1620-07db-bd9a-0e2dfefef248";
+
 
 
 // Add BGM URL constants
@@ -14,7 +17,7 @@ export const NEW_STREAM_CONFIGS: NewStreamConfig[] = [
  {
    id: 0,
    title: "Trump stream",
-   agentId: "795df77f-1620-07db-bd9a-0e2dfefef248",
+   agentId: DEFAULT_AGENT_ID,
    twitter: "@bor_live",
    modelName: "Trump",
    identifier: "Trump",
@@ -33,7 +36,7 @@ export const NEW_STREAM_CONFIGS: NewStreamConfig[] = [
          {
            "model": "Marshmero_VRM_cluster_zirai.vrm",
            "name": "Bor",
-           "agentId": "795df77f-1620-07db-bd9a-0e2dfefef248",
+           "agentId": DEFAULT_AGENT_ID,
            "description": "Bor",
            "clothes": "casual",
            "defaultAnimation": "idlet",
