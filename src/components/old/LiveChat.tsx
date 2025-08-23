@@ -34,12 +34,12 @@ function LiveChatComponent() {
     });
   }, []);
 
-  // Auto-scroll to bottom on mobile when new messages arrive
+  // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
-    if (isMobile && scrollContainerRef.current) {
+    if (scrollContainerRef.current) {
       scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
     }
-  }, [comments.length, isMobile]);
+  }, [comments.length]);
 
   // Calculate how many messages to show based on screen size and input visibility
   const maxMessages = isMobile ? 50 : 50; // Show 50 messages on both mobile and desktop
